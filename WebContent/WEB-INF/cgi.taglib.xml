@@ -1,0 +1,384 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<facelet-taglib xmlns="http://java.sun.com/xml/ns/javaee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
+        http://java.sun.com/xml/ns/javaee/web-facelettaglibrary_2_0.xsd"
+	version="2.0">
+
+	<namespace>http://cgi.com/jsf/html</namespace>
+	<tag>
+		<tag-name>inputFile</tag-name>
+		<component>
+			<component-type>HtmlInputFile</component-type>
+		</component>
+	</tag>
+
+	<tag>
+		<description><![CDATA[<p>Represents an HTML <code>input</code> element
+		  of type <code>checkbox</code>.  The checkbox will
+		  be rendered as checked, or not, based on the value
+		  of the <code>value</code> property.</p>
+		  <p>This tag is equivalent to selectBooleanCheckbox component, but it
+		  allows to define a converter to select a String value instead of a
+		  boolean.</p>]]></description>
+		<display-name>Checkbox</display-name>
+		<tag-name>selectStringCheckbox</tag-name>
+		<component>
+			<component-type>cgi.faces.HtmlSelectStringCheckbox</component-type>
+		</component>
+	</tag>
+
+	<tag>
+		<tag-name>customBooleanConverter</tag-name>
+		<converter>
+			<converter-id>cgi.faces.Boolean</converter-id>
+			<handler-class>fr.logica.jsf.components.checkbox.ConvertBooleanHandler</handler-class>
+		</converter>
+		<attribute>
+			<name>trueValue</name>
+			<type>java.lang.Object</type>
+		</attribute>
+		<attribute>
+			<name>falseValue</name>
+			<type>java.lang.Object</type>
+		</attribute>
+	</tag>
+
+	<tag>
+		<tag-name>autocomplete</tag-name>
+		<component>
+			<component-type>logica.faces.autocomplete</component-type>
+			<renderer-type>logica.faces.AutocompleteRenderer</renderer-type>
+			<handler-class>fr.logica.jsf.components.autocomplete.AutocompleteHandler</handler-class>
+		</component>
+		<attribute>
+			<name>autocompleteMethod</name>
+			<required>true</required>
+		</attribute>
+		<attribute>
+			<name>minLength</name>
+			<required>false</required>
+			<type>java.lang.Integer</type>
+		</attribute>
+	</tag>
+
+	<tag>
+		<tag-name>schedule</tag-name>
+		<component>
+			<component-type>cgi.faces.HtmlSchedule</component-type>
+			<renderer-type>cgi.faces.Schedule</renderer-type>
+		</component>
+		<attribute>
+			<description>The value binding expression used to wire up this component to a component property of a JavaBean class.</description>
+			<name>binding</name>
+			<type>javax.faces.component.UIComponent</type>
+		</attribute>
+		<attribute>
+			<description>The initial date when the schedule loads.</description>
+			<name>date</name>
+			<required>false</required>
+			<type>java.util.Date</type>
+		</attribute>
+		<attribute>
+			<description>Javascript code executed when user clicks on a day.</description>
+			<name>dayClick</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>		
+		<attribute>
+			<description>The day that each week begins. The value must be a number that represents the day of the week. Sunday=0, Monday=1, Tuesday=2, etc.</description>
+			<display-name>First day</display-name>
+			<name>firstDay</name>
+			<required>false</required>
+			<type>java.lang.Integer</type>
+		</attribute>
+		<attribute>
+			<description>Determines the first hour that will be visible in the scroll pane. Values must be from 0-23, where 0=midnight, 1=1am, etc. The user will be able to scroll upwards to see events before this time. If you want to prevent users from doing this, use the minTime option instead.</description>
+			<display-name>First hour</display-name>
+			<name>firstHour</name>
+			<required>false</required>
+			<type>java.lang.Integer</type>
+		</attribute>
+        <attribute>
+            <description>The component identifier for this component. This value must be unique within the closest parent component that is a naming container.</description>
+            <display-name>Component Identifier</display-name>
+            <name>id</name>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>The text label for the schedule.</description>
+            <name>label</name>
+            <type>java.lang.String</type>
+        </attribute>
+		<attribute>
+			<description>The locale used to determine date format, day names, month names, etc.</description>
+			<name>locale</name>
+			<required>false</required>
+			<type>java.util.Locale</type>
+		</attribute>
+		<attribute>
+			<description>The first hour that will be displayed, even when the scrollbars have been scrolled all the way up.</description>
+			<display-name>Minimum time</display-name>
+			<name>minTime</name>
+			<required>false</required>
+			<type>java.lang.Integer</type>
+		</attribute>
+		<attribute>
+			<description>The last hour that will be displayed, even when the scrollbars have been scrolled all the way down.</description>
+			<display-name>Maximum time</display-name>
+			<name>maxTime</name>
+			<required>false</required>
+			<type>java.lang.Integer</type>
+		</attribute>
+        <attribute>
+            <description>Javascript code executed when this element loses focus and its value has been modified since gaining focus.</description>
+            <name>onchange</name>
+            <type>java.lang.String</type>
+        </attribute>
+		<attribute>
+			<description>Determines whether or not the events on the schedule can be modified.</description>
+			<name>readonly</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+        <attribute>
+            <description>Determines whether or not this component should be rendered (during Render Response Phase), or processed on any subsequent form submit.</description>
+            <name>rendered</name>
+            <type>boolean</type>
+        </attribute>
+		<attribute>
+			<description>Determines whether or not to include Saturday/Sunday columns in any of the schedule views.</description>
+			<display-name>Date</display-name>
+			<name>showWeekends</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description>The frequency for displaying time slots, in minutes.</description>
+			<display-name>Date</display-name>
+			<name>slotMinutes</name>
+			<required>false</required>
+			<type>java.lang.Integer</type>
+		</attribute>
+		<attribute>
+			<description>A list of ScheduleEvent objects that will be displayed on the schedule.</description>
+			<display-name>Date</display-name>
+			<name>value</name>
+			<required>true</required>
+			<type>java.util.List</type>
+		</attribute>
+		<attribute>
+			<description>The initial view when the schedule loads.</description>
+			<display-name>Date</display-name>
+			<name>view</name>
+			<required>false</required>
+			<type>fr.logica.jsf.components.schedule.ScheduleView</type>
+		</attribute>
+	</tag>
+
+	<tag>
+		<tag-name>wizard</tag-name>
+		<component>
+			<component-type>cgi.faces.HtmlWizard</component-type>
+			<renderer-type>cgi.faces.Wizard</renderer-type>
+			<handler-class>fr.logica.jsf.components.wizard.WizardHandler</handler-class>
+		</component>
+		<attribute>
+			<description>The value binding expression used to wire up this component to a component property of a JavaBean class.</description>
+			<name>binding</name>
+			<type>javax.faces.component.UIComponent</type>
+		</attribute>
+        <attribute>
+            <description>The component identifier for this component. This value must be unique within the closest parent component that is a naming container.</description>
+            <display-name>Component Identifier</display-name>
+            <name>id</name>
+            <type>java.lang.String</type>
+        </attribute>
+		<attribute>
+			<description>The locale used to display previous and next buttons' text.</description>
+			<name>locale</name>
+			<type>java.util.Locale</type>
+		</attribute>
+		<attribute>
+            <description>CSS style attribute.</description>
+            <name>style</name>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>CSS class attribute.</description>
+            <name>styleClass</name>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>MethodExpression representing the application action to invoke when the user tries to change the current step.
+            The expression must evaluate to a public method that takes a parameter of type WizardEvent, and returns a String which represents the step to display.</description>
+            <name>stepFlowListener</name>
+            <type>javax.el.MethodExpression</type>
+        </attribute>
+        <attribute>
+            <description>Determines whether or not this component should be rendered (during Render Response Phase), or processed on any subsequent form submit.</description>
+            <name>rendered</name>
+            <type>boolean</type>
+        </attribute>
+        <attribute>
+        	<description>The current step to display.</description>
+        	<name>value</name>
+        	<type>java.lang.String</type>
+        </attribute>
+	</tag>
+
+	<tag>
+		<tag-name>tabPanel</tag-name>
+		<component>
+			<component-type>cgi.faces.HtmlTabPanel</component-type>
+			<renderer-type>cgi.faces.TabPanel</renderer-type>
+		</component>
+		<attribute>
+			<description>The value binding expression used to wire up this component to a component property of a JavaBean class.</description>
+			<name>binding</name>
+			<type>javax.faces.component.UIComponent</type>
+		</attribute>
+        <attribute>
+            <description>The component identifier for this component. This value must be unique within the closest parent component that is a naming container.</description>
+            <display-name>Component Identifier</display-name>
+            <name>id</name>
+            <type>java.lang.String</type>
+        </attribute>
+		<attribute>
+            <description>CSS style attribute.</description>
+            <name>style</name>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>CSS class attribute.</description>
+            <name>styleClass</name>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>Determines whether or not this component should be rendered (during Render Response Phase), or processed on any subsequent form submit.</description>
+            <name>rendered</name>
+            <type>boolean</type>
+        </attribute>
+        <attribute>
+        	<description>The current tab to display.</description>
+        	<name>value</name>
+        	<type>java.lang.String</type>
+        </attribute>
+	</tag>
+
+	<tag>
+		<tag-name>tab</tag-name>
+		<component>
+			<component-type>cgi.faces.HtmlTab</component-type>
+		</component>
+		<attribute>
+			<description>The value binding expression used to wire up this component to a component property of a JavaBean class.</description>
+			<name>binding</name>
+			<type>javax.faces.component.UIComponent</type>
+		</attribute>
+        <attribute>
+            <description>The component identifier for this component. This value must be unique within the closest parent component that is a naming container.</description>
+            <display-name>Component Identifier</display-name>
+            <name>id</name>
+            <type>java.lang.String</type>
+        </attribute>
+		<attribute>
+            <description>CSS style attribute.</description>
+            <name>style</name>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>CSS class attribute.</description>
+            <name>styleClass</name>
+            <type>java.lang.String</type>
+        </attribute>
+		<attribute>
+			<description>The title of this tab.</description>
+			<name>title</name>
+			<required>true</required>
+			<type>java.lang.String</type>
+		</attribute>
+        <attribute>
+            <description>Determines whether or not this component should be rendered (during Render Response Phase), or processed on any subsequent form submit.</description>
+            <name>rendered</name>
+            <type>boolean</type>
+        </attribute>
+	</tag>
+
+	<tag>
+		<tag-name>map</tag-name>
+		<component>
+			<component-type>cgi.faces.HtmlMap</component-type>
+			<renderer-type>cgi.faces.Map</renderer-type>
+		</component>
+		<attribute>
+			<description>Determines whether or not the component's value can be modified.</description>
+			<name>disabled</name>
+			<type>boolean</type>
+		</attribute>
+		<attribute>
+			<description>The value binding expression used to wire up this component to a component property of a JavaBean class.</description>
+			<name>binding</name>
+			<type>javax.faces.component.UIComponent</type>
+		</attribute>
+        <attribute>
+            <description>The component identifier for this component. This value must be unique within the closest parent component that is a naming container.</description>
+            <display-name>Component Identifier</display-name>
+            <name>id</name>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>Alternative value to find the location to display.</description>
+            <display-name>String value (an address)</display-name>
+            <name>stringValue</name>
+            <type>java.lang.String</type>
+        </attribute>
+		<attribute>
+            <description>CSS style attribute.</description>
+            <name>style</name>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>CSS class attribute.</description>
+            <name>styleClass</name>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>Determines whether or not this component should be rendered (during Render Response Phase), or processed on any subsequent form submit.</description>
+            <name>rendered</name>
+            <type>boolean</type>
+        </attribute>
+	</tag>
+
+	<tag>
+		<tag-name>breadcrumbs</tag-name>
+		<component>
+			<component-type>cgi.faces.breadcrumbs</component-type>
+			<handler-class>fr.logica.jsf.components.breadcrumbs.BreadcrumbsHandler</handler-class>
+		</component>
+		<attribute>
+			<description>Deepest page for the breadcrumbs</description>
+			<name>page</name>
+			<required>true</required>
+			<type>fr.logica.ui.Page</type>
+		</attribute>
+		<attribute>
+			<description>Which method to call with the crumb chosen</description>
+			<name>method</name>
+			<required>true</required>
+			<type>javax.el.MethodExpression</type>
+		</attribute>
+		<attribute>
+			<description>Javascript to execute before following a crumb link</description>
+			<name>onclick</name>
+			<type>java.lang.String</type>
+		</attribute>
+	</tag>
+
+	<function>
+		<function-name>label</function-name>
+		<function-class>fr.logica.jsf.utils.LabelFunction</function-class>
+		<function-signature>java.lang.String label( java.lang.String, java.lang.String )</function-signature>
+	</function>
+
+</facelet-taglib>

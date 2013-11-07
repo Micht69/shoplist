@@ -1,0 +1,18 @@
+
+### Generated with layers
+* jsf2-3.0.0-SNAPSHOT
+* jweb-3.0.0-SNAPSHOT
+* sql-3.0.0-SNAPSHOT
+
+### Generation options
+databaseType=MYSQL
+dataGenerator=false
+beanValidation=false
+encoding=windows-1252
+webServer=tomcat7
+multiapp=false
+exportXls=true
+css=default
+datasource=auto
+
+### This file can be removed with generation option footprint=false.

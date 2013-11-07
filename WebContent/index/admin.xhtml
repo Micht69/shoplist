@@ -1,0 +1,78 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:f="http://java.sun.com/jsf/core"
+				xmlns:h="http://java.sun.com/jsf/html" xmlns:ui="http://java.sun.com/jsf/facelets"
+				xmlns:logica="http://java.sun.com/jsf/composite/logica" xmlns:hh="http://cgi.com/jsf/html"
+				template="/templates/generic.xhtml">
+
+<ui:define name="title">Application - <h:outputText value="#{sessionCtrl.version}" /></ui:define>
+<ui:define name="body">
+
+<hh:tabPanel id="tabs-selected_pageAdmin" styleClass="jquery-ui-tabs">
+	<hh:tab id="tabListConnections" title="#{hh:label('labels', 'adminPage.connectionTitle')}">
+		<div class="mainTable_container">
+			<div class="form_container" id="connection#{conn.id}">
+				<font color="red" style="font-style: italic;"><h:outputText value="#{hh:label('labels', 'results.nodata')}" rendered="#{empty jsfCtrl.listConnections}" /></font>
+			</div>
+			<ui:repeat var="conn" value="${jsfCtrl.listConnections}">
+				<h:panelGroup id="connection#{conn.id}" layout="none">
+				<div class="form_container" id="connection#{conn.id}">
+					<div class="form_title">
+						<h:outputText value="#{hh:label('labels', 'adminPage.connection')}" /><h:outputText value="#{conn.id}" />
+					</div>
+					<div class="actions">
+						<table style="width: 100%">
+							<tr>
+								<td style="text-align: left;">
+									<h:outputText value="#{hh:label('labels', 'adminPage.connectionClass')} : #{conn.connectionClass.name}" />
+								</td>
+								<td style="text-align: right;">
+									<h:commandButton id="fermerConnectionButton" alt='fermerConnectionButton' styleClass="btn_large" 
+									 value="#{hh:label('labels', 'action.fermerConnection')}"
+									 action="#{jsfCtrl.prepareAdminPageWithClosingConnection(conn.id)}" />
+								</td>
+							</tr>
+						</table>
+					</div>
+					<br />
+					<table class="group_table">
+						<tr>
+							<td class="group_table_col_1">
+								<h:outputText value="#{hh:label('labels', 'adminPage.stacktrace')} : "/><br />
+								<div style="height:100px; overflow-y:hidden;" id="stackTrace#{conn.id}">
+									<ui:repeat var="stackTrace" value="#{conn.stackTrace}">
+										<h:outputText value="#{stackTrace}"/><br />
+									</ui:repeat>
+								</div>
+								<div style="text-align:center; margin-top:15px;">
+									~ ~ ~ ~ ~ ~ <span id="stackTraceButton#{conn.id}" onclick="javascript:toggleStackTrace(#{conn.id})" style="cursor:pointer;"><h:outputText value="#{hh:label('labels', 'adminPage.plus')}"/></span> ~ ~ ~ ~ ~ ~
+								</div>
+							</td>
+						</tr>
+					</table>
+				</div>
+				</h:panelGroup>
+			</ui:repeat>
+		</div>
+	</hh:tab>
+	<hh:tab id="tabFootPrint" title="#{hh:label('labels', 'adminPage.footPrintTitle')}">
+		<div class="mainTable_container">
+			<div class="form_container" id="connection#{conn.id}">
+				<ui:include src="../includes/footprint.xhtml" />
+			</div>
+		</div>
+	</hh:tab>
+</hh:tabPanel>
+
+<script type="text/javascript" >
+function toggleStackTrace(idConn) {
+	if ($("#stackTraceButton" + idConn).html() == "#{hh:label('labels', 'adminPage.plus')}") {
+		$("#stackTraceButton" + idConn).html("#{hh:label('labels', 'adminPage.moins')}");
+		$("#stackTrace" + idConn).css({'height' : '', 'overflow-y' : ''});
+	} else {
+		$("#stackTraceButton" + idConn).html("#{hh:label('labels', 'adminPage.plus')}");
+		$("#stackTrace" + idConn).css({'height' : '100px', 'overflow-y' : 'hidden'});
+	}
+}
+</script>
+
+</ui:define>
+</ui:composition>

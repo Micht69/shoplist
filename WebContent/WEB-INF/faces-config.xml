@@ -1,0 +1,161 @@
+<?xml version="1.0"?>
+<faces-config xmlns="http://java.sun.com/xml/ns/javaee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-facesconfig_2_0.xsd"
+	version="2.0">
+    
+    <managed-bean>
+		<managed-bean-name>sessionCtrl</managed-bean-name>
+		<managed-bean-class>fr.logica.jsf.controller.SessionController</managed-bean-class>
+		<managed-bean-scope>session</managed-bean-scope>
+	</managed-bean>
+	
+	<managed-bean>
+		<managed-bean-name>jsfCtrl</managed-bean-name>
+		<managed-bean-class>fr.logica.jsf.controller.JSFController</managed-bean-class>
+		<managed-bean-scope>session</managed-bean-scope>
+		<managed-property>
+			<property-name>sessionCtrl</property-name>
+			<value>#{sessionCtrl}</value>
+		</managed-property>
+	</managed-bean>
+	
+	<managed-bean>
+		<managed-bean-name>commentCtrl</managed-bean-name>
+		<managed-bean-class>fr.logica.jsf.controller.CommentController</managed-bean-class>
+		<managed-bean-scope>session</managed-bean-scope>
+		<managed-property>
+			<property-name>sessionCtrl</property-name>
+			<value>#{sessionCtrl}</value>
+		</managed-property>
+	</managed-bean>
+
+    <managed-bean>
+		<managed-bean-name>tabeditCtrl</managed-bean-name>
+		<managed-bean-class>fr.logica.jsf.controller.TabeditController</managed-bean-class>
+		<managed-bean-scope>view</managed-bean-scope>
+		<managed-property>
+			<property-name>jsfCtrl</property-name>
+			<value>#{jsfCtrl}</value>
+		</managed-property>
+		<managed-property>
+			<property-name>sessionCtrl</property-name>
+			<value>#{sessionCtrl}</value>
+		</managed-property>
+	</managed-bean>
+
+	<application>
+		<message-bundle>fr.logica.messages</message-bundle>
+		<resource-bundle>
+			<base-name>fr.logica.labels</base-name>
+			<var>labels</var>
+		</resource-bundle>
+		<resource-bundle>
+			<base-name>fr.logica.genlabels</base-name>
+			<var>genlabels</var>
+		</resource-bundle>
+		<resource-bundle>
+			<base-name>fr.logica.messages</base-name>
+			<var>messages</var>
+		</resource-bundle>
+		<resource-bundle>
+			<base-name>fr.logica.titles</base-name>
+			<var>titles</var>
+		</resource-bundle>
+		<resource-bundle>
+			<base-name>fr.logica.custom</base-name>
+			<var>custom</var>
+		</resource-bundle>
+		<resource-handler>
+			fr.logica.jsf.utils.ImageResourceHandlerWrapper
+		</resource-handler>
+		<system-event-listener>
+			<system-event-listener-class>fr.logica.jsf.exception.ExceptionEventListener</system-event-listener-class>
+			<system-event-class>javax.faces.event.ExceptionQueuedEvent</system-event-class>
+		</system-event-listener>
+		<locale-config>
+			<default-locale>fr</default-locale>
+			<supported-locale>fr</supported-locale>
+		</locale-config>
+	</application>
+
+	<navigation-rule>
+		<navigation-case>
+			<from-outcome>jvmError</from-outcome>
+			<to-view-id>/errors/jvmError.xhtml</to-view-id>
+		</navigation-case>
+		<navigation-case>
+			<from-outcome>timeout</from-outcome>
+			<to-view-id>/index/accueil.xhtml</to-view-id>
+		</navigation-case>
+		<navigation-case>
+			<from-outcome>error</from-outcome>
+			<to-view-id>/errors/error.xhtml</to-view-id>
+		</navigation-case>
+	</navigation-rule>
+
+	<factory>
+		<exception-handler-factory>fr.logica.jsf.exception.LogicaExceptionHandlerFactory</exception-handler-factory>
+	</factory>
+
+	<converter>
+		<converter-id>customDateTimeConverter</converter-id>
+		<converter-class>fr.logica.jsf.utils.CustomDateTimeConverter</converter-class>
+	</converter>
+	
+	<converter>
+		<converter-id>customTimestampConverter</converter-id>
+		<converter-class>fr.logica.jsf.utils.CustomTimestampConverter</converter-class>
+	</converter>
+
+	<converter>
+		<converter-id>customTimeConverter</converter-id>
+		<converter-class>fr.logica.jsf.utils.CustomTimeConverter</converter-class>
+	</converter>
+
+	<converter>
+		<converter-id>defaultIntegerConverter</converter-id>
+		<converter-class>javax.faces.convert.IntegerConverter</converter-class>
+	</converter>
+	
+	<converter>
+		<converter-id>customBigDecimalConverter</converter-id>
+		<converter-class>fr.logica.jsf.utils.CustomBigDecimalConverter</converter-class>
+	</converter>
+
+	<validator>
+		<validator-id>numberValidator</validator-id>
+		<validator-class>fr.logica.jsf.utils.NumberValidator</validator-class>
+		<attribute>
+			<attribute-name>precision</attribute-name>
+			<attribute-class>java.lang.String</attribute-class>
+		</attribute>
+		<attribute>
+			<attribute-name>scale</attribute-name>
+			<attribute-class>java.lang.String</attribute-class>
+		</attribute>
+	</validator> 
+	
+	<render-kit>
+	    <renderer>
+	        <component-family>javax.faces.SelectOne</component-family>
+	        <renderer-type>javax.faces.Radio</renderer-type>
+	        <renderer-class>fr.logica.jsf.renderer.RadioRenderer</renderer-class>
+	    </renderer>
+	    <renderer>
+	        <component-family>javax.faces.Data</component-family>
+	        <renderer-type>javax.faces.Table</renderer-type>
+	        <renderer-class>fr.logica.jsf.renderer.DatatableRenderer</renderer-class>
+	    </renderer>
+	    <renderer>
+	        <component-family>javax.faces.Panel</component-family>
+	        <renderer-type>javax.faces.Group</renderer-type>
+	        <renderer-class>fr.logica.jsf.renderer.PanelGroupRenderer</renderer-class>
+	    </renderer>
+	    <renderer>
+	        <component-family>org.primefaces.component</component-family>
+	        <renderer-type>org.primefaces.component.TreeTableRenderer</renderer-type>
+	        <renderer-class>fr.logica.jsf.renderer.TreeTableRenderer</renderer-class>
+	    </renderer>
+	</render-kit>
+</faces-config>

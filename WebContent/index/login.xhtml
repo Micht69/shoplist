@@ -1,0 +1,41 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:f="http://java.sun.com/jsf/core"
+				xmlns:h="http://java.sun.com/jsf/html" xmlns:ui="http://java.sun.com/jsf/facelets"
+				xmlns:logica="http://java.sun.com/jsf/composite/logica" xmlns:hh="http://cgi.com/jsf/html"
+				template="/templates/generic.xhtml">
+
+<ui:define name="title">Application - <h:outputText value="#{sessionCtrl.version}" /></ui:define>
+<ui:define name="body">
+
+<div class="actions">
+	<table style="width: 100%">
+		<tr>
+			<td style="text-align: right;">
+
+				<h:commandButton styleClass="btn_medium" value="#{labels['action.login']}" action="#{sessionCtrl.login}" />
+
+			</td>
+		</tr>
+	</table>
+</div>
+<div class="form_container login">
+	<div class="form_title">
+			<h:outputText styleClass="page_title" value="#{labels['login.title']}" />
+	</div><!-- form_title -->
+	<h:panelGrid columns="3" columnClasses="colFieldSetLeft, colFieldSetMid, colFieldSetRight">
+		<h:outputText value="#{labels['login.login']}" />
+		<h:outputText value=":" />
+		<h:panelGrid columns="2">
+			<h:inputText value="#{sessionCtrl.form.login}" label="Login" style="width: 160px;" autocomplete="off" autocorrect="off" autocapitalize="off" />
+			<h:outputText value="#{labels['login.help']}" escape="false" />
+	 	</h:panelGrid>
+			<h:outputText value="#{labels['login.password']}" />
+			<h:outputText value=":" />
+		<h:panelGrid columns="2">
+			<h:inputSecret value="#{sessionCtrl.form.password}" label="Mot de passe" style="width: 160px;" autocorrect="off" autocapitalize="off" />
+			<h:outputText value="#{labels['login.help']}" escape="false" />
+	 	</h:panelGrid>
+ 	</h:panelGrid>
+</div>
+
+</ui:define>
+</ui:composition>

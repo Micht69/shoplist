@@ -1,0 +1,43 @@
+<?xml version="1.0" ?> 
+<project name="shoplist" default="war" basedir="..">
+	
+	<property environment="env"/>
+
+	<path id="compile.classpath">
+		<fileset dir="WebContent/WEB-INF/lib">
+			<include name="*.jar"/>
+		</fileset>
+		<fileset dir="${env.TOMCAT_LIB_DIR}">
+			<include name="*.jar"/>
+		</fileset>
+	</path>
+	
+	<target name="init">
+		<mkdir dir="dist/build/classes" />
+	</target>
+	
+	<target name="compile" depends="init" >
+		<javac destdir="dist/build/classes" debug="true" srcdir="src" source="1.6" target="1.6" includeantruntime="false" encoding="iso-8859-1">
+			<classpath refid="compile.classpath"/>
+		</javac>
+		<copy todir="dist/build/classes">
+			<fileset dir="src">
+				<include name="**/*.properties" />
+				<include name="**/*.xml" />
+			</fileset>
+		</copy>
+	</target>
+	
+	<target name="war" depends="clean, compile">
+		<war destfile="dist/shoplist.war" webxml="WebContent/WEB-INF/web.xml">
+			<fileset dir="WebContent"/>
+			<lib dir="WebContent/WEB-INF/lib"/>
+			<classes dir="dist/build/classes"/>
+		</war>
+	</target>
+	
+	<target name="clean">
+		<delete dir="dist" />
+	</target>
+	
+</project>

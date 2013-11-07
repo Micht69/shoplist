@@ -1,0 +1,21 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:f="http://java.sun.com/jsf/core"
+				xmlns:h="http://java.sun.com/jsf/html" xmlns:ui="http://java.sun.com/jsf/facelets"
+				xmlns:logica="http://java.sun.com/jsf/composite/logica" xmlns:hh="http://cgi.com/jsf/html"
+				template="/templates/generic.xhtml">
+
+<ui:define name="title">Application - <h:outputText value="#{sessionCtrl.version}" /></ui:define>
+<ui:define name="body">
+<div class="actions">
+	<table style="width: 100%">
+		<tr>
+			<td style="display: none;">
+
+				<h:commandButton styleClass="btn_medium" value="#{labels['action.valider']}" action="#{sessionCtrl.redirectFromAccueil}" />
+
+				<script type="text/javascript">setTimeout('goToDefaultPage()', 100);</script>
+			</td>
+		</tr>
+	</table>
+</div>
+</ui:define>
+</ui:composition>

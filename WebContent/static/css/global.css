@@ -1,0 +1,158 @@
+@charset "utf-8";
+
+/* Div block to reset columns */
+.clear {
+	clear: both;
+	height: 0px;
+	font-size: 0;
+	line-height: 0;
+}
+
+
+
+/*****************************************************************************/
+/*                          Reset of page elements                           */
+/*****************************************************************************/
+
+html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p,
+blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em,
+font, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var,
+dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody,
+tfoot, thead, tr, th, td {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	outline: 0;
+	font-weight: inherit;
+	font-size: 100%;
+	font-family: inherit;
+	vertical-align: baseline;
+}
+
+
+
+/*****************************************************************************/
+/*                      Default behavior for a few tags                      */
+/*****************************************************************************/
+
+ol, ul {
+	list-style: none;
+}
+
+th, td {
+	vertical-align: middle;
+}
+
+
+
+/*****************************************************************************/
+/*                              General layout                               */
+/*****************************************************************************/
+
+html, body {
+	width: 100%;
+	height: 100%;
+}
+
+div.wrapper {
+	height: 100%;
+}
+
+
+
+/*****************************************************************************/
+/*                                  Header                                   */
+/*****************************************************************************/
+
+div.header {
+	position: static;
+	z-index: 2000;
+}
+
+.header_left .header_title {
+	position: absolute;
+	width: 100%;
+}
+
+/* client logo */
+div.header_left img {
+	position:relative;
+	z-index: 2001;
+}
+
+/* Application menu : see menu.css */
+
+/* breadcrumbs */
+.ariane {
+    list-style: none outside none;
+    width : 79%
+}
+
+.ariane:empty {
+	display: none;
+}
+
+
+/*****************************************************************************/
+/*                                  Content                                  */
+/*****************************************************************************/
+
+.content {
+	width: 79%;
+	margin: 0 auto;
+}
+
+
+
+/*****************************************************************************/
+/*                                  Footer                                   */
+/*****************************************************************************/
+
+.footer {
+	position: fixed;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 2000;
+	min-height: 40px;
+	*zoom: 1; /* IE<8 only, hence the asterisk */
+}
+
+.footer ul {
+    padding: 10px 0;
+    text-align: right;
+	list-style-type: none;
+}
+
+.footer ul li {
+	display: inline;
+}
+
+
+
+/*****************************************************************************/
+/*                            Login page specific                            */
+/*****************************************************************************/
+
+.login > table {
+	width: 100%;
+	position: relative;
+}
+
+.page_title_td > .page_title {
+	position: relative;
+	bottom: -41px;
+	z-index: 1;
+}
+
+
+
+/******************************************************************************
+ * Modals
+ *****************************************************************************/
+
+.modal-prototype {
+	display: none;
+	z-index: 5000;
+}
+

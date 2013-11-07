@@ -1,0 +1,82 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" 
+				xmlns:ui="http://java.sun.com/jsf/facelets" 
+				template="/templates/generic.xhtml" 
+				xmlns:h="http://java.sun.com/jsf/html" 
+				xmlns:hh="http://cgi.com/jsf/html"
+				xmlns:f="http://java.sun.com/jsf/core">
+
+	<ui:define name="title">Erreur inattendue</ui:define>
+
+	<ui:define name="body">
+		<h2><h:outputText value="#{hh:label('messages', 'error.bug')}" /></h2><br />
+		
+		<h:panelGroup rendered="#{!jsfCtrl.pageIsActionPage()}">
+			<div class="form_container" id="contextVars">
+				<div class="form_title">
+					<h:outputText value="#{hh:label('labels', 'errorPage.contextVars')}" />
+				</div>
+				<table class="group_table">
+					<tr>
+						<td class="group_table_col_1">
+							Query : <h:outputText value="#{jsfCtrl.getListPage().queryName}"/><br />
+							<br />
+						</td>
+					</tr>
+				</table>
+			</div>
+		</h:panelGroup>
+		<h:panelGroup rendered="#{jsfCtrl.pageIsActionPage()}">
+			<div class="form_container" id="contextVars">
+				<div class="form_title">
+					<h:outputText value="#{hh:label('labels', 'errorPage.contextVars')}" />
+				</div>
+				<table class="group_table">
+					<tr>
+						<td class="group_table_col_1">
+							Nom du domaine : <h:outputText value="#{jsfCtrl.getActionPage().domainName}"/><br />
+							Action : <h:outputText value="#{jsfCtrl.getActionPage().action}"/><br />
+							<ui:repeat var="key" value="#{jsfCtrl.getActionPage().keyList}">
+							Clé : <h:outputText value="#{key}"/><br />
+							</ui:repeat>
+							<br />
+						</td>
+					</tr>
+				</table>
+			</div>
+		</h:panelGroup>
+		
+		<h:panelGroup layout="none">
+			<div class="form_container" id="stackTraceGroup">
+				<div class="form_title">
+					<h:outputText value="#{hh:label('labels', 'errorPage.stacktrace')}" />
+				</div>
+				<table class="group_table">
+					<tr>
+						<td class="group_table_col_1">
+							<div style="height:300px; overflow-y:hidden;" id="stackTrace">
+								<h:outputText escape="false" value="#{exception}" />
+							</div>
+							<div style="text-align:center; margin-top:15px;">
+								~ ~ ~ ~ ~ ~ <span id="stackTraceButton" onclick="javascript:toggleStackTrace()" style="cursor:pointer;"><h:outputText value="#{hh:label('labels', 'errorPage.plus')}"/></span> ~ ~ ~ ~ ~ ~
+							</div>
+						</td>
+					</tr>
+				</table>
+			</div>
+		</h:panelGroup>
+			
+		<script type="text/javascript" >
+		function toggleStackTrace() {
+			if ($("#stackTraceButton").html() == "#{hh:label('labels', 'errorPage.plus')}") {
+				$("#stackTraceButton").html("#{hh:label('labels', 'errorPage.moins')}");
+				$("#stackTrace").css({'height' : '', 'overflow-y' : ''});
+			} else {
+				$("#stackTraceButton").html("#{hh:label('labels', 'errorPage.plus')}");
+				$("#stackTrace").css({'height' : '300px', 'overflow-y' : 'hidden'});
+			}
+		}
+		</script>
+		
+	</ui:define>
+
+</ui:composition>

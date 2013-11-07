@@ -1,0 +1,47 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:f="http://java.sun.com/jsf/core" xmlns:hh="http://cgi.com/jsf/html">
+
+<h:body>
+<ui:composition>
+    <h:panelGroup id="libraries" layout="none">
+		<div class="form_container" id="libraries">
+			<div class="form_title">
+				<h:outputText value="#{hh:label('labels', 'adminPage.libraries')}" />
+			</div>
+			<table class="group_table">
+				<tr>
+					<td class="group_table_col_1">
+						<h:outputText value="jsf2-3.0.0-SNAPSHOT"/><br />
+						<h:outputText value="jweb-3.0.0-SNAPSHOT"/><br />
+						<h:outputText value="sql-3.0.0-SNAPSHOT"/><br />
+					</td>
+				</tr>
+			</table>
+		</div>
+	</h:panelGroup>
+		
+	<h:panelGroup id="options" layout="none">
+		<div class="form_container" id="options">
+			<div class="form_title">
+				<h:outputText value="#{hh:label('labels', 'adminPage.options')}" />
+			</div>
+			<table class="group_table">
+				<tr>
+					<td class="group_table_col_1">
+						<h:outputText value="databaseType = MYSQL"/><br />
+						<h:outputText value="dataGenerator = false"/><br />
+						<h:outputText value="beanValidation = false"/><br />
+						<h:outputText value="encoding = windows-1252"/><br />
+						<h:outputText value="webServer = tomcat7"/><br />
+						<h:outputText value="multiapp = false"/><br />
+						<h:outputText value="exportXls = true"/><br />
+						<h:outputText value="css = default"/><br />
+						<h:outputText value="datasource = auto"/><br />
+					</td>
+				</tr>
+			</table>
+		</div>
+	</h:panelGroup>
+</ui:composition>
+</h:body>
+</html>

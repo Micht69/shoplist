@@ -1,0 +1,17 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:f="http://java.sun.com/jsf/core"
+				xmlns:h="http://java.sun.com/jsf/html" xmlns:ui="http://java.sun.com/jsf/facelets"
+				template="/templates/generic.xhtml">
+
+	<ui:define name="title">Erreur inattendue</ui:define>
+
+	<ui:define name="body">
+		<h2><h:outputText value="Timeout de la vue JSF - Redirection vers la page d'accueil" /></h2>
+		<h:panelGroup style="display: none;">
+
+			<h:commandButton styleClass="btn_medium" value="#{labels['action.valider']}" action="#{sessionCtrl.redirectFromAccueil}" />
+
+			<script type="text/javascript">setTimeout('goToDefaultPage()', 100);</script>
+		</h:panelGroup>
+	</ui:define>
+
+</ui:composition>

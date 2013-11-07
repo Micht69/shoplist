@@ -1,0 +1,234 @@
+.listButtons {
+	font-size: 0;
+	vertical-align: middle;
+}
+
+.listButtons a.btn_medium ~ a.btn_medium {
+	margin-left: 0;
+}
+
+.listButtons .btn_medium input {
+	font-size: 14px;
+	margin-left: -1px;
+	-webkit-border-radius: 0;
+	   -moz-border-radius: 0;
+	        border-radius: 0;
+}
+
+.listButtons a:first-child input {
+	margin-left: 0;
+	-webkit-border-radius: 4px 0 0 4px;
+	   -moz-border-radius: 4px 0 0 4px;
+	        border-radius: 4px 0 0 4px;
+}
+
+.listButtons a:last-child input {
+	-webkit-border-radius: 0 4px 4px 0;
+	   -moz-border-radius: 0 4px 4px 0;
+	        border-radius: 0 4px 4px 0;
+}
+
+.listButtons a:only-child input {
+	-webkit-border-radius: 4px;
+	   -moz-border-radius: 4px;
+	        border-radius: 4px;
+}
+
+.bottomActions {
+	display: none;
+}
+
+.actions td:last-child {
+	font-size: 0;
+}
+
+.actions td:last-child a {
+	font-size: 14px;
+}
+
+a.btn_medium ~ .listButtons,
+.listButtons ~ a.btn_medium,
+.listButtons ~ .listButtons,
+a.btn_medium ~ a.btn_medium {
+	margin-left: 10px;
+}
+
+.btn_medium input {
+	background: none;
+	background-repeat: no-repeat;
+	background-position: left center;
+}
+
+a.btn_tablerow
+{
+	margin: 1px;
+	padding: 1px;
+}
+
+table tr td a.btn_tablerow input {
+	height: 14px;
+	width: 14px;
+}
+
+.actions ~ .list_results_container,
+.actions ~ .results_container {
+	position: relative;
+	margin-top: 10px;
+}
+
+.list_results_container table,
+.results_container table {
+	width: 100%;
+	border-collapse: separate;
+	border-spacing: 0;
+	border-color: #DDDDDD;
+	border-style: solid;
+}
+
+.table_container table td.tabedit-editable-cell {
+	border-style: dotted;
+}
+
+.list_results_container table > tbody > tr > td.first,
+.results_container table > tbody > tr > td.first {
+	width: 20px;
+	text-align: center;
+}
+
+.list_results_container table > thead > tr > th.first,
+.results_container table > thead > tr > th.first {
+	width: 20px;
+	text-align: center;
+}
+
+.list_results_container table > thead > tr > th,
+.list_results_container table > tbody > tr > td,
+.results_container table > thead > tr > th,
+.results_container table > tbody > tr > td {
+	border-width: 0 1px 1px 0;
+}
+
+.list_results_container table > thead > tr:first-child > th,
+.results_container table > thead > tr:first-child > th {
+	border-top-width: 1px;
+}
+
+.list_results_container table > tbody > tr:last-child > td {
+	border-bottom-width: 1px;
+}
+
+.list_results_container table > thead > tr > th:first-child,
+.list_results_container table > tbody > tr > td:first-child,
+.results_container table > thead > tr > th:first-child,
+.results_container table > tbody > tr > td:first-child {
+	border-left-width: 1px;
+}
+
+.list_results_container table > thead > tr:first-child > th:first-child,
+.results_container table > thead > tr:first-child > th:first-child {
+	border-radius: 4px 0 0 0;
+}
+
+.list_results_container table > thead > tr:first-child > th:last-child,
+.results_container table > thead > tr:first-child > th:last-child {
+	border-radius: 0 4px 0 0;
+}
+
+.list_results_container table > tbody > tr:last-child > td:last-child,
+.results_container table > tbody > tr:last-child > td:last-child {
+	border-radius: 0 0 4px 0;
+}
+
+.list_results_container table > tbody > tr:last-child > td:first-child,
+.results_container table > tbody > tr:last-child > td:first-child {
+	border-radius: 0 0 0 4px;
+}
+
+.list_results_container table tbody td.date,
+.list_results_container table tbody td.defValue,
+.results_container table tbody td.date,
+.results_container table tbody td.defValue {
+	text-align: center;
+}
+
+.list_results_container table tbody td.numeric,
+.results_container table tbody td.numeric {
+	text-align: right;
+}
+
+.list_results_container table tbody > tr:first-child > td:only-child,
+.results_container table tbody > tr:first-child > td:only-child {
+	border: 0;
+}
+
+.list_results_container > font,
+.results_container > font {
+	position: absolute;
+	bottom: 0;
+    padding: 10px 0 0 5px;
+}
+
+.treetable-break-line-col {
+	background-color: rgba(224, 232, 248, 0.4);
+}
+
+.list_results_container table tbody > tr:first-child > td.treetable-break-line-col:only-child {
+	border-width: 0 1px 1px 1px;
+	border-style: solid;
+	border-color: #DDDDDD;
+}
+
+.ui-treetable .ui-treetable-header {
+	text-align: left;
+}
+
+.ui-treetable-header, .ui-treetable-scrollable-header {
+	background: white;
+}
+
+.ui-treetable-header button.ui-state-default {
+	display: inline-block;
+	margin-bottom: 0;
+	font-family: inherit;
+	font-size: 14px;
+	line-height: 20px;
+	color: #333333;
+	text-align: center;
+	text-shadow: 0 1px 1px rgba(255, 255, 255, 0.75);
+	vertical-align: middle;
+	cursor: pointer;
+	background-color: #e6e6e6;
+	background-image: -moz-linear-gradient(top, #ffffff, #e6e6e6);
+	background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ffffff), to(#e6e6e6));
+	background-image: -webkit-linear-gradient(top, #ffffff, #e6e6e6);
+	background-image: -o-linear-gradient(top, #ffffff, #e6e6e6);
+	background-image: linear-gradient(to bottom, #ffffff, #e6e6e6);
+	background-repeat: repeat-x;
+	border: 1px solid #bbbbbb;
+	border-color: #e6e6e6 #e6e6e6 #bfbfbf;
+	border-color: rgba(0, 0, 0, 0.15);
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffffff', endColorstr='#ffe6e6e6', GradientType=0);
+	filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
+	-webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+	-moz-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.list_results_container table > tbody > tr.ui-state-highlight > td,
+.results_container table > tbody > tr.ui-state-highlight > td {
+	background-color: rgba(224, 232, 248, 0.6);
+}
+
+.datatable-div-data {
+	overflow-y: auto;
+	height: 100%;
+}
+
+.btn_more_lines {
+	float: right; 
+	margin-top: 5px; 
+	margin-right: 10px; 
+}

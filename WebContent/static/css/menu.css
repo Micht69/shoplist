@@ -1,0 +1,208 @@
+
+/******************************************************************************
+ * Drop-down menu
+ *                               
+ * Be warned that a lot of those styles are not directly present in the code, 
+ * but are applied on the fly by jQuery.                                      
+ *****************************************************************************/
+
+/* Initial situation : hide everything. */
+
+/* div containing the whole menu */
+.menu {
+	padding: 0px;
+	z-index: 300;
+	*zoom: 1; /* IE<8 only, hence the asterisk */
+	position:relative;
+}
+
+
+/******************************************************************************
+ * Menu bar
+ *****************************************************************************/
+
+/* the horizontal <ul> with the menu titles */
+#menu {
+	padding: 0;
+	z-index: 300;
+	float: none;
+	position: static; /* set up as relative by primeface */
+	width: auto; /* set up at something by primeface */
+}
+
+#menu > li {
+	clear: none;
+	float: left;
+	height: 100%;
+	width: auto;
+	margin: 0;
+	padding: 0;
+}
+
+#menu > li > a {
+	display: block;
+	float: none;
+	min-height: 0; /* support: IE7 */
+	min-width: 1px;
+	position: static;
+	margin: 0px;
+}
+
+#menu > li > a span {
+	display: block;
+	width: 100%;
+}
+
+/* Adding the triangle after each menu title */
+#menu > li > a span:last-child:after {
+    content: "";
+    display: inline-block;
+    height: 0;
+    width: 0;
+    vertical-align: top;
+    border-left-style: solid;
+    border-left-color: transparent;
+    border-right-style: solid;
+    border-right-color: transparent;
+    border-top-style: solid;
+    border-bottom-style: none;
+}
+
+/******************************************************************************
+ * All menus (not the menu-bar)
+ *****************************************************************************/
+
+#menu ul {
+	display: none;
+	float: none;
+	left: 0;
+	list-style: none;
+	margin: 0;
+	min-width: 160px;
+	outline: none;
+	position: absolute;
+	top: 100%;
+	width: auto;
+	z-index: 1000;
+}
+
+#menu ul li {
+	margin: 0;
+	padding: 0;
+	clear: none;
+	float: none;
+	width: 100%;
+}
+
+#menu ul li a {
+	background: none;
+	border: none;
+	clear: both;
+	display: block;
+	min-height: 0; /* support: IE7 */
+	min-width: 1px;
+	position: relative;
+	white-space: nowrap;
+	margin: 0px;
+}
+
+#menu ul li a span {
+	display: block;
+	width: 100%;
+}
+
+/* All disabled entries (including on the menu) */
+#menu li.ui-state-disabled a {
+	cursor: default;
+}
+
+/* icon marking that this entry has a sub-menu */
+#menu ul li a span:last-child:after {
+    border-left-style: solid;
+    border-right-style: none;
+    border-top-style: solid;
+    border-top-color: transparent;
+	border-bottom-style: solid;
+	border-bottom-color: transparent;
+    content: "";
+    display: inline-block;
+    height: 0;
+    vertical-align: top;
+    width: 0;
+}
+
+
+
+/******************************************************************************
+ * First level menus only (in the menu bar)
+ *****************************************************************************/
+
+#menu > li > ul {
+	display: none;
+}
+
+/* Triangle pointing to the menu title */
+#menu > li > ul:after {
+	display: inline-block;
+	position: absolute;
+	border-bottom-style: solid;
+	border-left-style: solid;
+	border-left-color: transparent;
+	border-right-style: solid;
+	border-right-color: transparent;
+	content: "";
+}
+
+/* Border of the triangle pointing to the menu title */
+#menu > li > ul:before {
+	display: inline-block;
+	position: absolute;
+	border-bottom-style: solid;
+	border-left-style: solid;
+	border-left-color: transparent;
+	border-right-style: solid;
+	border-right-color: transparent;
+	content: "";
+}
+
+
+
+/******************************************************************************
+ * Icons support
+ *****************************************************************************/
+
+#menu .ui-menu-icons {
+	position: relative;
+}
+#menu .ui-menu-icons li a {
+	position: relative;
+	padding-left: 2em;
+}
+
+/* left-aligned */
+#menu .ui-icon {
+	position: absolute;
+	top: 50%;
+	margin-top: -6px;
+}
+
+/* right-aligned */
+#menu .ui-menu-icon {
+	/* position: inherit; */
+	right: .75em;
+}
+
+#menu span.ui-menu-icon.ui-icon-carat-1-e {
+	display: none;
+}
+
+
+
+/******************************************************************************
+ * Other stuff
+ *****************************************************************************/
+
+#menu .ui-menu-divider {
+	display: none;
+}
+

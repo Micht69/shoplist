@@ -1,0 +1,57 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:f="http://java.sun.com/jsf/core" xmlns:hh="http://cgi.com/jsf/html">
+
+<h:body>
+<ui:composition>
+    <!-- Comment Beginning -->
+	<div id="comment-popup" title="#{hh:label('labels', 'comment.title')}" style="display: none;">
+		<table class="group_table">
+		<tbody>
+			<tr>
+				<td class="group_table_col_1">
+					<h:panelGroup id="comment-list">
+					<div class="form_container">
+						<div class="form_title"><h:outputText value="#{hh:label('labels', 'comment.existing')}" /></div>
+						<ui:repeat var="commentRow" value="#{commentCtrl.comments}">
+						<table class="group_table">
+						<tbody>
+							<tr>
+								<td style="padding-top: 9px; padding-left: 9px;">
+									<span style="float: right;"><b><h:outputText value="#{commentRow.user}" /></b> (<i><h:outputText value="#{commentRow.date}" /></i>)</span>
+									<div><h:outputText value="#{commentRow.comment}" /></div>
+								</td>
+							</tr>
+						</tbody>
+						</table>
+						</ui:repeat>
+					</div>
+					</h:panelGroup>
+				</td>
+			</tr>
+			<tr>
+				<td class="group_table_col_1">
+					<div class="form_container" id="comment-form">
+						<div class="form_title"><h:outputText value="#{hh:label('labels', 'comment.add')}" /></div>
+						<table class="group_table">
+						<tbody>
+							<tr>
+								<td style="padding-top: 9px; text-align: center;">
+									<h:inputTextarea id="comment-comment" value="#{commentCtrl.comment.comment}" style="width: 95%; height: 80px;" />
+									
+									<h:commandButton styleClass="btn_medium" value="#{hh:label('labels', 'action.valider')}" style="float: right; margin-right: 10px; margin-top: 10px;" >
+										<f:ajax event="click" execute="comment-comment" render="messages commentAction" listener="#{commentCtrl.saveComment()}" onevent="saveComment" />
+									</h:commandButton>
+								</td>
+							</tr>
+						</tbody>
+						</table>
+					</div>
+				</td>
+			</tr>
+		</tbody>
+		</table>
+	</div>
+    <!-- Comment Ending -->
+</ui:composition>
+</h:body>
+</html>

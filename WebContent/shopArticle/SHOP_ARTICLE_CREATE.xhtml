@@ -1,0 +1,120 @@
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets" template="/templates/generic.xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core" xmlns:logica="http://java.sun.com/jsf/composite/logica" xmlns:hh="http://cgi.com/jsf/html" xmlns:p="http://primefaces.org/ui">
+
+<ui:define name="metadata">
+	<f:metadata>
+		<f:event type="preRenderView" listener="#{jsfCtrl.prepareUiAccess('mainForm')}" />
+		<f:attribute name="entity" value="shopArticle" />
+	</f:metadata>
+</ui:define>
+
+<ui:define name="title"><h:outputText value="#{jsfCtrl.title}" /></ui:define>
+
+<ui:define name="body">
+	<div class="actions topActions">
+	<table style="width: 100%">
+		<tr>
+			<td width="1%" style="text-align: left; white-space: nowrap;">
+				<div id="advanced-actions">
+	    			<h:panelGroup rendered="#{commentCtrl.commentsEnabled}">
+						<h:commandLink id="commentAction" styleClass="btn_comment" value="#{commentCtrl.commentsCount('shopArticle', jsfCtrl.entity.primaryKey.encodedValue)}" title="#{hh:label('labels', 'boutons.comment')}" onclick="commentPage();">
+							<f:ajax event="click" execute="@none" render="comment-list" />
+						</h:commandLink>
+	    				<ui:include src="../includes/comment.xhtml" />
+	    			</h:panelGroup>
+					<h:outputText value=" "/>
+					<h:commandButton id="printAction" styleClass="btn_print" image="../static/img/buttons/print.png" title="#{hh:label('labels', 'boutons.print')}" onclick="window.print(); return false;" />
+					<h:outputText value=" "/>
+					<h:panelGroup id="socialActions" rendered="#{jsfCtrl.socialPanelEnabled}">
+<div class="g-plusone" data-size="standard" data-annotation="none"></div>
+
+<script type="text/javascript">
+  (function() {
+    var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+    po.src = 'https://apis.google.com/js/plusone.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+  })();
+</script>
+					</h:panelGroup>
+				</div>
+			</td>
+			<td width="99%" style="text-align: right; white-space: nowrap;">
+				<h:commandButton id="validateAction" rendered="#{!jsfCtrl.noValidateButton}" styleClass="btn_medium" value="#{hh:label('labels', 'boutons.valider')}" action="#{jsfCtrl.validate}"  onclick="if ($('#mainForm').submitted) { alert('Traitement en cours. Veuillez patienter...');return false;} else { $('#mainForm').submitted = true; return true; }" />
+				<h:outputText value=" "/>
+				<h:commandButton id="cancelAction" immediate="true" styleClass="btn_medium" value="#{hh:label('labels', 'boutons.annuler')}" action="#{jsfCtrl.cancel}" onclick="return checkDirtyState(this);" />
+			</td>
+		</tr>
+	</table>
+	</div>
+
+<h:panelGroup id="shopArticleCreate" rendered="#{jsfCtrl.isVisible('shopArticleCreate')}" layout="none">
+
+<table class="group_table">
+
+	<tr>
+	
+		<td class="group_table_col_1">
+
+
+<ui:fragment rendered="#{jsfCtrl.isVisible('shopArticle.ean13')}">
+
+<table class="#{!jsfCtrl.isValid('mainForm:shopArticleCreate_shopArticle_ean13') ? 'error' : ''}">
+
+<tr><td class="colFieldSetLeft">
+
+<h:outputLabel escape="false" value="#{jsfCtrl.getLabel('shopArticle.ean13', 'shopArticleCreate.shopArticle.ean13')}" title="#{hh:label('tooltips', 'shopArticleCreate.shopArticle.ean13')}"/>
+<h:outputLabel value="*" styleClass="mandatory_label" rendered="#{jsfCtrl.isMandatory('shopArticle.ean13')}"/>
+
+</td>
+<td class="colFieldSetMid">
+<h:outputLabel value=":" />
+</td>
+<td class="colFieldSetRight">
+
+<h:inputText style="" disabled="#{jsfCtrl.readonly('shopArticle.ean13')}" id="shopArticleCreate_shopArticle_ean13" value="#{jsfCtrl.entity.ean13}" label="#{jsfCtrl.getLabel('shopArticle.ean13', 'shopArticle.ean13')}" maxlength="13" onkeypress="markAsDirty()">
+	<f:validateLength maximum="13" />
+</h:inputText>
+
+
+<h:message for="shopArticleCreate_shopArticle_ean13" styleClass="errorLabel" />
+
+</td></tr></table>
+
+</ui:fragment>
+
+
+	
+		</td>
+
+	</tr>
+
+</table>
+
+</h:panelGroup>
+
+
+	<div class="actions bottomActions">
+	<table style="width: 100%">
+		<tr>
+			<td style="text-align: right;">
+				<h:commandButton id="validateAction2" rendered="#{!jsfCtrl.noValidateButton}" styleClass="btn_medium" value="#{hh:label('labels', 'boutons.valider')}" action="#{jsfCtrl.validate}"  onclick="if ($('#mainForm').submitted) { alert('Traitement en cours. Veuillez patienter...');return false;} else { $('#mainForm').submitted = true; return true; }" />
+				<h:outputText value=" "/>
+				<h:commandButton id="cancelAction2" immediate="true" styleClass="btn_medium" value="#{hh:label('labels', 'boutons.annuler')}" action="#{jsfCtrl.cancel}" onclick="return checkDirtyState(this);" />
+			</td>
+		</tr>
+	</table>
+	</div>
+<script type="text/javascript">
+$(document).ready(function() {
+	try { 
+		doPageCustomize('SHOP_ARTICLE_CREATE'); 
+		$('td[class="first"]').click(function(event){
+			event.stopPropagation();
+		});
+	} catch (e) {}
+});
+</script>
+
+</ui:define>
+</ui:composition>
+

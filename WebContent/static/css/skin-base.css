@@ -1,0 +1,535 @@
+/******************************************************************************
+ * Theme colors
+ * Bright blue (for input fields) : rgb(82, 168, 236)
+ * Dark blue : rgb(0, 116, 202)
+ * Light blue: rgb(243, 248, 253)
+ * Base font color : #333333
+ * Input text font : #555555
+ * Disabled font : #7b7b7b
+ * Low importance font : #a5acb0
+ * Light grey : #b3b3b3
+ * Pale grey : #eeeeee
+ *****************************************************************************/
+
+/******************************************************************************
+* General theme
+******************************************************************************/
+html,body {
+	background-color: white; /* rgb(161, 196, 208) */
+	color: #333333;
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+	font-size: 14px;
+	line-height: 20px;
+}
+
+/******************************************************************************
+* Default behavior for a few tags
+******************************************************************************/
+th {
+	font-weight: normal;
+}
+
+fieldset {
+	border: none;
+}
+
+a {
+	color: inherit;
+	text-decoration: none;
+	cursor: pointer;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a img {
+	border: none;
+}
+
+/******************************************************************************
+ *                                  Content 
+ *****************************************************************************/
+
+.content {
+	padding: 0px 0 52px 0;
+}
+
+/******************************************************************************
+* Buttons
+******************************************************************************/
+
+button, input[type="button"], input[type="submit"],
+input.dateTime ~ img, /* calendar button */
+a.link-actions,
+.iconAction,
+.uploadFile label.btn_medium span,
+.jw-widget .jw-footer button.ui-button /* buttons in wizard */ {
+	margin: 0px;
+	padding: 4px 12px;
+	font-size: 14px;
+	line-height: 20px;
+	text-align: center;
+	vertical-align: middle;
+	font-weight: bold;
+	color: rgb(0, 116, 202);
+	background-color: white;
+	border: 1px solid rgb(0, 116, 202);
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
+}
+
+input.dateTime ~ img {
+	height: 20px;
+	padding: 4px 8px 4px 6px;
+	-webkit-border-radius: 0 4px 4px 0;
+	-moz-border-radius: 0 4px 4px 0;
+	border-radius: 0 4px 4px 0;
+}
+
+/* The same, :hover */
+button:hover, input[type="button"]:hover, input[type="submit"]:hover,
+a.link-actions:hover,
+.iconAction:hover,
+input.dateTime ~ img:hover,
+.uploadFile label.btn_medium span:hover,
+.jw-widget .jw-footer button.ui-button:hover {
+	color: white;
+	background-color: rgb(0, 116, 202);
+}
+
+/* The same, :active */
+button:active,input[type="button"]:active,input[type="submit"]:active,a.link-actions:active,.iconAction:active,input.dateTime 
+	~ img:active,.uploadFile label.btn_medium span:active,.jw-widget .jw-footer button.ui-button:active
+	{
+	color: rgb(243, 248, 253);
+	background-color: rgb(0, 116, 202);
+}
+
+/* Buttons, [disabled] */
+button[disabled],input[type="button"][disabled],input[type="submit"][disabled]
+	{
+	color: #7b7b7b;
+	cursor: default;
+	background-color: white;
+	border-color: #7b7b7b;
+}
+
+
+
+/******************************************************************************
+* Fields
+******************************************************************************/
+
+/* Field labels */
+.colFieldSetLeft {
+	text-align: right;
+	padding-right: 10px;
+	font-weight: bold;
+}
+
+/* "display: table-cell" to show the colon */
+.colFieldSetMid {
+	display: table-cell;
+}
+
+/* Fields */
+.colFieldSetRight {
+	text-align: left;
+	padding-left: 10px;
+}
+/* Fields */
+textarea,select, /* a lot of stuff is going to be redefined for select later */
+input[type="text"], input[type="password"],
+input[type="datetime"], input[type="datetime-local"], input[type="date"],
+input[type="month"], input[type="week"], input[type="time"],
+input[type="number"], input[type="url"], input[type="search"],
+input[type="email"], input[type="tel"], input[type="color"] {
+	display: inline-block;
+	height: 20px;
+	padding: 4px 6px;
+	font-size: 14px;
+	line-height: 20px;
+	color: #555555;
+	vertical-align: middle;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
+	background-color: #ffffff;
+	border: 1px solid #b3b3b3;
+	-webkit-transition: border linear 0.2s, box-shadow linear 0.2s;
+	-moz-transition: border linear 0.2s, box-shadow linear 0.2s;
+	-o-transition: border linear 0.2s, box-shadow linear 0.2s;
+	transition: border linear 0.2s, box-shadow linear 0.2s;
+}
+
+select:focus,textarea:focus,input[type="text"]:focus,input[type="password"]:focus,input[type="datetime"]:focus,input[type="datetime-local"]:focus,input[type="date"]:focus,input[type="month"]:focus,input[type="time"]:focus,input[type="week"]:focus,input[type="number"]:focus,input[type="email"]:focus,input[type="url"]:focus,input[type="search"]:focus,input[type="tel"]:focus,input[type="color"]:focus
+	{
+	border-color: rgba(82, 168, 236, 0.8);
+	outline: 0;
+	outline: thin dotted \9; /* IE6-9 */
+	-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, 0.6);
+	       -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, 0.6);
+                box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, 0.6);
+}
+
+select,input[type="file"] {
+	height: 30px;
+	line-height: 30px;
+	/* In IE7, the height of the select element cannot be changed by height, only font-size */
+	*margin-top: 4px;
+	/* For IE7, add top margin to align select with labels */
+}
+
+input.inline {
+	margin-left: 5px;
+	margin-right: 5px;
+}
+
+
+
+/******************************************************************************
+ * List page
+ *****************************************************************************/
+
+
+/* Whole block (title plus content) */
+.ui-accordion {
+	background-image: none;
+	border: 1px solid rgb(0, 116, 202);
+	padding: 0px;
+	padding-bottom: 0px;
+	border-radius: 4px;
+}
+
+.ui-accordion.reduced {
+	border: none;
+	padding: 1px; /* to compensate for the loss of the 1px border */
+}
+
+/* Block titles */
+.ui-accordion .ui-accordion-header {
+	background-image: none;
+	border: 1px solid rgb(0, 116, 202);
+	margin-top: -1px;
+	margin-left: -1px;
+	padding: 6px 15px;
+	color: rgb(0, 116, 202);
+	font-size: 21px;
+	line-height: 20px;
+	border-top-left-radius: 4px;
+	border-bottom-right-radius: 4px;
+	background-color: rgb(243, 248, 253);
+	display: inline-block;
+	width: auto;
+	position: relative;
+}
+
+.ui-accordion .ui-accordion-header td.open-close-image {
+	width: 15px;
+}
+
+.ui-accordion .ui-accordion-header td.accordion-title {
+	width: auto;
+}
+
+.ui-accordion .ui-accordion-header td.accordion-title-description {
+	width: auto;
+}
+
+/* Block title description */
+.ui-accordion .ui-accordion-header td.accordion-title-description > * {
+	width: auto;
+	text-align: right;
+	max-width: 725px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	display: inline-block;
+	float: right;
+	margin: auto;
+	padding-left: 20px;
+}
+.ui-accordion .ui-accordion-header td.accordion-title-description > *:before {
+	content:"(";
+}
+.ui-accordion .ui-accordion-header td.accordion-title-description > *:after {
+	content:")";
+}
+.ui-accordion .ui-accordion-header td.accordion-title-description > *:empty {
+	padding: 0px;
+}
+.ui-accordion .ui-accordion-header td.accordion-title-description > *:empty:before,
+.ui-accordion .ui-accordion-header td.accordion-title-description > *:empty:after {
+	content:"";
+}
+
+/* Block content */
+.ui-accordion > div {
+	padding: 10px 15px;
+}
+
+.ui-accordion > div .content_title {
+}
+
+.ui-accordion > div .content_title .action_all {
+	margin-top: -31px; /* 46px available, minus 15 to have the same margin as on the right */
+}
+
+.filterCombo {
+	width: 220px;
+	border-radius: 0 4px 4px 0;
+}
+
+.user_criteria > .link-actions {
+	padding:4px;
+	height:20px;
+	margin-right:-5px;
+	border-radius: 4px 0 0 4px;
+}
+
+
+/******************************************************************************
+* Lists
+******************************************************************************/
+
+.table_container > .actions > table > tbody > tr {
+	height: 30px;
+}
+
+/* The full filter line */
+.table_container > .actions > table > tbody > tr > td:first-child > span.filter-line {
+	position: relative;
+}
+
+/* The text about filtering */
+.table_container > .actions > table > tbody > tr > td:first-child > span.filter-line > span:first-child {
+	display: none;
+}
+
+/* Filtering field */
+.table_container > .actions > table > tbody > tr > td:first-child > span.filter-line > input.filter {
+	width: 250px;
+	padding-left: 30px;
+	margin-bottom: 7px;
+}
+
+/* Adding an icon */
+.table_container > .actions > table > tbody > tr > td:first-child > span.filter-line > span:last-child:before {
+	content: url("../img/form/icon-filter.png");
+	position: absolute;
+	top: -9px;
+	left: 0px;
+}
+
+.list_results_container table > thead > tr > th,
+.list_results_container table > tbody > tr > td,
+.results_container table > thead > tr > th,
+.results_container table > tbody > tr > td {
+	border-style: solid;
+	border-color: #b3b3b3;
+	padding: 4px 5px;
+	vertical-align: middle;
+}
+
+.list_results_container table > thead > tr > th,
+.results_container table > thead > tr > th {
+	background-image: none;
+	background-color: white;
+	text-align: center;
+	font-weight: bold;
+}
+
+.list_results_container table > tbody > tr.odd > td,
+.results_container table > tbody > tr.odd > td,
+.list_results_container table > tbody > tr.treetable-break-line > td,
+.results_container table > tbody > tr.treetable-break-line > td {
+	background-image: none;
+	background-color: #eeeeee;
+}
+
+.list_results_container table > tbody > tr.even > td,
+.results_container table > tbody > tr.even > td,
+.list_results_container table > tbody > tr.default > td,
+.results_container table > tbody > tr.default > td {
+	background-image: none;
+	background-color: white;
+}
+
+.list_results_container table > tbody > tr:hover > td,
+.results_container table > tbody > tr:hover > td {
+	background-image: none;
+	color: white;
+	background-color: rgb(0, 116, 202);
+}
+
+
+
+/******************************************************************************
+* Action page
+******************************************************************************/
+
+/* Used by : top actions (typically, validate/cancel) and bottom actions (the same) */
+form > .actions {
+	margin-bottom: 5px;
+}
+
+/* Space between main blocks. Note that no padding is applied to the first block. */
+#mainForm > .group_table > tbody > tr > td {
+	padding-top: 20px;
+}
+
+/* Whole block (title plus content). The "form_container" can't be defined without a prefix, because a form_container is something different on list pages */
+#mainForm > .form_container, /* single block on a form page, for the simplest form pages  */
+.group_table .form_container, /* sequential blocks on form pages */
+.mainTable_container /* block for link lists */ {
+	border: 1px solid rgb(0, 116, 202);
+	padding: 0px;
+	padding-bottom: 0px;
+	border-radius: 4px;
+}
+
+/* Block titles */
+#mainForm > .form_container > .form_title, /* block title on single block  */
+.group_table .form_container > .form_title, /* block title on sequential blocks */
+.mainTable_container > .table_title, /* block title on link lists */
+.lineTitle /* titles of group templates */ {
+	border: 1px solid rgb(0, 116, 202);
+	margin-top: -1px;
+	margin-left: -1px;
+	padding: 6px 15px;
+	color: rgb(0, 116, 202);
+	font-size: 21px;
+	border-top-left-radius: 4px;
+	border-bottom-right-radius: 4px;
+	background-color: rgb(243, 248, 253);
+	display: inline-block;
+	width: auto;
+}
+
+/* Block contents */
+#mainForm > .form_container > .group_table, /* block content on single block */
+.group_table .form_container > .group_table, /* block content on sequential blocks */
+.mainTable_container>.table_container /* block content on link lists */ {
+	
+}
+
+
+
+/******************************************************************************
+* Tabs
+******************************************************************************/
+
+/* Tabs block */
+div.ui-tabs { 
+	position: relative; /* position: relative prevents IE scroll bug (element with position: relative inside container with overflow: auto appear as "fixed") */
+	padding: .2em;
+	border: 0px;
+	zoom: 1;
+}
+
+div.ui-tabs ul.ui-tabs-nav li a, /* first selector in group seems obsolete, but required to overcome bug in Opera applying cursor: text overall if defined elsewhere... */
+div.ui-tabs.ui-tabs-collapsible ul.ui-tabs-nav li.ui-tabs-selected a {
+	cursor: pointer;
+}
+
+/* Tab title bar */
+div.ui-tabs ul.ui-tabs-nav {
+	list-style-type: none;
+	clear: both;
+	background: none;
+	border: none;
+	margin: 0px;
+	padding: 0px;
+	height: auto;
+	width: auto;
+}
+
+/* Tab title stuff */
+div.ui-tabs ul.ui-tabs-nav > li {
+	list-style: none; 
+	float: left; 
+	position: relative; 
+	top: 1px; 
+	white-space: nowrap;
+	border: none;
+	border-bottom: 0 !important; 
+	padding: 0; 
+	margin: 0;
+	background: none;
+}
+
+/* Images in tab titles */
+div.ui-tabs ul.ui-tabs-nav > li > img.imgleft,
+div.ui-tabs ul.ui-tabs-nav > li > img.imgright {
+	display: none;
+}
+
+/* Tab titles */
+div.ui-tabs ul.ui-tabs-nav > li > a.ui-tabs-anchor {
+	display: block;
+	float: left;
+	text-decoration: none;
+	line-height: 20px;
+	-webkit-border-radius: 4px 4px 0 0;
+	   -moz-border-radius: 4px 4px 0 0;
+	        border-radius: 4px 4px 0 0;
+	margin-right: 6px;	
+	background-image: none;
+	background-color: white;
+	border: 1px solid #b3b3b3;
+	border-bottom-color: rgb(0, 116, 202);
+	padding: 6px 15px;
+	color: #7b7b7b;
+	border-top-left-radius: 4px;
+	border-top-right-radius: 4px;
+	width: auto;
+	text-shadow: none;
+}
+
+/* Tab title :hover */
+div.ui-tabs ul.ui-tabs-nav a.ui-tabs-anchor:hover {
+	background-color: #b3b3b3;
+}
+
+/* Selected tab title, hover or not */
+div.ui-tabs ul.ui-tabs-nav li.ui-state-active a.ui-tabs-anchor {
+	margin-bottom: 0;
+	background-color: white;
+	border: 1px solid rgb(0, 116, 202);
+	border-bottom-color: white;
+	color: rgb(0, 116, 202);
+	font-size: larger;
+	font-weight: bold;
+	cursor: default;
+}
+
+/* Content of tab */
+div.ui-tabs div.ui-tabs-panel {
+	border-radius: 4px;
+	border-top-left-radius: 0px;
+	display: block;
+	border: 1px solid rgb(0, 116, 202);
+	background: none;
+	padding: 0px 3px;
+	
+}
+
+/* already a border on the tab, no border on the first element */
+div.ui-tabs div.ui-tabs-panel > table > tbody > tr > td > .mainTable_container,
+div.ui-tabs div.ui-tabs-panel > table > tbody > tr > td > .form_container{
+	border: none;
+}
+
+
+/* No titles within tabs */
+.ui-tabs > .ui-tabs-panel > table > tbody > tr > td > div > div.table_title,
+.ui-tabs > .ui-tabs-panel > .lineTitle {
+	display: none;
+}
+
+/* Unused tab */
+.ui-tabs .ui-tabs-hide {
+	display: none !important;
+}

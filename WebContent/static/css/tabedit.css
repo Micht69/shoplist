@@ -1,0 +1,32 @@
+td.tabedit-editable-cell.tabedit-active {
+	padding: 0px;
+}
+
+td.tabedit-editable-cell.tabedit-active div.tabedit-content {
+	width: 100%;
+}
+
+td.tabedit-editable-cell.tabedit-active div.tabedit-content div.tabedit-editable-read {
+	width: 100%;
+}
+
+/* This element's width will be set by the javascript. Not displayed by default. */
+td.tabedit-editable-cell div.tabedit-content div.tabedit-editable-write {
+	display: none;
+	margin: 0px;
+	padding: 0px;
+}
+
+/* JSF 2 puts input elements in span blocks */
+td.tabedit-editable-cell.tabedit-active div.tabedit-content div.tabedit-editable-write span {
+	width: 100%;
+	margin: 0px;
+	padding: 0px;
+}
+
+td.tabedit-editable-cell.tabedit-active div.tabedit-content div.tabedit-editable-write input,
+td.tabedit-editable-cell.tabedit-active div.tabedit-content div.tabedit-editable-write select,
+td.tabedit-editable-cell.tabedit-active div.tabedit-content div.tabedit-editable-write textarea {
+	margin: 0px;
+	width: 100%;
+}

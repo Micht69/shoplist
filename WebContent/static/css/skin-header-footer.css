@@ -1,0 +1,285 @@
+/******************************************************************************
+* Header
+******************************************************************************/
+
+div.header {
+	background-color: #ffffff;
+}
+
+/* client logo */
+div.header_left img {
+	width: 67px;
+	height: 40px;
+}
+
+div.header_left h1.header_title {
+	color: rgb(0, 116, 202);
+	font-size: 1.5em;
+	font-weight: bold;
+	text-align: center;
+	top: 10px; /* adjust with the size of the client logo */
+}
+
+
+
+/******************************************************************************
+* Menu
+******************************************************************************/
+
+/* div containing the whole menu */
+.menu {
+	height: 33px; /* visible height of the menu. MUST be specified (jQuery limitation). */
+	padding-left: 20px;
+	background-color: rgb(0, 116, 202);
+	border: 0px;
+	margin: 0px;
+}
+
+/* the horizontal <ul> with the menu titles. Note : due to technical constraints
+ of the jQuery library, the height of this element and the height of the 
+ div.menu element above must both be set to the exact same value. */
+#menu {
+	border: none;
+	background: none;
+	/*specify a height bigger than the height on .menu if you want the menu to appear not exactly under the menu bar. */
+	height: 35px;
+}
+
+/* menu title boxes */
+#menu > li {
+	border: none;
+	background: none;
+}
+
+/* menu titles */
+#menu > li > a {
+	padding: 5px 15px;
+	background: none;
+	border: 1px solid rgb(0, 116, 202);
+	border-left: none;
+	border-right: 1px solid white;
+	color: white;
+	font-weight: bold;
+	line-height: 1.5;
+	text-decoration: none;
+}
+
+#menu > li:first-child > a {
+	border-left: 1px solid white;
+}
+
+/* menu titles when hovered or focused */
+#menu > li > a:hover,
+#menu > li > a:focus {
+	background-color: white;
+	color: rgb(0, 116, 202);
+}
+
+/* Triangle after each menu title. Set "border:none" instead to hide. You can put an image instead if you like. */
+#menu > li > a span:last-child:after {
+	border: none;
+}
+
+/* all menus (including sub-menus) */
+#menu ul {
+	background: none;
+	background-color: white;
+	border: 1px solid rgb(0, 116, 202);
+	*border-right-width: 2px; /* IE 8 only */
+	*border-bottom-width: 2px; /* IE 8 only */
+	padding: 5px 0px;
+	-webkit-border-radius: 3px;
+	   -moz-border-radius: 3px;
+	        border-radius: 3px;
+}
+
+/* all menus entries */
+#menu ul li {
+	border: none;
+	background: none;
+}
+
+/* text of all menus entries */
+#menu ul li a {
+	background: none;
+	border: none;
+	color: rgb(0, 116, 202);
+	font-weight: normal;
+	line-height: 20px;
+	padding: 3px 10px;
+	text-decoration: none;
+}
+
+#menu ul li a:hover,
+#menu ul li a:focus {
+	color: white;
+	text-decoration: none;
+	background-color: rgb(0, 116, 202);
+}
+
+/* Triangle marking that this entry has a sub-menu. Set "border:none" instead to hide. You can put an image instead if you like. */
+#menu ul li a span:last-child:after {
+	/* Sets the triangle color */
+	border-left-color: rgb(0, 116, 202);
+	/* Sets the triangle size */
+	border-width: 5px;
+	/* Positioning */
+    margin-left: 10px;
+ 	margin-top: 6px;
+}
+
+#menu ul li a span:last-child:hover:after {
+	/* Sets the triangle color */
+	border-left-color: white;
+}
+
+/* All disabled entries (including on the menu) */
+#menu li.ui-state-disabled {
+	font-weight: normal;
+}
+
+/* First level-menu : triangle pointing to the menu title. Set "border:none" instead to hide. */
+#menu > li > ul:after {
+	border: none;
+}
+
+/* First level-menu : border of the triangle pointing to the menu title. Set "border:none" instead to hide. */
+#menu > li > ul:before {
+	border: none;
+}
+
+.notificationCounter {
+	position: relative;
+    height: 16px;
+    width: 16px;
+    float: right;
+	margin-top: -22px;
+	margin-right: -12px;
+	padding: 0 2px 3px 2px;
+	color: white;
+	font-weight: bold;
+	text-align: center;
+	box-shadow: inset 0px 0px 2px white;
+	background-color: rgb(153, 31, 61);
+	-webkit-border-radius: 10px;
+	-moz-border-radius: 10px;
+	border-radius: 10px;
+	background: -webkit-gradient(
+        linear,
+        left top, right bottom,
+        from(rgba(153,31,61,1)),
+        to(rgba(227,25,55,1))
+    );
+    background: -webkit-linear-gradient(
+        left top,
+        rgba(153,31,61,1),
+        rgba(227,25,55,1)
+    );
+    background: -moz-linear-gradient(
+        left top,
+        rgba(153,31,61,1),
+        rgba(227,25,55,1)
+    );
+    background: -o-linear-gradient(
+        left top,
+        rgba(153,31,61,1),
+        rgba(227,25,55,1)
+    );
+    background: linear-gradient(
+        left top,
+        rgba(153,31,61,1),
+        rgba(227,25,55,1)
+    );
+}
+
+/******************************************************************************
+* Breadcrumbs
+******************************************************************************/
+
+.ariane {
+    background-color: white;
+	border-width: 1px;
+	border-color: #eeeeee;
+	border-style: solid none;
+    margin: 10px auto;
+    padding: 4px 0;
+	color: #a5acb0;
+    font-size: small;
+}
+
+.ariane > span:first-child {
+	margin-left: 15px;
+}
+
+.ariane > span:last-child {
+	margin-right: 15px;
+}
+
+
+
+/******************************************************************************
+* Messages
+******************************************************************************/
+
+ul.message {
+	margin: 10px 0;
+}
+
+ul.message > li {
+	margin-bottom: 5px;
+	-webkit-border-radius: 4px;
+	   -moz-border-radius: 4px;
+	        border-radius: 4px;
+	padding: 5px 15px;
+	text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+	background-color: #FCF8E3;
+	border: 1px solid #FBEED5;
+	color: #C09853;
+}
+
+ul.message > li.message_error {
+	background-color: #F2DEDE;
+	border: 1px solid #EED3D7;
+	color: #B94A48;
+}
+
+ul.message > li.message_success {
+	background-color: #DFF0D8;
+	border-color: #D6E9C6;
+	color: #468847;
+}
+
+ul.message > li.message_info {
+	background-color: #D9EDF7;
+	border-color: #BCE8F1;
+	color: #3A87AD;
+}
+
+
+
+/*****************************************************************************/
+/*                                  Footer                                   */
+/*****************************************************************************/
+
+.footer {
+	border: none;
+	border-top: 1px solid #eeeeee;
+	background-color: white;
+	padding-right: 20px;
+	padding-left: 0px;
+}
+
+.footer ul li {
+	padding: 0 20px;
+	color: #a5acb0;
+	border-left: 1px solid #a5acb0;
+}
+
+.footer ul li:first-child {
+	border-left: none;
+}
+
+.footer .bottomLogo img {
+    display: none;
+}
+

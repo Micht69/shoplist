@@ -1,0 +1,23 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:f="http://java.sun.com/jsf/core" xmlns:hh="http://cgi.com/jsf/html">
+
+<h:body>
+<ui:composition>
+    <!-- Composition for the modal windows of the application (for use with JQuery's dialog() function) -->
+    
+    <span id="modalYesButton" class="modal-prototype" title="#{labels['generic.yes']}" />
+    <span id="modalNoButton" class="modal-prototype" title="#{labels['generic.no']}" />
+    
+    <!-- For the warning when attempting to leave a page with unsaved modifications -->
+    <div id="modalConfirmDirty" class="modal-prototype" title="#{messages['modal.dirty.title']}">
+    	<p><h:outputText value="#{messages['modal.dirty.text']}" escape="false" /></p>
+    </div>
+    
+    <!-- For the progress window. See prepareProgressIndicator in logica.js -->
+    <div id="modalWorkInProgress" class="modal-prototype" title="#{messages['modal.workInProgress.title']}">
+        <p><h:outputText value="#{messages['modal.workInProgress.text']}"  escape="false" /></p>
+    </div>
+    
+</ui:composition>
+</h:body>
+</html>

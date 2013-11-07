@@ -1,0 +1,104 @@
+/**
+ * CSS file for action page printing
+ */
+
+/* Hide some elements:
+ * - header
+ * - footer
+ * - actions
+ * - link actions
+ * - first column of lists
+ * - stars of mandatory fields
+ */
+.header, 
+.footer, 
+.actions,
+.link-attach,
+.link-deattach,
+.link-actions-container,
+.results_container .first,
+.mandatory_label {
+	display: none;
+}
+/* Content full size */
+.content {
+	padding: 0px;
+	margin: 0px;
+	width: 100%;
+}
+
+/* Gradient remove */
+.table_title,
+.lineTitle,
+.form_title,
+.tab_title {
+	background-image: none !important;
+}
+
+/* Smaller map */
+div.map {
+	width: 200px;
+	height: 150px;
+}
+/* Hide map buttons */
+.map .olButton {
+	display: none;
+}
+
+/* Display input as simple text */
+textarea,
+input[type="text"],
+input[type="password"],
+input[type="datetime"],
+input[type="datetime-local"],
+input[type="date"],
+input[type="month"],
+input[type="time"],
+input[type="week"],
+input[type="number"],
+input[type="email"],
+input[type="url"],
+input[type="search"],
+input[type="tel"],
+input[type="color"],
+select {
+	background-color: #ffffff;
+	border: 0px;
+	-webkit-box-shadow: none;
+	   -moz-box-shadow: none;
+	        box-shadow: none;
+	-webkit-transition: none;
+	   -moz-transition: none;
+	     -o-transition: none;
+	        transition: none;
+}
+
+/* Hide combo box arrow */
+select {
+	-webkit-appearance: none;
+    -moz-appearance:none;
+    appearance:none;
+	padding: 0px;
+}
+/* Disable textarea resize */
+textarea { 
+    resize: none; 
+}
+
+/* Tabs */
+.ui-tabs-nav {
+	display: none;
+}
+.tab_title {
+	display: block !important;
+	background-image: none;
+}
+.ui-tabs-panel {
+	display: block !important;
+	margin-bottom: 15px;
+}
+
+/* Main grouptemplate padding */
+#mainForm > .group_table > tbody > tr > td {
+	padding-top: 0px;
+}

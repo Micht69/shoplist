@@ -1,0 +1,103 @@
+/******************************************************************************
+* jQuery Wizard
+******************************************************************************/
+
+.jw-widget {
+	border: 1px solid rgb(0, 116, 202);
+	padding: 0px;
+	padding-bottom: 0px;
+	border-radius: 4px;
+}
+
+div.jw-widget div.jw-content {
+}
+
+.jw-widget .jw-header, .jw-widget .jw-footer {
+	border: 1px solid rgb(0, 116, 202);
+	margin-top: -1px;
+	margin-left: -1px;
+	padding: 6px 15px;
+	color: rgb(0, 116, 202);
+	font-size: larger;
+	font-weight: 600;
+	border-top-left-radius: 4px;
+	border-bottom-right-radius: 4px;
+	background-color: rgb(243, 248, 253);
+	display: inline-block;
+	width: auto;
+}
+
+.jw-widget .jw-footer {
+	border-radius: 0 0 4px 4px;
+}
+
+
+
+/*****************************************************************************/
+/*                                Login page                                 */
+/*****************************************************************************/
+
+/* Whole block (title plus content). */
+.login.form_container {
+	border: 1px solid rgb(0, 116, 202);
+	padding: 0px;
+	padding-bottom: 20px;
+	border-radius: 4px;
+}
+
+/* Block titles */
+.login.form_container > .form_title {
+	border: 1px solid rgb(0, 116, 202);
+	margin-top: -1px;
+	margin-left: -1px;
+	padding: 6px 15px;
+	color: rgb(0, 116, 202);
+	font-size: 21px;
+	border-top-left-radius: 4px;
+	border-bottom-right-radius: 4px;
+	background-color: rgb(243, 248, 253);
+	display: inline-block;
+	width: auto;
+}
+
+
+
+/******************************************************************************
+*  Dialog box
+******************************************************************************/
+
+div.ui-dialog {
+	border: 1px solid rgb(0, 116, 202);
+	background-color: white;
+	padding: 0px;
+	padding-bottom: 10px;
+	border-radius: 4px;
+}
+
+div.ui-dialog div.ui-dialog-titlebar {
+	border: 1px solid rgb(0, 116, 202);
+	margin-top: -1px;
+	margin-left: -1px;
+	padding: 6px 15px;
+	color: rgb(0, 116, 202);
+	font-size: 21px;
+	font-weight: normal;
+	text-shadow: none;
+	border-top-left-radius: 4px;
+	border-bottom-right-radius: 4px;
+	background-color: rgb(243, 248, 253);
+	background-image: none;
+	display: inline-block;
+	width: auto;	
+}
+
+div.ui-dialog div.ui-dialog-buttonpane {
+	border: none;
+	background-color: none;
+	padding: 0px
+}
+
+div.ui-dialog div.ui-dialog-content {
+	border: none;
+}
+
