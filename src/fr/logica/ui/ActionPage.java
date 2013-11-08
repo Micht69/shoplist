@@ -105,7 +105,7 @@ public class ActionPage<E extends Entity> extends Page<E> {
 	}
 
 	public int getActionCode() {
-		return (null != action) ? action.code : null;
+		return action.code;
 	}
 
 }

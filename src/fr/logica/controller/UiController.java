@@ -1,6 +1,6 @@
 package fr.logica.controller;
 
-import java.io.File;
+
 import java.io.Serializable;
 
 import java.sql.Time;
@@ -49,7 +49,7 @@ import fr.logica.db.DbManager;
 import fr.logica.db.DbQuery;
 import fr.logica.db.DbQuery.Var;
 
-import fr.logica.export.ExcelWriter;
+
 import fr.logica.jsf.components.schedule.ScheduleEvent;
 import fr.logica.reflect.DomainUtils;
 import fr.logica.security.ApplicationUser;
@@ -243,10 +243,6 @@ public class UiController implements Serializable {
 					queryResults.getTitles().put(columnKey, domainLogic.internalUiListColumnCaption(query, null, columnKey, ctx));
 				}
 
-				if (typeExport.equals("xls")) {
-					page.setAttachment(prepareExcelSheet(query, queryResults, page.getCriteria(), ctx));
-				}
-
 				page.setLastActionSuccess(true);
 			} catch (TechnicalException e) {
 				String errorMsg = MessageUtils.getInstance().getMessage("uiControlerModel.queryExecError",
@@ -270,21 +266,6 @@ public class UiController implements Serializable {
 				ctx.getConnection().close();
 			}
 		}
-	}
-
-	public File prepareExcelSheet(DbQuery query, Results results, Entity criteria, Context ctx) {
-		File excelFile = null;
-
-		try {
-			excelFile = File.createTempFile(query.getName(), ".xls");
-			new ExcelWriter().export(excelFile, query, results, criteria);
-
-		} catch (Exception e) {
-			ctx.getMessages().add(new Message(
-					MessageUtils.getInstance().getMessage("uiControlerModel.cvsExportError", new Object[] { (Object) e.getMessage() }),
-					Severity.ERROR));
-		}
-		return excelFile;
 	}
 
 
@@ -804,41 +785,6 @@ public class UiController implements Serializable {
 			link.getTemplates().add(uiLink);
 		}
 		bean.setLink(elt.linkName, link);
-	}
-
-	public <E extends Entity> void prepareLinkListExport(ActionPage<?> page, E bean, String linkName, String queryName, String exportType,
-			ApplicationUser user) {
-
-		Context ctx = null;
-		try {
-			ctx = new Context(DB.createDbConnection(), user);
-			DbManager dbManager = null;
-
-			try {
-				DbQuery query = DB.getLinkQuery(ctx, bean, linkName, queryName);
-				dbManager = new DbManager(ctx, query);
-				Results results = dbManager.toResults();
-				results.setResultSetCount(dbManager.count());
-
-				if (exportType.equals("xls")) {
-					page.setAttachment(prepareExcelSheet(query, results, bean, ctx));
-				}
-				page.setMessages(ctx.getMessages());
-
-			} catch (Exception exception) {
-				throw new TechnicalException(exception.getMessage(), exception);
-
-			} finally {
-				if (null != dbManager) {
-					dbManager.close();
-				}
-			}
-
-		} finally {
-			if (ctx != null && ctx.getConnection() != null) {
-				ctx.getConnection().close();
-			}
-		}
 	}
 
 	/**

@@ -181,7 +181,7 @@ public class LdapSecurityManager extends DefaultSecurityManager {
 			// Close connection
 			dctx.close();
 		} catch (Exception e) {
-			// Error
+			LOGGER.error("Error during LDAP query", e);
 		}
 
 		return userData;

@@ -54,7 +54,7 @@ public class TreeTableModel implements Serializable {
 			if (breakers.size() > 0) {
 				new RowNode(r, nodeMap.get(r.get(breakers.get(breakers.size() - 1))));
 			} else {
-				new RowNode(r, nodeMap.get(root));
+				new RowNode(r, root);
 			}
 		}
 

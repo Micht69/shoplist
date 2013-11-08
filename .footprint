@@ -11,7 +11,7 @@ beanValidation=false
 encoding=windows-1252
 webServer=tomcat7
 multiapp=false
-exportXls=true
+exportXls=false
 css=default
 datasource=auto
 

@@ -73,7 +73,7 @@ public class UiDescriptor {
 		UiPage SHOP_LIST_L_ARTICLE = new UiPage();
 		UiElement SHOP_LIST_L_ARTICLE_SHOP_LIST_L_ARTICLE_L_LIST_null = new UiElement("shopList", "shopListLArticleLList", null, null, Type.LINK_COMBO); 
 		SHOP_LIST_L_ARTICLE.elements.add(SHOP_LIST_L_ARTICLE_SHOP_LIST_L_ARTICLE_L_LIST_null);
-		UiElement SHOP_LIST_L_ARTICLE_SHOP_LIST_L_ARTICLE_L_ARTICLE = new UiElement("shopArticle", "shopListLArticleLArticle", null, null, Type.LINK_QUICK_SEARCH); 
+		UiElement SHOP_LIST_L_ARTICLE_SHOP_LIST_L_ARTICLE_L_ARTICLE = new UiElement("shopArticle", "shopListLArticleLArticle", null, null, Type.LINK); 
 		SHOP_LIST_L_ARTICLE.elements.add(SHOP_LIST_L_ARTICLE_SHOP_LIST_L_ARTICLE_L_ARTICLE);
 		pages.put("SHOP_LIST_L_ARTICLE", SHOP_LIST_L_ARTICLE);
 

@@ -599,23 +599,6 @@ public class JSFController implements Serializable {
 		return page.getUrl();
 	}
 
-	public String prepareExport(String fileType, String linkName, String queryName) {
-		ActionPage<Entity> page = getActionPage();
-		ActionPage<Entity> newPage = page.clone();
-		Entity bean = page.getBean();
-		Entity newBean = DomainUtils.newDomain(bean.$_getName());
-		EntityModel model = newBean.getModel();
-
-		for (String field : model.getFields()) {
-			newBean.invokeSetter(field, bean.invokeGetter(field));
-		}
-		uiController.prepareLinkListExport(newPage, newBean, linkName, queryName, fileType, sessionCtrl.getUser());
-		if (newPage.getAttachment() != null && newPage.getAttachment() instanceof File) {
-			setDownload((File) newPage.getAttachment());
-		}
-		return null;
-	}
-
 	/**
 	 * Basic method preparing a list page.
 	 * 

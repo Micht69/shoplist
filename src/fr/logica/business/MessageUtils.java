@@ -34,7 +34,7 @@ public class MessageUtils {
 	 * 
 	 * @return Available languages for labels.
 	 */
-	public static Set<Locale> getAvailableLanguages() {
+	public static synchronized Set<Locale> getAvailableLanguages() {
 		if (availableLanguages == null) {
 			availableLanguages = new HashSet<Locale>();
 			ClassLoader loader = Thread.currentThread().getContextClassLoader();
