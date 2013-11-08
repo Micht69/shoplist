@@ -260,3 +260,4 @@ public abstract class DomainLogic<E extends Entity> extends AbstractDomainLogic<
 
 	
 }
+

@@ -855,3 +855,4 @@ public abstract class AbstractDomainLogic<E extends Entity> {
 
 	
 }
+

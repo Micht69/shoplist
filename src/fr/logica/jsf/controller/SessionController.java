@@ -31,7 +31,7 @@ public class SessionController implements Serializable {
 	/** serialUID */
 	private static final long serialVersionUID = -7648293653392389886L;
 
-	private ApplicationUser user = new ApplicationUser("admin");
+	private ApplicationUser user;
 
 	private LoginForm form;
 
@@ -134,7 +134,7 @@ public class SessionController implements Serializable {
 		lists = new HashSet<String>();
 		actions = new HashMap<String, Set<Integer>>();
 		form = new LoginForm();
-		// user = null;
+		user = null;
 		return getDefaultPage();
 	}
 
