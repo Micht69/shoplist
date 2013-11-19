@@ -256,13 +256,13 @@ public class ShopArticleModel extends EntityModel implements Serializable {
 
 	/**
 	 * Link from entity SHOP_ARTICLE to SHOP_SHELF
-	 * Shelf
+	 * Rayon
 	 */ 
 	public static final String LINK_SHOP_ARTICLE_L_SHELF = "shopArticleLShelf";
 
 	/**
 	 * Link from entity SHOP_LIST_L_ARTICLE to SHOP_ARTICLE
-	 * Link to Article
+	 * Article
 	 */ 
 	public static final String LINK_SHOP_LIST_L_ARTICLE_L_ARTICLE = "shopListLArticleLArticle";
 

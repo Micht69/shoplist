@@ -429,3 +429,6 @@ div.map {
 .btn_comment:hover {
 	text-decoration: none;
 }
+.mandatory_label {
+	padding-left: 2px;
+}

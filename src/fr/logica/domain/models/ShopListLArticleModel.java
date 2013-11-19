@@ -251,13 +251,13 @@ public class ShopListLArticleModel extends EntityModel implements Serializable {
 
 	/**
 	 * Link from entity SHOP_LIST_L_ARTICLE to SHOP_LIST
-	 * Link to List
+	 * Liste
 	 */ 
 	public static final String LINK_SHOP_LIST_L_ARTICLE_L_LIST = "shopListLArticleLList";
 
 	/**
 	 * Link from entity SHOP_LIST_L_ARTICLE to SHOP_ARTICLE
-	 * Link to Article
+	 * Article
 	 */ 
 	public static final String LINK_SHOP_LIST_L_ARTICLE_L_ARTICLE = "shopListLArticleLArticle";
 

@@ -230,7 +230,7 @@ public class ShopUserModel extends EntityModel implements Serializable {
 
 	/**
 	 * Link from entity SHOP_LIST to SHOP_USER
-	 * User
+	 * Utilisateur
 	 */ 
 	public static final String LINK_SHOP_ARTICLE_L_USER = "shopArticleLUser";
 

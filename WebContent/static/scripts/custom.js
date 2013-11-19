@@ -5,6 +5,9 @@
  * @param pageName the name of the page
  */
 function doPageCustomize(pageName) {
+	try {
+		$("#mainForm .colFieldSetRight input:visible, #mainForm .colFieldSetRight select:visible").first().focus();
+	} catch (e) {}
 }
 
 /**

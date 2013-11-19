@@ -223,7 +223,7 @@ public class ShopShelfModel extends EntityModel implements Serializable {
 
 	/**
 	 * Link from entity SHOP_ARTICLE to SHOP_SHELF
-	 * Shelf
+	 * Rayon
 	 */ 
 	public static final String LINK_SHOP_ARTICLE_L_SHELF = "shopArticleLShelf";
 
