@@ -90,25 +90,39 @@ $(document).ready(function() {
 	}
 	$(".content").width(contentWidth); // Also allow convertion from % to px
 	
-	$('.actionContent').click(function() {
-		contentImage = $(this);
+	
+	/* Collapsable fieldsets */
+	$('.actionContent').each(function() {
+		this.closeOpen = function() {
+			var contentImage = $(this);
+			var contentTable;
+			var block;
 
-		if (contentImage.parent().hasClass('table_title'))
-			contentTable = contentImage.parents('.mainTable_container').children('.table_container');
-		else
-			contentTable = contentImage.parents('.form_container').children('table');
-
-		if (contentTable.length) {
-			if (contentTable.is(':visible')) {
-				contentTable.stop().hide();
-				contentImageSrc = contentImage.attr('src').replace(/close/ig, "open");
+			if (contentImage.parent().hasClass('table_title')) {
+				block = contentImage.parents('.mainTable_container');
+				contentTable = block.children('.table_container');
 			} else {
-				contentTable.stop().show();
-				contentImageSrc = contentImage.attr('src').replace(/open/ig, "close");
+				block = contentImage.parents('.form_container');
+				contentTable = block.children('table');
 			}
-			contentImage.attr('src', contentImageSrc);
-		}
+
+			if (contentTable.length) {
+				if (contentTable.is(':visible')) {
+					contentTable.stop().hide();
+					contentImageSrc = contentImage.attr('src').replace(/close/ig, "open");
+					block.addClass("reduced").removeClass("developed");
+				} else {
+					contentTable.stop().show();
+					contentImageSrc = contentImage.attr('src').replace(/open/ig, "close");
+					block.addClass("developed").removeClass("reduced");
+				}
+				contentImage.attr('src', contentImageSrc);
+			}
+		};
 	});
+
+	$('.actionContent').click(function() {this.closeOpen();});
+	$('.actionContent').parent().click(function() {$(this).children('.actionContent')[0].closeOpen()});
 
 	// Gestion des champs "disabled"
 	$("select:disabled").each(function(idx) {
@@ -848,21 +862,25 @@ Object.size = function(arr)
 };
 
 function filterLoadCommand() {
+	$('input[type="radio"]:checked').filter('[value=""]').prop('checked', false);
 	$(".link-actions").click();
 	$("#mainForm\\\:criteriaLoadButton").click();
 }
 
 function filterModifyCommand() {
+	$('input[type="radio"]:checked').filter('[value=""]').prop('checked', false);
 	$(".link-actions").click();
 	$("#mainForm\\\:criteriaModifyButton").click();
 }
 
 function filterDeleteCommand() {
+	$('input[type="radio"]:checked').filter('[value=""]').prop('checked', false);
 	$(".link-actions").click();
 	$("#mainForm\\\:criteriaDeleteButton").click();
 }
 
 function filterCreateCommand() {
+	$('input[type="radio"]:checked').filter('[value=""]').prop('checked', false);
 	$(".link-actions").click();
 	$("#createNewCriteriaDialog").dialog("open");
 }

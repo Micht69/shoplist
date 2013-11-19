@@ -179,7 +179,8 @@ $(document).ready(function() {
 	try {
 		initList('SHOP_ARTICLES2');
 		#{sessionCtrl.page.displayCriterias ? 'listInitialized = false;' : ''}
-		doListCustomize('SHOP_ARTICLES2', 'SHOP_ARTICLES2_LIST');
+
+		<h:outputText value="doListCustomize('SHOP_ARTICLES2', 'SHOP_ARTICLES2_LIST');" rendered="#{!sessionCtrl.disableJS}"/>
 		showLines(null, '#{jsfCtrl.jsFilterMap.SHOP_ARTICLES2}', 'SHOP_ARTICLES2');
 	} catch (e) {}
 });

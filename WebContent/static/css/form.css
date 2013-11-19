@@ -143,6 +143,9 @@ button.btn_large {
 }
 
 .colFieldSetLeft {
+	width: 20%;
+}
+.group_table_col_2 .colFieldSetLeft {
 	width: 40%;
 }
 
@@ -152,8 +155,11 @@ button.btn_large {
 }
 
 .colFieldSetRight {
-	width: 60%;
+	width: 80%;
 	white-space: nowrap;
+}
+.group_table_col_2 .colFieldSetRight {
+	width: 60%;
 }
 
 .colFieldSetRight > input,
@@ -162,7 +168,7 @@ button.btn_large {
 }
 
 .colFieldSetRight > select {
-	width: 220px;
+	width: 230px;
 }
 
 .colFieldSetRight > input.dateTime {

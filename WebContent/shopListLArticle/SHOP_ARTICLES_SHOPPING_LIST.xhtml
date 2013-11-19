@@ -171,7 +171,8 @@ $(document).ready(function() {
 	try {
 		initList('SHOP_ARTICLES_SHOPPING');
 		#{sessionCtrl.page.displayCriterias ? 'listInitialized = false;' : ''}
-		doListCustomize('SHOP_ARTICLES_SHOPPING', 'SHOP_ARTICLES_SHOPPING_LIST');
+
+		<h:outputText value="doListCustomize('SHOP_ARTICLES_SHOPPING', 'SHOP_ARTICLES_SHOPPING_LIST');" rendered="#{!sessionCtrl.disableJS}"/>
 		showLines(null, '#{jsfCtrl.jsFilterMap.SHOP_ARTICLES_SHOPPING}', 'SHOP_ARTICLES_SHOPPING');
 	} catch (e) {}
 });

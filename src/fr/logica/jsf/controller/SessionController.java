@@ -31,7 +31,7 @@ public class SessionController implements Serializable {
 	/** serialUID */
 	private static final long serialVersionUID = -7648293653392389886L;
 
-	private ApplicationUser user = new ApplicationUser("admin");
+	private ApplicationUser user;
 
 	private LoginForm form;
 
@@ -44,6 +44,11 @@ public class SessionController implements Serializable {
 
 	/** Access rights on Actions **/
 	private Map<String, Set<Integer>> actions;
+
+	/** Admin controls **/
+	private Boolean disableJS = Boolean.FALSE;
+	private Boolean disableCustom = Boolean.FALSE;
+	private Boolean disableCSS = Boolean.FALSE;
 
 	/**
 	 * Gets application version number.
@@ -134,6 +139,7 @@ public class SessionController implements Serializable {
 		lists = new HashSet<String>();
 		actions = new HashMap<String, Set<Integer>>();
 		form = new LoginForm();
+		user = null;
 		return getDefaultPage();
 	}
 
@@ -318,6 +324,30 @@ public class SessionController implements Serializable {
 
 	public boolean isLanguageSelector() {
 		return (getLanguages().size() > 1);
+	}
+	
+	public Boolean getDisableJS() {
+		return disableJS;
+	}
+
+	public void setDisableJS(Boolean disableJS) {
+		this.disableJS = disableJS;
+	}
+
+	public Boolean getDisableCustom() {
+		return disableCustom;
+	}
+
+	public void setDisableCustom(Boolean disableCustom) {
+		this.disableCustom = disableCustom;
+	}
+
+	public Boolean getDisableCSS() {
+		return disableCSS;
+	}
+
+	public void setDisableCSS(Boolean disableCSS) {
+		this.disableCSS = disableCSS;
 	}
 }
 

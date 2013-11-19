@@ -209,7 +209,7 @@
 <script type="text/javascript">
 $(document).ready(function() {
 	try { 
-		doPageCustomize('SHOP_SHELF'); 
+		<h:outputText value="doPageCustomize('SHOP_SHELF');" rendered="#{!sessionCtrl.disableJS}"/>
 		$('td[class="first"]').click(function(event){
 			event.stopPropagation();
 		});

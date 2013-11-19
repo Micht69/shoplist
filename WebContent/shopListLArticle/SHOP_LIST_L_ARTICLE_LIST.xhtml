@@ -187,7 +187,8 @@ $(document).ready(function() {
 	try {
 		initList('SHOP_LIST_L_ARTICLE');
 		#{sessionCtrl.page.displayCriterias ? 'listInitialized = false;' : ''}
-		doListCustomize('SHOP_LIST_L_ARTICLE', 'SHOP_LIST_L_ARTICLE_LIST');
+
+		<h:outputText value="doListCustomize('SHOP_LIST_L_ARTICLE', 'SHOP_LIST_L_ARTICLE_LIST');" rendered="#{!sessionCtrl.disableJS}"/>
 		showLines(null, '#{jsfCtrl.jsFilterMap.SHOP_LIST_L_ARTICLE}', 'SHOP_LIST_L_ARTICLE');
 	} catch (e) {}
 });

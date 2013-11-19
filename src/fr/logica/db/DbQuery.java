@@ -30,6 +30,7 @@ import fr.logica.business.Key;
 import fr.logica.business.KeyModel;
 import fr.logica.business.LinkModel;
 import fr.logica.business.TechnicalException;
+import fr.logica.db.DbConnection;
 import fr.logica.db.DbConnection.Type;
 import fr.logica.db.DbQuery.Var;
 import fr.logica.reflect.DomainUtils;
@@ -467,6 +468,8 @@ public class DbQuery implements Cloneable {
 		} else if (maxRownum > 0) {
 			if (DbConnection.dbType == Type.ORACLE) {
 				query = query.concat(") WHERE ROWNUM <= " + maxRownum);
+			} else if (DbConnection.dbType == Type.PostgreSQL) {
+				query = query.concat(" LIMIT " + maxRownum + " OFFSET " + minRownum);
 			} else {
 				query = query.concat(" LIMIT " + minRownum + ", " + maxRownum);
 			}

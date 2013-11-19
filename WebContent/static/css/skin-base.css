@@ -390,6 +390,14 @@ form > .actions {
 	border-radius: 4px;
 }
 
+/* Whole block when reduced */
+#mainForm > .form_container.reduced,
+.group_table .form_container.reduced,
+.mainTable_container.reduced {
+	border: none;
+	padding: 1px; /* to compensate for the loss of the 1px border */
+}
+
 /* Block titles */
 #mainForm > .form_container > .form_title, /* block title on single block  */
 .group_table .form_container > .form_title, /* block title on sequential blocks */

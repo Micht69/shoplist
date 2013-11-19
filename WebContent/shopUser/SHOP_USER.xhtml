@@ -208,7 +208,7 @@
 <script type="text/javascript">
 $(document).ready(function() {
 	try { 
-		doPageCustomize('SHOP_USER'); 
+		<h:outputText value="doPageCustomize('SHOP_USER');" rendered="#{!sessionCtrl.disableJS}"/>
 		$('td[class="first"]').click(function(event){
 			event.stopPropagation();
 		});

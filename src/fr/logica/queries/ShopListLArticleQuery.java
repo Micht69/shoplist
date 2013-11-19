@@ -22,22 +22,6 @@ public class ShopListLArticleQuery extends AbstractEntityQuery {
 	static { 
 		QUERIES = new HashMap<String, DbQuery>();	
 		
-		DbQuery SHOP_ARTICLES_SHOPPING = new DbQuery("shopListLArticle", "T1");
-		SHOP_ARTICLES_SHOPPING.setName("SHOP_ARTICLES_SHOPPING");
-		SHOP_ARTICLES_SHOPPING.addEntity("shopArticle", "T4", "shopListLArticleLArticle", null, Join.LOOSE);
-		SHOP_ARTICLES_SHOPPING.addEntity("shopShelf", "T3", "shopArticleLShelf", null, Join.LOOSE);
-		SHOP_ARTICLES_SHOPPING.addColumn("listId", "T1", Visibility.INVISIBLE);
-		SHOP_ARTICLES_SHOPPING.addColumn("articleId", "T1", Visibility.INVISIBLE);
-		SHOP_ARTICLES_SHOPPING.addColumn("position", "T3", Visibility.INVISIBLE);
-		SHOP_ARTICLES_SHOPPING.addColumn("name", "T3");
-		SHOP_ARTICLES_SHOPPING.addColumn("name", "T4");
-		SHOP_ARTICLES_SHOPPING.addColumn("quantity", "T1");
-		SHOP_ARTICLES_SHOPPING.addColumn("status", "T1");
-		SHOP_ARTICLES_SHOPPING.addCondEq("status", "T1", "BUY");
-		SHOP_ARTICLES_SHOPPING.addSortBy("position", "T3", "ASC");
-		SHOP_ARTICLES_SHOPPING.addSortBy("name", "T4", "ASC");
-		QUERIES.put("SHOP_ARTICLES_SHOPPING", SHOP_ARTICLES_SHOPPING);	
-		
 		DbQuery SHOP_ARTICLES2 = new DbQuery("shopListLArticle", "T1");
 		SHOP_ARTICLES2.setName("SHOP_ARTICLES2");
 		SHOP_ARTICLES2.addEntity("shopArticle", "T4", "shopListLArticleLArticle", null, Join.LOOSE);
@@ -53,6 +37,22 @@ public class ShopListLArticleQuery extends AbstractEntityQuery {
 		SHOP_ARTICLES2.addSortBy("position", "T3", "ASC");
 		SHOP_ARTICLES2.addSortBy("name", "T4", "ASC");
 		QUERIES.put("SHOP_ARTICLES2", SHOP_ARTICLES2);	
+		
+		DbQuery SHOP_ARTICLES_SHOPPING = new DbQuery("shopListLArticle", "T1");
+		SHOP_ARTICLES_SHOPPING.setName("SHOP_ARTICLES_SHOPPING");
+		SHOP_ARTICLES_SHOPPING.addEntity("shopArticle", "T4", "shopListLArticleLArticle", null, Join.LOOSE);
+		SHOP_ARTICLES_SHOPPING.addEntity("shopShelf", "T3", "shopArticleLShelf", null, Join.LOOSE);
+		SHOP_ARTICLES_SHOPPING.addColumn("listId", "T1", Visibility.INVISIBLE);
+		SHOP_ARTICLES_SHOPPING.addColumn("articleId", "T1", Visibility.INVISIBLE);
+		SHOP_ARTICLES_SHOPPING.addColumn("position", "T3", Visibility.INVISIBLE);
+		SHOP_ARTICLES_SHOPPING.addColumn("name", "T3");
+		SHOP_ARTICLES_SHOPPING.addColumn("name", "T4");
+		SHOP_ARTICLES_SHOPPING.addColumn("quantity", "T1");
+		SHOP_ARTICLES_SHOPPING.addColumn("status", "T1");
+		SHOP_ARTICLES_SHOPPING.addCondEq("status", "T1", "BUY");
+		SHOP_ARTICLES_SHOPPING.addSortBy("position", "T3", "ASC");
+		SHOP_ARTICLES_SHOPPING.addSortBy("name", "T4", "ASC");
+		QUERIES.put("SHOP_ARTICLES_SHOPPING", SHOP_ARTICLES_SHOPPING);	
 				
 		DbQuery SHOP_LIST_L_ARTICLE = new DbQuery("shopListLArticle", "T1");
 		SHOP_LIST_L_ARTICLE.setName("SHOP_LIST_L_ARTICLE");

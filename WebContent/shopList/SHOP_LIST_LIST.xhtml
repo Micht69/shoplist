@@ -166,7 +166,8 @@ $(document).ready(function() {
 	try {
 		initList('SHOP_LIST');
 		#{sessionCtrl.page.displayCriterias ? 'listInitialized = false;' : ''}
-		doListCustomize('SHOP_LIST', 'SHOP_LIST_LIST');
+
+		<h:outputText value="doListCustomize('SHOP_LIST', 'SHOP_LIST_LIST');" rendered="#{!sessionCtrl.disableJS}"/>
 		showLines(null, '#{jsfCtrl.jsFilterMap.SHOP_LIST}', 'SHOP_LIST');
 	} catch (e) {}
 });

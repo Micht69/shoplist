@@ -1,11 +1,25 @@
 package fr.logica.reflect;
 
+import javax.faces.context.FacesContext;
+
 import fr.logica.business.Constants;
 import fr.logica.business.DomainLogic;
 import fr.logica.business.Entity;
 import fr.logica.business.TechnicalException;
+import fr.logica.jsf.controller.SessionController;
+import fr.logica.jsf.utils.JSFBeanUtils;
 
 public class DomainUtils {
+
+	private static SessionController sessionCtrl;
+
+	private static SessionController getSessionCtrl() {
+		if (sessionCtrl == null)
+		{
+			sessionCtrl = (SessionController) JSFBeanUtils.getManagedBean(FacesContext.getCurrentInstance(), "sessionCtrl");
+		}
+		return sessionCtrl;
+	}
 
 	/**
 	 * Retourne la classe associée à la classe passée en paramêtre
@@ -39,6 +53,16 @@ public class DomainUtils {
 	private static DomainLogic<? extends Entity> internalGetLogic(String className) {
 		String fullClassName = Constants.DOMAIN_LOGIC_PACKAGE + "." + className + Constants.EXTENSION_LOGIC;
 		try {
+
+			if (getSessionCtrl() != null && getSessionCtrl().getDisableCustom() != null && getSessionCtrl().getDisableCustom())
+			{
+				try {
+					return (DomainLogic<?>) Class.forName("fr.logica.business.DefaultLogic").newInstance();
+				} catch (Exception ex) {
+					throw new TechnicalException("Impossible d'instancier la classe générique.", ex);
+				}
+			}
+
 			return (DomainLogic<?>) Class.forName(fullClassName).newInstance();
 			/* si l'objet custom n'existe pas, création d'un custom générique */
 		} catch (InstantiationException e) {
@@ -114,7 +138,7 @@ public class DomainUtils {
 				toUpper = true;
 				continue;
 			}
-			
+
 			if (toUpper) {
 				result[j] = strUpper[i];
 				toUpper = false;

@@ -138,7 +138,7 @@
 					<tr>
 						<td class="colFieldSetLeft">
 								
-<h:outputLabel escape="false" value="#{jsfCtrl.getLabel('shopArticleLUser', 'shopListInfos2.shopArticleLUser')}" title="#{hh:label('tooltips', 'shopListInfos2.shopArticleLUser')}"/>
+<h:outputLabel escape="false" value="#{jsfCtrl.getLabel('shopArticleLUser', 'shopListInfos2.0.shopArticleLUser')}" title="#{hh:label('tooltips', 'shopListInfos2.0.shopArticleLUser')}"/>
 
 <h:outputLabel value="*" styleClass="mandatory_label" rendered="#{jsfCtrl.isMandatory('shopArticleLUser')}"/>
 
@@ -156,10 +156,10 @@
 	</span>
 
 	<h:commandLink rendered="#{jsfCtrl.entity.links.shopArticleLUser.key != null and sessionCtrl.isActionRendered('SHOP_USER', 2)}" action="#{jsfCtrl.prepareSingleAction('shopUser', 2, 2, jsfCtrl.entity.links.shopArticleLUser.key, 'shopArticleLUser')}">
-		<h:outputText value="#{jsfCtrl.entity.links.shopArticleLUser.readValue}" id="shopListInfos2_shopArticleLUser" title="#{jsfCtrl.getLabel('shopArticleLUser', 'shopListInfos2.shopArticleLUser')}" />
+		<h:outputText value="#{jsfCtrl.entity.links.shopArticleLUser.readValue}" id="shopListInfos2_0_shopArticleLUser" title="#{jsfCtrl.getLabel('shopArticleLUser', 'shopListInfos2.0.shopArticleLUser')}" />
 		<f:param name="skipRequired" value="true" />
 	</h:commandLink>
-	<h:outputText value="#{jsfCtrl.entity.links.shopArticleLUser.readValue}" id="shopListInfos2_shopArticleLUser-label" title="#{jsfCtrl.getLabel('shopArticleLUser', 'shopListInfos2.shopArticleLUser')}"
+	<h:outputText value="#{jsfCtrl.entity.links.shopArticleLUser.readValue}" id="shopListInfos2_0_shopArticleLUser-label" title="#{jsfCtrl.getLabel('shopArticleLUser', 'shopListInfos2.0.shopArticleLUser')}"
 		rendered="#{jsfCtrl.entity.links.shopArticleLUser.key != null and !sessionCtrl.isActionRendered('SHOP_USER', 2)}" />
 
 	<h:panelGroup rendered="#{!jsfCtrl.readonly('shopArticleLUser')}">
@@ -226,7 +226,7 @@
 <script type="text/javascript">
 $(document).ready(function() {
 	try { 
-		doPageCustomize('SHOP_LIST_CREATE'); 
+		<h:outputText value="doPageCustomize('SHOP_LIST_CREATE');" rendered="#{!sessionCtrl.disableJS}"/>
 		$('td[class="first"]').click(function(event){
 			event.stopPropagation();
 		});

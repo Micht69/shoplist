@@ -60,6 +60,14 @@
 			</div>
 		</div>
 	</hh:tab>
+	<hh:tab id="tabParam" title="#{hh:label('labels', 'adminPage.tabParamTitle')}">
+		<ul>
+			<li><h:selectBooleanCheckbox id="disableJS" value="${sessionCtrl.disableJS}"></h:selectBooleanCheckbox> <h:outputText value="#{hh:label('labels', 'adminPage.disableJS')}" /></li>
+			<li><h:selectBooleanCheckbox id="disableCustom" value="${sessionCtrl.disableCustom}"></h:selectBooleanCheckbox> <h:outputText value="#{hh:label('labels', 'adminPage.disableCustom')}" /></li>
+			<li><h:selectBooleanCheckbox id="disableCSS" value="${sessionCtrl.disableCSS}"></h:selectBooleanCheckbox> <h:outputText value="#{hh:label('labels', 'adminPage.disableCSS')}" /></li>
+			<li><h:commandButton value="#{hh:label('labels', 'adminPage.save')}" /> </li>
+		</ul>
+	</hh:tab>
 </hh:tabPanel>
 
 <script type="text/javascript" >

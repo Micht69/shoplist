@@ -179,7 +179,8 @@ $(document).ready(function() {
 	try {
 		initList('SHOP_USER');
 		#{sessionCtrl.page.displayCriterias ? 'listInitialized = false;' : ''}
-		doListCustomize('SHOP_USER', 'SHOP_USER_LIST');
+
+		<h:outputText value="doListCustomize('SHOP_USER', 'SHOP_USER_LIST');" rendered="#{!sessionCtrl.disableJS}"/>
 		showLines(null, '#{jsfCtrl.jsFilterMap.SHOP_USER}', 'SHOP_USER');
 	} catch (e) {}
 });

@@ -31,21 +31,17 @@
 	<link rel="stylesheet" type="text/css" href="../static/css/menu.css" />
 	<link rel="stylesheet" type="text/css" href="../static/css/form.css" />
 	<link rel="stylesheet" type="text/css" href="../static/css/lists.css" />
-	
 		
 	<link rel="stylesheet" type="text/css" media="print" href="../static/css/print.css" />
-	
 	<link rel="stylesheet" type="text/css" href="../static/css/skin-base.css" />
 	<link rel="stylesheet" type="text/css" href="../static/css/skin-header-footer.css" />
 	<link rel="stylesheet" type="text/css" href="../static/css/skin-specifics.css" />
 	<link rel="stylesheet" type="text/css" media="print" href="../static/css/skin-print.css" />
-	
-	<!-- Kept for compatbility, deprecated -->
-	<link rel="stylesheet" type="text/css" href="../static/css/custom.css" />
-	
+	<!-- Kept for compatibility, deprecated -->
+	<h:panelGroup rendered="#{!sessionCtrl.disableCSS}"><link rel="stylesheet" type="text/css" href="../static/css/custom.css" /></h:panelGroup>
+		
 	<link rel="icon" href="../static/img/favicon.ico" type="image/x-icon" />
 	<link rel="shortcut icon" href="../static/img/favicon.ico" type="image/x-icon" />
-
 	
 	<script type="text/javascript" src="../static/scripts/jquery-1.9.1.min.js" />
 	<script type="text/javascript" src="../static/scripts/jquery-migrate-1.1.0.js" />
@@ -58,7 +54,7 @@
 	<script type="text/javascript" src="../static/scripts/filtre.js" />
 	<script type="text/javascript" src="../static/scripts/logica.js" />
 	<script type="text/javascript" src="../static/scripts/comment.js" />
-	<script type="text/javascript" src="../static/scripts/custom.js" />
+	<h:panelGroup rendered="#{!sessionCtrl.disableJS}"><script type="text/javascript" src="../static/scripts/custom.js" /></h:panelGroup>
 	<script type="text/javascript" src="../static/scripts/tabedit.js" />
 	<script type="text/javascript" src="../static/scripts/k.min.js" />
 	
