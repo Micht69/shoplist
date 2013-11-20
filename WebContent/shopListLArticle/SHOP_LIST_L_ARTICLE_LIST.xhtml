@@ -46,31 +46,31 @@
 			<td style="text-align: right;"><span class="allActionButtons">
 				<h:panelGroup rendered="#{!jsfCtrl.select}">
 
-					<h:commandButton id="SHOP_LIST_L_ARTICLE_button0" alt='commandButton0' styleClass="btn_medium"
+					<h:commandButton id="SHOP_LIST_L_ARTICLE_button0" alt='commandButton0' styleClass="btn_icon btn_medium"
 						rendered="#{sessionCtrl.isActionRendered('SHOP_LIST_L_ARTICLE', 0)}"
-						value="#{hh:label('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_0')}" action="#{jsfCtrl.prepareSingleAction('shopListLArticle', 0, 0, null, null)}" />
+						value="#{hh:label('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_0')}" action="#{jsfCtrl.prepareSingleAction('shopListLArticle', 0, 0, null, null)}" style="background-image: url('#{application.contextPath}/static/img/icons/create.png');" />
 
-					<h:commandButton id="SHOP_LIST_L_ARTICLE_button51" alt='commandButton51' styleClass="btn_medium"
+					<h:commandButton id="SHOP_LIST_L_ARTICLE_button51" alt='commandButton51' styleClass="btn_icon btn_medium"
 						rendered="#{sessionCtrl.isActionRendered('SHOP_LIST_L_ARTICLE', 51)}"
-						value="#{hh:label('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_51')}" action="#{jsfCtrl.prepareSingleAction('shopListLArticle', 51, 0, null, null)}" />
+						value="#{hh:label('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_51')}" action="#{jsfCtrl.prepareSingleAction('shopListLArticle', 51, 0, null, null)}" style="background-image: url('#{application.contextPath}/static/img/icons/create.png');" />
 
 					<span class="listButtons" id="buttonSHOP_LIST_L_ARTICLE">
 
-						<h:commandButton id="SHOP_LIST_L_ARTICLE_button2" alt='commandButton2' styleClass="btn_medium"
+						<h:commandButton id="SHOP_LIST_L_ARTICLE_button2" alt='commandButton2' styleClass="btn_icon btn_medium"
 							rendered="#{sessionCtrl.isActionRendered('SHOP_LIST_L_ARTICLE', 2)}"
-							value="#{hh:label('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_2')}" action="#{jsfCtrl.prepareMultiAction('shopListLArticle', 2, 2, jsfCtrl.results.selectedPk, null)}" />
+							value="#{hh:label('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_2')}" action="#{jsfCtrl.prepareMultiAction('shopListLArticle', 2, 2, jsfCtrl.results.selectedPk, null)}" style="background-image: url('#{application.contextPath}/static/img/icons/edit.png');" />
 
-						<h:commandButton id="SHOP_LIST_L_ARTICLE_button4" alt='commandButton4' styleClass="btn_medium"
+						<h:commandButton id="SHOP_LIST_L_ARTICLE_button4" alt='commandButton4' styleClass="btn_icon btn_medium"
 							rendered="#{sessionCtrl.isActionRendered('SHOP_LIST_L_ARTICLE', 4)}"
-							value="#{hh:label('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_4')}" action="#{jsfCtrl.prepareMultiAction('shopListLArticle', 4, 4, jsfCtrl.results.selectedPk, null)}" />
+							value="#{hh:label('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_4')}" action="#{jsfCtrl.prepareMultiAction('shopListLArticle', 4, 4, jsfCtrl.results.selectedPk, null)}" style="background-image: url('#{application.contextPath}/static/img/icons/delete.png');" />
 
-						<h:commandButton id="SHOP_LIST_L_ARTICLE_button5" alt='commandButton5' styleClass="btn_medium"
+						<h:commandButton id="SHOP_LIST_L_ARTICLE_button5" alt='commandButton5' styleClass="btn_icon btn_medium"
 							rendered="#{sessionCtrl.isActionRendered('SHOP_LIST_L_ARTICLE', 5)}"
-							value="#{hh:label('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_5')}" action="#{jsfCtrl.prepareMultiAction('shopListLArticle', 5, 5, jsfCtrl.results.selectedPk, null)}" />
+							value="#{hh:label('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_5')}" action="#{jsfCtrl.prepareMultiAction('shopListLArticle', 5, 5, jsfCtrl.results.selectedPk, null)}" style="background-image: url('#{application.contextPath}/static/img/icons/display.png');" />
 
-						<h:commandButton id="SHOP_LIST_L_ARTICLE_button50" alt='commandButton50' styleClass="btn_medium"
+						<h:commandButton id="SHOP_LIST_L_ARTICLE_button50" alt='commandButton50' styleClass="btn_icon btn_medium"
 							rendered="#{sessionCtrl.isActionRendered('SHOP_LIST_L_ARTICLE', 50)}"
-							value="#{hh:label('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_50')}" action="#{jsfCtrl.prepareMultiAction('shopListLArticle', 50, 10, jsfCtrl.results.selectedPk, null)}" />
+							value="#{hh:label('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_50')}" action="#{jsfCtrl.prepareMultiAction('shopListLArticle', 50, 10, jsfCtrl.results.selectedPk, null)}" style="background-image: url('#{application.contextPath}/static/img/icons/mark.png');" />
 
 					</span>
 				</h:panelGroup>

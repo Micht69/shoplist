@@ -250,22 +250,22 @@
 			</td>
 			<td style="text-align: right;"><span class="allActionButtons">
 				<h:panelGroup rendered="#{!jsfCtrl.listIsReadOnly('shopListLArticleLList_SHOP_ARTICLES2')}">
-					<h:commandButton id="shopListLArticleLList_shopArticles2_button0" alt='commandButton0' styleClass="btn_medium"
+					<h:commandButton id="shopListLArticleLList_shopArticles2_button0" alt='commandButton0' styleClass="btn_icon btn_medium"
 						rendered="#{sessionCtrl.isActionRendered('SHOP_LIST_L_ARTICLE', 0) and !jsfCtrl.listIsProtected('shopListLArticleLList_SHOP_ARTICLES2')}"
-						value="#{hh:label('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_0')}" action="#{jsfCtrl.prepareSingleAction('shopListLArticle', 0, 0, null, 'shopListLArticleLList', 'SHOP_ARTICLES2')}" />
+						value="#{hh:label('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_0')}" action="#{jsfCtrl.prepareSingleAction('shopListLArticle', 0, 0, null, 'shopListLArticleLList', 'SHOP_ARTICLES2')}" style="background-image: url('#{application.contextPath}/static/img/icons/create.png');" />
 					<h:outputText value=" " />
 					<span class="listButtons" id="buttonshopListLArticleLList_shopArticles2">
-						<h:commandButton id="shopListLArticleLList_shopArticles2_button2" alt='commandButton2' styleClass="btn_medium"
+						<h:commandButton id="shopListLArticleLList_shopArticles2_button2" alt='commandButton2' styleClass="btn_icon btn_medium"
 						rendered="#{sessionCtrl.isActionRendered('SHOP_LIST_L_ARTICLE', 2) and !jsfCtrl.listIsProtected('shopListLArticleLList_SHOP_ARTICLES2')}"
-						value="#{hh:label('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_2')}" action="#{jsfCtrl.prepareMultiAction('shopListLArticle', 2, 2, jsfCtrl.entity.links.shopListLArticleLList.results('SHOP_ARTICLES2').selectedPk, 'shopListLArticleLList')}" />
+						value="#{hh:label('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_2')}" action="#{jsfCtrl.prepareMultiAction('shopListLArticle', 2, 2, jsfCtrl.entity.links.shopListLArticleLList.results('SHOP_ARTICLES2').selectedPk, 'shopListLArticleLList')}" style="background-image: url('#{application.contextPath}/static/img/icons/edit.png');" />
 						<h:outputText value=" " />
-						<h:commandButton id="shopListLArticleLList_shopArticles2_button4" alt='commandButton4' styleClass="btn_medium"
+						<h:commandButton id="shopListLArticleLList_shopArticles2_button4" alt='commandButton4' styleClass="btn_icon btn_medium"
 						rendered="#{sessionCtrl.isActionRendered('SHOP_LIST_L_ARTICLE', 4) and !jsfCtrl.listIsProtected('shopListLArticleLList_SHOP_ARTICLES2')}"
-						value="#{hh:label('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_4')}" action="#{jsfCtrl.prepareMultiAction('shopListLArticle', 4, 4, jsfCtrl.entity.links.shopListLArticleLList.results('SHOP_ARTICLES2').selectedPk, 'shopListLArticleLList')}" />
+						value="#{hh:label('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_4')}" action="#{jsfCtrl.prepareMultiAction('shopListLArticle', 4, 4, jsfCtrl.entity.links.shopListLArticleLList.results('SHOP_ARTICLES2').selectedPk, 'shopListLArticleLList')}" style="background-image: url('#{application.contextPath}/static/img/icons/delete.png');" />
 						<h:outputText value=" " />
-						<h:commandButton id="shopListLArticleLList_shopArticles2_button5" alt='commandButton5' styleClass="btn_medium"
+						<h:commandButton id="shopListLArticleLList_shopArticles2_button5" alt='commandButton5' styleClass="btn_icon btn_medium"
 						rendered="#{sessionCtrl.isActionRendered('SHOP_LIST_L_ARTICLE', 5)}"
-						value="#{hh:label('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_5')}" action="#{jsfCtrl.prepareMultiAction('shopListLArticle', 5, 5, jsfCtrl.entity.links.shopListLArticleLList.results('SHOP_ARTICLES2').selectedPk, 'shopListLArticleLList')}" />
+						value="#{hh:label('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_5')}" action="#{jsfCtrl.prepareMultiAction('shopListLArticle', 5, 5, jsfCtrl.entity.links.shopListLArticleLList.results('SHOP_ARTICLES2').selectedPk, 'shopListLArticleLList')}" style="background-image: url('#{application.contextPath}/static/img/icons/display.png');" />
 						<h:outputText value=" " />
 					</span>
 				</h:panelGroup>

@@ -80,6 +80,12 @@ a.link-actions,
 	border-radius: 4px;
 }
 
+.btn_icon > input {
+	background-position-y: center;
+	background-position-x: 1px;
+	padding-left: 25px;
+}
+
 input.dateTime ~ img {
 	height: 20px;
 	padding: 4px 8px 4px 6px;
