@@ -145,16 +145,16 @@
 				<table>
 					<tr>
 						<td class="colFieldSetLeft">
-								
+							
 <h:outputLabel escape="false" value="#{jsfCtrl.getLabel('shopArticleLUser', 'shopListInfos2.0.shopArticleLUser')}" title="#{hh:label('tooltips', 'shopListInfos2.0.shopArticleLUser')}"/>
 
 <h:outputLabel value="*" styleClass="mandatory_label" rendered="#{jsfCtrl.isMandatory('shopArticleLUser')}"/>
 
 
-						</td>
-						<td class="colFieldSetMid"><h:outputLabel value=":" /></td>
-						<td class="colFieldSetRight">
-			 <h:panelGroup>
+			</td>
+			<td class="colFieldSetMid"><h:outputLabel value=":" /></td>
+			<td class="colFieldSetRight">
+ <h:panelGroup>
 	<span class="link-actions-container">
 	<h:commandLink styleClass="link-attach" rendered="#{!jsfCtrl.readonly('shopArticleLUser')}" action="#{jsfCtrl.prepareSingleAction('shopUser', 1, 1, jsfCtrl.entity.links.shopArticleLUser.key, 'shopArticleLUser')}">
 		<h:graphicImage class="iconAction" library="img" name="link.png" alt="#{hh:label('labels', 'action.selectionner')}" title="#{hh:label('labels', 'action.selectionner')}" />

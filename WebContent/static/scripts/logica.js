@@ -71,6 +71,15 @@ function displayCriteres() {
 	} else {
 		$resultatsBody.closest(".ui-accordion").addClass("reduced").removeClass("developed");
 	}
+	
+	if (!listInitialized) {
+		var listName = $('#tableIdList').val();
+		$('#datatable-div-data-' + listName).css('height', '');
+		$('#datatable-div-data-' + listName).css('visibility', 'visible');
+		$('.list_results_container').css('height', '');
+		initList(listName);
+		listInitialized = true;
+	}
 }
 
 function displayResults() {
@@ -587,7 +596,9 @@ function datatableAlignColumns(listName, forceAlignment) {
 		$(cols[index]).width(innerWidth);
 		$(headers[index]).width(innerWidth);
 	});
-	$('#datatable-div-data-' + listName + ' thead').hide();
+	$('#datatable-div-data-' + listName + ' thead').css('visibility', 'hidden');
+	var headerHeight = $('#datatable-div-data-' + listName + ' thead').innerHeight() + 1;
+	$('#datatable-div-data-' + listName + ' table').css('margin-top', -headerHeight);
 	$('#datatable-div-header-' + listName).css('visibility', 'visible');
 	$('#datatable-div-data-' + listName).css('visibility', 'visible');
 	$('#datatable-div-header-' + listName).data('initialized', true);

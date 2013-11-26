@@ -18,8 +18,11 @@ public class ApplicationLogic extends DefaultApplicationLogic {
 
 	@Override
 	public String getDefaultPage(ApplicationUser user) {
-		return ((JSFController) JSFBeanUtils.getManagedBean(FacesContext.getCurrentInstance(), "jsfCtrl"))
-				.prepareList(ShopListModel.ENTITY_NAME, ShopListQuery.Query.QUERY_SHOP_LIST, "SHOP_LIST_LIST");
+		if (user != null) {
+			JSFController jsfCtrl = ((JSFController) JSFBeanUtils.getManagedBean(FacesContext.getCurrentInstance(), "jsfCtrl"));
 
+			return jsfCtrl.prepareList(ShopListModel.ENTITY_NAME, ShopListQuery.Query.QUERY_SHOP_LIST, "SHOP_LIST_LIST");
+		}
+		return "/index/login";
 	}
 }

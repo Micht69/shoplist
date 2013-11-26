@@ -16,7 +16,7 @@ import fr.logica.ui.ActionPage;
 public class ShopListLArticleLogic extends DefaultLogic<ShopListLArticle> {
 	@Override
 	public List<Key> doCustomAction(ActionPage<ShopListLArticle> page, List<Key> keys, Context ctx) {
-		if (page != null && page.getAction().code == ShopListLArticle.Action.ACTION_50) {
+		if (page != null && page.getAction().code == ShopListLArticle.Action.ACTION_60) {
 			for (Key k : keys) {
 				int listId = Integer.parseInt((String) k.getValue(ShopListLArticle.Var.LIST_ID));
 				int articleId = Integer.parseInt((String) k.getValue(ShopListLArticle.Var.ARTICLE_ID));

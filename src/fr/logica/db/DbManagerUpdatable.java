@@ -21,6 +21,7 @@ public class DbManagerUpdatable extends DbManager {
 	}
 
 	public void insertRow(Entity bean) throws SQLException {
+
 		try {
 			rs.moveToInsertRow();
 		} catch (SQLException e) {
@@ -35,6 +36,7 @@ public class DbManagerUpdatable extends DbManager {
 	}
 
 	public void updateRow(Entity bean) throws SQLException {
+
 		putToResultSet(bean, rs, true);
 		try {
 			rs.updateRow();
@@ -43,7 +45,18 @@ public class DbManagerUpdatable extends DbManager {
 		}
 	}
 
+	/**
+	 * Méthode conservée pour compatibilité avec les précédentes version.
+	 * 
+	 * @deprecated Préférer la méthode {@link #deleteRow(Entity)}.
+	 */
+	@Deprecated
 	public void deleteRow() throws SQLException {
+		rs.deleteRow();
+	}
+
+	public void deleteRow(Entity bean) throws SQLException {
+
 		rs.deleteRow();
 	}
 
@@ -72,4 +85,6 @@ public class DbManagerUpdatable extends DbManager {
 		}
 		return entity;
 	}
+	
+
 }

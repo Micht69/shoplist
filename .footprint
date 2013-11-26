@@ -9,6 +9,7 @@ databaseType=MYSQL
 dataGenerator=false
 beanValidation=false
 encoding=windows-1252
+lock=none
 webServer=tomcat7
 multiapp=false
 exportXls=false

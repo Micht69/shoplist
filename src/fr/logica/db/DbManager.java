@@ -662,7 +662,12 @@ public class DbManager {
                     method.invoke(entity, (index == null ? rs.getBigDecimal(dbName) : rs.getBigDecimal(index)).longValue());
 
                 } else if (Boolean.class.getName().equals(className)) {
-                    method.invoke(entity, (index == null ? rs.getBoolean(dbName) : rs.getBoolean(index)));
+					int bVal = (index == null ? rs.getInt(dbName) : rs.getInt(index));
+					if (bVal == 1) {
+						method.invoke(entity, Boolean.TRUE);
+					} else {
+						method.invoke(entity, Boolean.FALSE);
+					}
 
                 } else if ("BLOB".equals(eField.getSqlType()) || "CLOB".equals(eField.getSqlType())) {
                     method = entity.getClass().getDeclaredMethod(methodName + "Container", FileContainer.class);
@@ -713,14 +718,23 @@ public class DbManager {
 
                 if ("BOOLEAN".equals(eField.getSqlType())) {
                     Boolean bResult = null;
-                    try {
-                        // On regarde si le champ est un booleen
-                        bResult = Boolean.valueOf((String) result);
-                    } catch (Exception ex) {
+					if (result instanceof String) {
+						try {
+							// On regarde si le champ est un booleen
+							bResult = Boolean.valueOf((String) result);
+						} catch (Exception ex) {
 
+						}
+					} else if (result instanceof Boolean) {
+						bResult = (Boolean) result;
                     }
                     if (bResult != null) {
-                        rs.updateBoolean(sqlName, bResult);
+						if (bResult.booleanValue()) {
+							rs.updateInt(sqlName, 1);
+						} else {
+							rs.updateInt(sqlName, 0);
+						}
+						// rs.updateBoolean(sqlName, bResult);
                         continue;
                     }
                     // FIXME : Time et Timestamp OK ?

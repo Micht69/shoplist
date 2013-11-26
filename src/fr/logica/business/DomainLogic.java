@@ -136,9 +136,7 @@ public abstract class DomainLogic<E extends Entity> extends AbstractDomainLogic<
 	@Override
 	public String uiListColumnCaption(DbQuery query, LinkModel link, String varName, Context ctx) {
 		Var var = query.getOutVar(varName);
-		
-		String key = query.getName() + "." + var.tableId + "." + var.name;
-		return MessageUtils.getInstance().getGenLabel(key, null);
+		return MessageUtils.getInstance().getQryVarTitle(query.getName(), var.tableId, var.name);
 	}
 
 	@Override

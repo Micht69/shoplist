@@ -237,17 +237,17 @@ public class DbEntity {
 	 * @throws DbException
 	 *             Exception thrown if an error occurs.
 	 */
-	public boolean remove(Entity domain, Context ctx) throws DbException {
+	public boolean remove(Entity entity, Context ctx) throws DbException {
 		DbManagerUpdatable dbMgr = null;
 
 		try {
 			boolean removed = false;
-			DbQuery query = DB.createQuery(ctx, domain.$_getName(), "T01");
-			query.addCondKey(domain.getPrimaryKey(), "T01");
+			DbQuery query = DB.createQuery(ctx, entity.$_getName(), "T01");
+			query.addCondKey(entity.getPrimaryKey(), "T01");
 			query.setForUpdate(true);
 			dbMgr = new DbManagerUpdatable(ctx, query);
 			if (dbMgr.next()) {
-				dbMgr.deleteRow();
+				dbMgr.deleteRow(entity);
 				removed = true;
 			}
 			return removed;

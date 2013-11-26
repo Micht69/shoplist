@@ -54,6 +54,39 @@
 	<tr>
 	
 		<td class="group_table_col_1">
+<ui:fragment rendered="#{jsfCtrl.isVisible('shopArticleLShelf')}">
+				<table>
+					<tr>
+						<td class="colFieldSetLeft">
+							
+<h:outputLabel escape="false" value="#{jsfCtrl.getLabel('shopArticleLShelf', 'shopArticleCreate.0.shopArticleLShelf')}" title="#{hh:label('tooltips', 'shopArticleCreate.0.shopArticleLShelf')}"/>
+
+<h:outputLabel value="*" styleClass="mandatory_label" rendered="#{jsfCtrl.isMandatory('shopArticleLShelf')}"/>
+
+
+			</td>
+			<td class="colFieldSetMid"><h:outputLabel value=":" /></td>
+			<td class="colFieldSetRight">
+ 
+<h:selectOneMenu disabledClass="disabledCombo" disabled="#{jsfCtrl.readonly('shopArticleLShelf')}" value="#{jsfCtrl.entity.links.shopArticleLShelf.encodedValue}"  label="#{hh:label('genLabels', 'shopArticleCreate.0.shopArticleLShelf')}" onchange="markAsDirty()">
+
+	<f:selectItem noSelectionOption="true" itemLabel=" "/>
+	<f:selectItems value="#{jsfCtrl.entity.links.shopArticleLShelf.comboValues}" />
+	<f:validateRequired disabled="#{param['skipRequired'] == true}" />
+</h:selectOneMenu>
+ 
+						</td>
+					</tr>
+				</table>
+			</ui:fragment> 
+	
+		</td>
+
+	</tr>
+
+	<tr>
+	
+		<td class="group_table_col_1">
 
 
 <ui:fragment rendered="#{jsfCtrl.isVisible('shopArticle.ean13')}">
@@ -82,6 +115,17 @@
 
 </ui:fragment>
 
+
+	
+		</td>
+
+	</tr>
+
+	<tr>
+	
+		<td class="group_table_col_1">
+
+<ui:include src="../includes/ean_scan.xhtml" />
 
 	
 		</td>

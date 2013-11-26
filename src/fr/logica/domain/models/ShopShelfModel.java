@@ -13,9 +13,9 @@ import java.util.Set;
 
 
 import fr.logica.business.Action;
+import fr.logica.business.EntityField;
 import fr.logica.business.EntityField.Memory;
 import fr.logica.business.EntityModel;
-import fr.logica.business.EntityField;
 import fr.logica.business.ForeignKeyModel;
 import fr.logica.business.Key;
 import fr.logica.business.KeyModel;
@@ -39,16 +39,22 @@ public class ShopShelfModel extends EntityModel implements Serializable {
 
 	/** PK definition */
 	private static final KeyModel PRIMARY_KEY_MODEL;
+
 	/** FKs definitions */
 	private static final Map<String, ForeignKeyModel> FOREIGN_KEY;
+
 	/** Links definitions */
 	private static final Map<String, LinkModel> LINK;
+
 	/** Back-Links definitions */
 	private static final Map<String, LinkModel> BACK_REF;
+
 	/** Entity fields definitions */
 	private static final Map<String, EntityField> FIELDS;
+
 	/** Entity autoincrement-fields definitions */
 	private static final Set<String> AUTOINCREMENT_FIELDS;
+
 	/** Entity actions definitions */
 	private static final Map<Integer, Action> ACTIONS;
 	
@@ -87,7 +93,7 @@ public class ShopShelfModel extends EntityModel implements Serializable {
 		FIELDS.put("name", new EntityField("NAME", "VARCHAR2", 100, 0, Memory.NO, true, false, "Nom"));
 		FIELDS.put("position", new EntityField("POSITION", "INTEGER", 3, 0, Memory.NO, true, false, "Position"));
 		FIELDS.put("w$Desc", new EntityField("W$_DESC", "VARCHAR2", 100, 0, Memory.SQL, false, false, "Description")); 
-		FIELDS.get("w$Desc").setSqlExpr("NAME");
+		FIELDS.get("w$Desc").setSqlExpr(":tableAlias.NAME");
 
 		ACTIONS = new HashMap<Integer, Action>();
 		ACTIONS.put(0, new Action(0, 0));

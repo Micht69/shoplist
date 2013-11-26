@@ -48,12 +48,12 @@
 
 					<span class="listButtons" id="buttonSHOP_ARTICLES_SHOPPING">
 
-						<h:commandButton id="SHOP_ARTICLES_SHOPPING_button50" alt='commandButton50' styleClass="btn_icon btn_medium"
-							rendered="#{sessionCtrl.isActionRendered('SHOP_LIST_L_ARTICLE', 50)}"
-							value="#{hh:label('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_50')}" action="#{jsfCtrl.prepareMultiAction('shopListLArticle', 50, 10, jsfCtrl.results.selectedPk, null)}" style="background-image: url('#{application.contextPath}/static/img/icons/mark.png');" />
+						<h:commandButton id="SHOP_ARTICLES_SHOPPING_button60" alt='commandButton60' styleClass="btn_icon btn_medium"
+							rendered="#{sessionCtrl.isActionRendered('SHOP_LIST_L_ARTICLE', 60)}"
+							value="#{hh:label('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_60')}" action="#{jsfCtrl.prepareMultiAction('shopListLArticle', 60, 10, jsfCtrl.results.selectedPk, null)}" style="background-image: url('#{application.contextPath}/static/img/icons/mark.png');" />
 
 						<h:commandButton id="SHOP_ARTICLES_SHOPPING_buttonDefaultAction" alt='commandButton05' styleClass="btn_icon btn_medium"
-							rendered="#{sessionCtrl.isDisplayActionRendered('SHOP_LIST_L_ARTICLE', 50)}"
+							rendered="#{sessionCtrl.isDisplayActionRendered('SHOP_LIST_L_ARTICLE', 60)}"
 							value="Consulter" action="#{jsfCtrl.prepareMultiAction('shopListLArticle', 5, 5, jsfCtrl.results.selectedPk, null)}" style="background-image: url('#{application.contextPath}/static/img/icons/mark.png');" />
 
 					</span>
@@ -72,7 +72,7 @@
 		</tr>
 	</table>
 
-	<h:commandButton id="launchAction" action="#{jsfCtrl.prepareDefaultAction('50')}" style="display:none;"/> 
+	<h:commandButton id="launchAction" action="#{jsfCtrl.prepareDefaultAction('60')}" style="display:none;"/> 
 	<h:inputText id="launchActionSelected" value="#{jsfCtrl.selectedRowEncodedKey}" style="display:none" />
 </div>
 

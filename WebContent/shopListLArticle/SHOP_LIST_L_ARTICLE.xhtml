@@ -58,16 +58,16 @@
 				<table>
 					<tr>
 						<td class="colFieldSetLeft">
-								
+							
 <h:outputLabel escape="false" value="#{jsfCtrl.getLabel('shopListLArticleLList', 'shopListLArticle.0.shopListLArticleLList')}" title="#{hh:label('tooltips', 'shopListLArticle.0.shopListLArticleLList')}"/>
 
 <h:outputLabel value="*" styleClass="mandatory_label" rendered="#{jsfCtrl.isMandatory('shopListLArticleLList')}"/>
 
 
-						</td>
-						<td class="colFieldSetMid"><h:outputLabel value=":" /></td>
-						<td class="colFieldSetRight">
-			 
+			</td>
+			<td class="colFieldSetMid"><h:outputLabel value=":" /></td>
+			<td class="colFieldSetRight">
+ 
 <h:selectOneMenu disabledClass="disabledCombo" disabled="#{jsfCtrl.readonly('shopListLArticleLList')}" value="#{jsfCtrl.entity.links.shopListLArticleLList.encodedValue}"  label="#{hh:label('genLabels', 'shopListLArticle.0.shopListLArticleLList')}" onchange="markAsDirty()">
 
 	<f:selectItem noSelectionOption="true" itemLabel=" "/>
@@ -87,69 +87,7 @@
 	<tr>
 	
 		<td class="group_table_col_1">
-<ui:fragment rendered="#{jsfCtrl.isVisible('shopListLArticleLArticle')}">
-				<table>
-					<tr>
-						<td class="colFieldSetLeft">
-								
-<h:outputLabel escape="false" value="#{jsfCtrl.getLabel('shopListLArticleLArticle', 'shopListLArticle.1.shopListLArticleLArticle')}" title="#{hh:label('tooltips', 'shopListLArticle.1.shopListLArticleLArticle')}"/>
 
-<h:outputLabel value="*" styleClass="mandatory_label" rendered="#{jsfCtrl.isMandatory('shopListLArticleLArticle')}"/>
-
-
-						</td>
-						<td class="colFieldSetMid"><h:outputLabel value=":" /></td>
-						<td class="colFieldSetRight">
-			 <h:panelGroup>
-	<span class="link-actions-container">
-	<h:commandLink styleClass="link-attach" rendered="#{!jsfCtrl.readonly('shopListLArticleLArticle')}" action="#{jsfCtrl.prepareSingleAction('shopArticle', 1, 1, jsfCtrl.entity.links.shopListLArticleLArticle.key, 'shopListLArticleLArticle')}">
-		<h:graphicImage class="iconAction" library="img" name="link.png" alt="#{hh:label('labels', 'action.selectionner')}" title="#{hh:label('labels', 'action.selectionner')}" />
-		<f:param name="skipRequired" value="true" />
-	</h:commandLink>
-
-	</span>
-
-	<h:commandLink rendered="#{jsfCtrl.entity.links.shopListLArticleLArticle.key != null and sessionCtrl.isActionRendered('SHOP_ARTICLE', 2)}" action="#{jsfCtrl.prepareSingleAction('shopArticle', 2, 2, jsfCtrl.entity.links.shopListLArticleLArticle.key, 'shopListLArticleLArticle')}">
-		<h:outputText value="#{jsfCtrl.entity.links.shopListLArticleLArticle.readValue}" id="shopListLArticle_1_shopListLArticleLArticle" title="#{jsfCtrl.getLabel('shopListLArticleLArticle', 'shopListLArticle.1.shopListLArticleLArticle')}" />
-		<f:param name="skipRequired" value="true" />
-	</h:commandLink>
-	<h:outputText value="#{jsfCtrl.entity.links.shopListLArticleLArticle.readValue}" id="shopListLArticle_1_shopListLArticleLArticle-label" title="#{jsfCtrl.getLabel('shopListLArticleLArticle', 'shopListLArticle.1.shopListLArticleLArticle')}"
-		rendered="#{jsfCtrl.entity.links.shopListLArticleLArticle.key != null and !sessionCtrl.isActionRendered('SHOP_ARTICLE', 2)}" />
-
-	<h:panelGroup rendered="#{!jsfCtrl.readonly('shopListLArticleLArticle')}">
-	<span class="link-actions-container">
-	<a href="#" class="link-actions" onclick="return false;">
-		<span class="ui-icon ui-icon-circle-triangle-s"></span>
-	</a>
-	<div class="link-actions-buttons">
-		<ul>
-		<li><h:commandLink rendered="#{jsfCtrl.entity.links.shopListLArticleLArticle.key == null and sessionCtrl.isActionRendered('SHOP_ARTICLE', 0)}" action="#{jsfCtrl.prepareSingleAction('shopArticle', 0, 0, jsfCtrl.entity.links.shopListLArticleLArticle.key, 'shopListLArticleLArticle')}">			<h:outputLabel value="#{hh:label('genLabels', 'SHOP_ARTICLE_ACTION_0')}" />
-			<f:param name="skipRequired" value="true" />
-		</h:commandLink></li>
-		<li><h:commandLink rendered="#{jsfCtrl.entity.links.shopListLArticleLArticle.key != null and sessionCtrl.isActionRendered('SHOP_ARTICLE', 2)}" action="#{jsfCtrl.prepareSingleAction('shopArticle', 2, 2, jsfCtrl.entity.links.shopListLArticleLArticle.key, 'shopListLArticleLArticle')}">			<h:outputLabel value="#{hh:label('genLabels', 'SHOP_ARTICLE_ACTION_2')}" />
-			<f:param name="skipRequired" value="true" />
-		</h:commandLink></li>
-		<li><h:commandLink rendered="#{jsfCtrl.entity.links.shopListLArticleLArticle.key != null and sessionCtrl.isActionRendered('SHOP_ARTICLE', 4)}" action="#{jsfCtrl.prepareSingleAction('shopArticle', 4, 4, jsfCtrl.entity.links.shopListLArticleLArticle.key, 'shopListLArticleLArticle')}">			<h:outputLabel value="#{hh:label('genLabels', 'SHOP_ARTICLE_ACTION_4')}" />
-			<f:param name="skipRequired" value="true" />
-		</h:commandLink></li>
-		<li><h:commandLink rendered="#{jsfCtrl.entity.links.shopListLArticleLArticle.key != null and sessionCtrl.isActionRendered('SHOP_ARTICLE', 5)}" action="#{jsfCtrl.prepareSingleAction('shopArticle', 5, 5, jsfCtrl.entity.links.shopListLArticleLArticle.key, 'shopListLArticleLArticle')}">			<h:outputLabel value="#{hh:label('genLabels', 'SHOP_ARTICLE_ACTION_5')}" />
-			<f:param name="skipRequired" value="true" />
-		</h:commandLink></li>
-		<li><h:commandLink rendered="#{jsfCtrl.entity.links.shopListLArticleLArticle.key == null and sessionCtrl.isActionRendered('SHOP_ARTICLE', 50)}" action="#{jsfCtrl.prepareSingleAction('shopArticle', 50, 0, jsfCtrl.entity.links.shopListLArticleLArticle.key, 'shopListLArticleLArticle')}">			<h:outputLabel value="#{hh:label('genLabels', 'SHOP_ARTICLE_ACTION_50')}" />
-			<f:param name="skipRequired" value="true" />
-		</h:commandLink></li>
-		</ul>
-	</div>
-	</span>
-	</h:panelGroup>
-
-</h:panelGroup>
-
- 
-						</td>
-					</tr>
-				</table>
-			</ui:fragment> 
 	
 		</td>
 

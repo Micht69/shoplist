@@ -114,9 +114,9 @@
 			<td style="text-align: right;"><span class="allActionButtons">
 				<h:panelGroup rendered="#{!jsfCtrl.listIsReadOnly('shopListLArticleLList_SHOP_ARTICLES_SHOPPING')}">
 					<span class="listButtons" id="buttonshopListLArticleLList_shopArticlesShopping">
-						<h:commandButton id="shopListLArticleLList_shopArticlesShopping_button50" alt='commandButton50' styleClass="btn_icon btn_medium"
-						rendered="#{sessionCtrl.isActionRendered('SHOP_LIST_L_ARTICLE', 50) and !jsfCtrl.listIsProtected('shopListLArticleLList_SHOP_ARTICLES_SHOPPING')}"
-						value="#{hh:label('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_50')}" action="#{jsfCtrl.prepareMultiAction('shopListLArticle', 50, 10, jsfCtrl.entity.links.shopListLArticleLList.results('SHOP_ARTICLES_SHOPPING').selectedPk, 'shopListLArticleLList')}" style="background-image: url('#{application.contextPath}/static/img/icons/mark.png');" />
+						<h:commandButton id="shopListLArticleLList_shopArticlesShopping_button60" alt='commandButton60' styleClass="btn_icon btn_medium"
+						rendered="#{sessionCtrl.isActionRendered('SHOP_LIST_L_ARTICLE', 60) and !jsfCtrl.listIsProtected('shopListLArticleLList_SHOP_ARTICLES_SHOPPING')}"
+						value="#{hh:label('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_60')}" action="#{jsfCtrl.prepareMultiAction('shopListLArticle', 60, 10, jsfCtrl.entity.links.shopListLArticleLList.results('SHOP_ARTICLES_SHOPPING').selectedPk, 'shopListLArticleLList')}" style="background-image: url('#{application.contextPath}/static/img/icons/mark.png');" />
 						<h:outputText value=" " />
 					</span>
 				</h:panelGroup>
@@ -141,7 +141,7 @@
 				value="#{jsfCtrl.entity.links.shopListLArticleLList.results('SHOP_ARTICLES_SHOPPING').list}" var="tempVar"
 				rendered="#{not empty jsfCtrl.entity.links.shopListLArticleLList.results('SHOP_ARTICLES_SHOPPING')}"
 
-				onRowClick="launchLinkAction('shopListLArticleLList', 'shopListLArticle', 50, 10, '#{tempVar.primaryKey.encodedValue}', 'shopListLArticleLList_SHOP_ARTICLES_SHOPPING');"
+				onRowClick="launchLinkAction('shopListLArticleLList', 'shopListLArticle', 60, 10, '#{tempVar.primaryKey.encodedValue}', 'shopListLArticleLList_SHOP_ARTICLES_SHOPPING');"
 				readOnly="#{jsfCtrl.listIsReadOnly('shopListLArticleLList_SHOP_ARTICLES_SHOPPING')}">
 
 				<h:column headerClass="first" rendered="#{!jsfCtrl.listIsReadOnly('shopListLArticleLList_SHOP_ARTICLES_SHOPPING')}">

@@ -123,6 +123,35 @@ public class MessageUtils {
 	public String getTitle(String entityName, int action) {
 		return getGenLabel(DomainUtils.createDbName(entityName) + "_ACTION_" + action, null);
 	}
+	
+	/**
+	 * Récupère le titre d'un couple entité / variable.
+	 * 
+	 * @param entityName
+	 *            le nom de la liste
+	 * @param var
+	 *            le nom de la variable
+	 * @return le titre
+	 */
+	public String getVarTitle(String entityName, String varName) {
+		return getGenLabel(entityName + "." + varName, null);
+	}
+	
+	/**
+	 * Récupère le titre d'un couple query / variable.
+	 * 
+	 * @param queryName
+	 *            le nom de la liste
+	 *            
+	 * @param alias
+	 * 			l' alias de la table 
+	 * @param var
+	 *            le nom de la variable
+	 * @return le titre
+	 */
+	public String getQryVarTitle(String queryName, String alias, String varName) {
+		return getGenLabel(queryName + "." + alias + "." + varName, null);
+	}
 
 	/**
 	 * Récupère le titre d'un liste.

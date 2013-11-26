@@ -13,9 +13,9 @@ import java.util.Set;
 
 
 import fr.logica.business.Action;
+import fr.logica.business.EntityField;
 import fr.logica.business.EntityField.Memory;
 import fr.logica.business.EntityModel;
-import fr.logica.business.EntityField;
 import fr.logica.business.ForeignKeyModel;
 import fr.logica.business.Key;
 import fr.logica.business.KeyModel;
@@ -39,16 +39,22 @@ public class ShopListLArticleModel extends EntityModel implements Serializable {
 
 	/** PK definition */
 	private static final KeyModel PRIMARY_KEY_MODEL;
+
 	/** FKs definitions */
 	private static final Map<String, ForeignKeyModel> FOREIGN_KEY;
+
 	/** Links definitions */
 	private static final Map<String, LinkModel> LINK;
+
 	/** Back-Links definitions */
 	private static final Map<String, LinkModel> BACK_REF;
+
 	/** Entity fields definitions */
 	private static final Map<String, EntityField> FIELDS;
+
 	/** Entity autoincrement-fields definitions */
 	private static final Set<String> AUTOINCREMENT_FIELDS;
+
 	/** Entity actions definitions */
 	private static final Map<Integer, Action> ACTIONS;
 	
@@ -109,18 +115,18 @@ public class ShopListLArticleModel extends EntityModel implements Serializable {
 		FIELDS.put("status", new EntityField("STATUS", "VARCHAR2", 5, 0, Memory.NO, false, false, "Statut"));
 		FIELDS.get("status").setDefaultValue("BUY", "BUY"); 
 		FIELDS.get("status").getCodes().add("BUY");
-		FIELDS.get("status").getLabels().add(ENTITY_NAME + ".status.BUY");
+		FIELDS.get("status").getLabels().add("shopListLArticle.status.BUY");
 		FIELDS.get("status").getValues().add("BUY"); 
 		FIELDS.get("status").getCodes().add("DONE");
-		FIELDS.get("status").getLabels().add(ENTITY_NAME + ".status.DONE");
+		FIELDS.get("status").getLabels().add("shopListLArticle.status.DONE");
 		FIELDS.get("status").getValues().add("DONE"); 
 		ACTIONS = new HashMap<Integer, Action>();
 		ACTIONS.put(0, new Action(0, 0, 51));
 		ACTIONS.put(2, new Action(2, 2));
 		ACTIONS.put(4, new Action(4, 4));
 		ACTIONS.put(5, new Action(5, 5));
-		ACTIONS.put(50, new Action(50, 10));
 		ACTIONS.put(51, new Action(51, 0, 0));
+		ACTIONS.put(60, new Action(60, 10));
 
 	}
 	/**

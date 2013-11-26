@@ -309,7 +309,6 @@ public class UiController implements Serializable {
 	 */
 	public <E extends Entity> Page<?> prepareAction(ActionPage<E> page, Page<?> previousPage, Context ctx) {
 		DomainLogic<E> domainLogic = (DomainLogic<E>) DomainUtils.getLogic(page.getDomainName());
-
 		try {
 			if (previousPage != null) {
 				page.setNextPage(previousPage);
@@ -440,8 +439,10 @@ public class UiController implements Serializable {
 				}
 			}
 
-			for (UiElement elt : uiPage.elements) {
-				prepareLink(page, page.getBean(), elt, ctx);
+			if (page.isLastActionSuccess()) {
+				for (UiElement elt : uiPage.elements) {
+					prepareLink(page, page.getBean(), elt, ctx);
+				}
 			}
 
 			Map<String, UiAccess> pageAccess = new HashMap<String, UiAccess>();
@@ -490,7 +491,7 @@ public class UiController implements Serializable {
 	 */
 	public <E extends Entity> Page<?> validateAction(ActionPage<E> page, Context ctx) {
 		try {
-
+			page.setLastActionSuccess(true);
 			DomainLogic<E> domainLogic = (DomainLogic<E>) DomainUtils.getLogic(page.getDomainName());
 			domainLogic.internalUiActionOnValidation(page, ctx);
 
@@ -501,8 +502,18 @@ public class UiController implements Serializable {
 			if (page.getAction().type == Constants.DETACH) {
 				Entity baseBean = ((ActionPage<?>) page.getNextPage()).getBean();
 				Link link = baseBean.getLink(page.getLinkName());
-				if (baseBean.$_getName().equals(link.getModel().getRefEntityName())) {
-
+				boolean isSelfRefLink = false;
+				if (baseBean.$_getName().equals(link.getModel().getRefEntityName())
+						&& baseBean.$_getName().equals(link.getModel().getEntityName())) {
+					// Self-referenced entity
+					for (UiLink uiLink : link.getTemplates()) {
+						if (uiLink.getType() == Type.LINK) {
+							isSelfRefLink = true;
+						}
+					}
+				}
+				if (!isSelfRefLink && baseBean.$_getName().equals(link.getModel().getRefEntityName())) {
+				
 					if (EntityManager.getEntityModel(link.getModel().getEntityName()).isAssociative()) {
 						DB.removeAssociations(baseBean, page.getLinkName(), page.getKeyList(), ctx);
 					} else {
@@ -609,6 +620,7 @@ public class UiController implements Serializable {
 		// En cas d'erreur sur une page custom sans affichage.
 		if (ActionUtils.hasNoDisplay(page.getAction().type)) {
 			page.getNextPage().setMessages(ctx.getMessages());
+			page.getNextPage().setLastActionSuccess(false);
 			return page.getNextPage();
 		}
 		page.setMessages(ctx.getMessages());
@@ -941,7 +953,7 @@ public class UiController implements Serializable {
 			key = linkNamePrefix + "." + key;
 		}
 		if (elt.type == UiElement.Type.LINK_COMBO || elt.type == UiElement.Type.LINK || elt.type == UiElement.Type.LINK_QUICK_SEARCH || elt.type == UiElement.Type.LINK_MULTI_COMBO) {
-			boolean visible = domainLogic.internalUiLinkIsVisible(page, elt.linkName, page.getAction(), ctx);
+			boolean visible = domainLogic.internalUiLinkIsVisible(page, key, page.getAction(), ctx);
 			boolean readOnly = false;
 			if (page.getLinkName() != null && page.getLinkName().equals(elt.linkName)) {
 				readOnly = true;

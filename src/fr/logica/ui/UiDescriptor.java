@@ -29,6 +29,8 @@ public class UiDescriptor {
 		actionPages.put("shopArticle", actPagesShopArticle);
 
 		UiPage SHOP_ARTICLE_CREATE = new UiPage();
+		UiElement SHOP_ARTICLE_CREATE_SHOP_ARTICLE_L_SHELF_null = new UiElement("shopShelf", "shopArticleLShelf", null, null, Type.LINK_COMBO); 
+		SHOP_ARTICLE_CREATE.elements.add(SHOP_ARTICLE_CREATE_SHOP_ARTICLE_L_SHELF_null);
 		pages.put("SHOP_ARTICLE_CREATE", SHOP_ARTICLE_CREATE);
 
 		UiPage SHOP_ARTICLE = new UiPage();
@@ -66,15 +68,13 @@ public class UiDescriptor {
 		actPagesShopListLArticle.put(2, "SHOP_LIST_L_ARTICLE");
 		actPagesShopListLArticle.put(4, "SHOP_LIST_L_ARTICLE");
 		actPagesShopListLArticle.put(5, "SHOP_LIST_L_ARTICLE");
-		actPagesShopListLArticle.put(50, "SHOP_LIST_L_ARTICLE");
 		actPagesShopListLArticle.put(51, "SHOP_LIST_L_ARTICLE");
+		actPagesShopListLArticle.put(60, "SHOP_LIST_L_ARTICLE");
 		actionPages.put("shopListLArticle", actPagesShopListLArticle);
 
 		UiPage SHOP_LIST_L_ARTICLE = new UiPage();
 		UiElement SHOP_LIST_L_ARTICLE_SHOP_LIST_L_ARTICLE_L_LIST_null = new UiElement("shopList", "shopListLArticleLList", null, null, Type.LINK_COMBO); 
 		SHOP_LIST_L_ARTICLE.elements.add(SHOP_LIST_L_ARTICLE_SHOP_LIST_L_ARTICLE_L_LIST_null);
-		UiElement SHOP_LIST_L_ARTICLE_SHOP_LIST_L_ARTICLE_L_ARTICLE = new UiElement("shopArticle", "shopListLArticleLArticle", null, null, Type.LINK); 
-		SHOP_LIST_L_ARTICLE.elements.add(SHOP_LIST_L_ARTICLE_SHOP_LIST_L_ARTICLE_L_ARTICLE);
 		pages.put("SHOP_LIST_L_ARTICLE", SHOP_LIST_L_ARTICLE);
 
 		Map<Integer, String> actPagesShopShelf = new HashMap<Integer, String>();

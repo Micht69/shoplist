@@ -83,7 +83,10 @@ public class DbQuery implements Cloneable {
 			}
 			tableId = pTableId;
 			model = pField;
-			expr = pField.getSqlExpr();
+
+			if (null != pField.getSqlExpr()) {
+				expr = pField.getSqlExpr().replace(":tableAlias", tableId);
+			}
 		}
 
 		public String getColumnAlias() {
@@ -482,6 +485,10 @@ public class DbQuery implements Cloneable {
 				params += ("".equals(params) ? "" : ", ") + o;
 			}
 			LOGGER.debug("SQL Params : " + params);
+		}
+
+		if (forUpdate) {
+			query = query + " FOR UPDATE ";
 		}
 
 		return query;

@@ -10,7 +10,7 @@ import fr.logica.domain.models.ShopListLArticleModel;
 
 /**
  * Entity ShopListLArticle definition
- *
+ * 
  * @author CGI
  */
 public class ShopListLArticle extends Entity implements Serializable {
@@ -89,8 +89,6 @@ public class ShopListLArticle extends Entity implements Serializable {
 	public String $_getDesc() {
 		return null;
 	}
-
-
 
 	/**
 	 * Get the value from field ListId.
@@ -245,10 +243,10 @@ public class ShopListLArticle extends Entity implements Serializable {
 		int ACTION_4 = 4;
 		/** Display. */
 		int ACTION_5 = 5;
-		/** Mark done. */
-		int ACTION_50 = 50;
 		/** Create. */
 		int ACTION_51 = 51;
+		/** Mark done. */
+		int ACTION_60 = 60;
     }
 
 	/** Nom de l'entité. */

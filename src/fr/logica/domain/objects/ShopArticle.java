@@ -1,9 +1,9 @@
 package fr.logica.domain.objects;
 
 import java.io.Serializable;
-
 import java.util.HashSet;
 import java.util.Set;
+
 
 import fr.logica.business.Context;
 import fr.logica.business.Entity;
@@ -13,7 +13,7 @@ import fr.logica.domain.models.ShopArticleModel;
 
 /**
  * Entity ShopArticle definition
- *
+ * 
  * @author CGI
  */
 public class ShopArticle extends Entity implements Serializable {
@@ -96,8 +96,6 @@ public class ShopArticle extends Entity implements Serializable {
 	public String $_getDesc() {
 		return "name";
 	}
-
-
 
 	/**
 	 * Get the value from field Id.

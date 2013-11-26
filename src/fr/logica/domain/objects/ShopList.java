@@ -1,11 +1,11 @@
 package fr.logica.domain.objects;
 
 import java.io.Serializable;
-
 import java.util.HashSet;
 import java.util.Set;
 
 import java.util.Date;
+
 import fr.logica.business.Context;
 import fr.logica.business.DateUtils;
 import fr.logica.business.Entity;
@@ -15,7 +15,7 @@ import fr.logica.domain.models.ShopListModel;
 
 /**
  * Entity ShopList definition
- *
+ * 
  * @author CGI
  */
 public class ShopList extends Entity implements Serializable {
@@ -98,8 +98,6 @@ public class ShopList extends Entity implements Serializable {
 	public String $_getDesc() {
 		return "name";
 	}
-
-
 
 	/**
 	 * Get the value from field Id.

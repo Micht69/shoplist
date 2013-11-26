@@ -104,7 +104,7 @@ public abstract class AbstractDomainLogic<E extends Entity> {
             String varLabel = internalUiVarCaption(bean, varName, action, ctx);
 
             if (null == varLabel) {
-                varLabel = MessageUtils.getInstance().getGenLabel(bean.$_getName() + "." + varName, null);
+                varLabel = MessageUtils.getInstance().getVarTitle(bean.$_getName(), varName);
             }
             ctx.getMessages().add(new Message(varLabel + " : Vous devez indiquer une valeur.", Severity.ERROR));
             errors = true;

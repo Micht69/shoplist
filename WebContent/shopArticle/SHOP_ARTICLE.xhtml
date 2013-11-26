@@ -58,16 +58,16 @@
 				<table>
 					<tr>
 						<td class="colFieldSetLeft">
-								
+							
 <h:outputLabel escape="false" value="#{jsfCtrl.getLabel('shopArticleLShelf', 'shopArticle.0.shopArticleLShelf')}" title="#{hh:label('tooltips', 'shopArticle.0.shopArticleLShelf')}"/>
 
 <h:outputLabel value="*" styleClass="mandatory_label" rendered="#{jsfCtrl.isMandatory('shopArticleLShelf')}"/>
 
 
-						</td>
-						<td class="colFieldSetMid"><h:outputLabel value=":" /></td>
-						<td class="colFieldSetRight">
-			 
+			</td>
+			<td class="colFieldSetMid"><h:outputLabel value=":" /></td>
+			<td class="colFieldSetRight">
+ 
 <h:selectOneMenu disabledClass="disabledCombo" disabled="#{jsfCtrl.readonly('shopArticleLShelf')}" value="#{jsfCtrl.entity.links.shopArticleLShelf.encodedValue}"  label="#{hh:label('genLabels', 'shopArticle.0.shopArticleLShelf')}" onchange="markAsDirty()">
 
 	<f:selectItem noSelectionOption="true" itemLabel=" "/>
