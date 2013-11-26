@@ -47,21 +47,7 @@
 	</table>
 	</div>
 
-<h:panelGroup id="dfttplShopUser" rendered="#{jsfCtrl.isVisible('dfttplShopUser')}" layout="none">
-
-<table class="group_table">
-
-	<tr>
-	
-		<td class="group_table_col_1">
-
 <h:panelGroup id="shopUser" rendered="#{jsfCtrl.isVisible('shopUser')}" layout="none">
-
-<div class="form_container" id="shopUser">
-	<div class="form_title">
-
-		<h:outputText value="#{hh:label('genLabels', 'shopUser')}" />
-	</div>
 
 <table class="group_table">
 
@@ -72,11 +58,11 @@
 
 <ui:fragment rendered="#{jsfCtrl.isVisible('shopUser.login')}">
 
-<table class="#{!jsfCtrl.isValid('mainForm:shopUser_login') ? 'error' : ''}">
+<table class="#{!jsfCtrl.isValid('mainForm:shopUser_shopUser_login') ? 'error' : ''}">
 
 <tr><td class="colFieldSetLeft">
 
-<h:outputLabel escape="false" value="#{jsfCtrl.getLabel('shopUser.login', 'shopUser.login')}" title="#{hh:label('tooltips', 'shopUser.login')}"/>
+<h:outputLabel escape="false" value="#{jsfCtrl.getLabel('shopUser.login', 'shopUser.shopUser.login')}" title="#{hh:label('tooltips', 'shopUser.shopUser.login')}"/>
 <h:outputLabel value="*" styleClass="mandatory_label" rendered="#{jsfCtrl.isMandatory('shopUser.login')}"/>
 
 </td>
@@ -85,29 +71,18 @@
 </td>
 <td class="colFieldSetRight">
 
-<h:inputText style="" disabled="#{jsfCtrl.readonly('shopUser.login')}" id="shopUser_login" value="#{jsfCtrl.entity.login}" label="#{jsfCtrl.getLabel('shopUser.login', 'shopUser.login')}" maxlength="10" onkeypress="markAsDirty()">
+<h:inputText style="" disabled="#{jsfCtrl.readonly('shopUser.login')}" id="shopUser_shopUser_login" value="#{jsfCtrl.entity.login}" label="#{jsfCtrl.getLabel('shopUser.login', 'shopUser.login')}" maxlength="10" onkeypress="markAsDirty()">
 	<f:validateRequired disabled="#{param['skipRequired'] == true}" />
 	<f:validateLength maximum="10" />
 </h:inputText>
 
 
-<h:message for="shopUser_login" styleClass="errorLabel" />
+<h:message for="shopUser_shopUser_login" styleClass="errorLabel" />
 
 </td></tr></table>
 
 </ui:fragment>
 
-
-	
-		</td>
-
-	</tr>
-
-</table>
-
-</div>
-
-</h:panelGroup>
 
 	
 		</td>
@@ -121,11 +96,11 @@
 
 <ui:fragment rendered="#{jsfCtrl.isVisible('shopUser.name')}">
 
-<table class="#{!jsfCtrl.isValid('mainForm:shopUser_name') ? 'error' : ''}">
+<table class="#{!jsfCtrl.isValid('mainForm:shopUser_shopUser_name') ? 'error' : ''}">
 
 <tr><td class="colFieldSetLeft">
 
-<h:outputLabel escape="false" value="#{jsfCtrl.getLabel('shopUser.name', 'shopUser.name')}" title="#{hh:label('tooltips', 'shopUser.name')}"/>
+<h:outputLabel escape="false" value="#{jsfCtrl.getLabel('shopUser.name', 'shopUser.shopUser.name')}" title="#{hh:label('tooltips', 'shopUser.shopUser.name')}"/>
 <h:outputLabel value="*" styleClass="mandatory_label" rendered="#{jsfCtrl.isMandatory('shopUser.name')}"/>
 
 </td>
@@ -134,13 +109,48 @@
 </td>
 <td class="colFieldSetRight">
 
-<h:inputText style="" disabled="#{jsfCtrl.readonly('shopUser.name')}" id="shopUser_name" value="#{jsfCtrl.entity.name}" label="#{jsfCtrl.getLabel('shopUser.name', 'shopUser.name')}" maxlength="100" onkeypress="markAsDirty()">
+<h:inputText style="" disabled="#{jsfCtrl.readonly('shopUser.name')}" id="shopUser_shopUser_name" value="#{jsfCtrl.entity.name}" label="#{jsfCtrl.getLabel('shopUser.name', 'shopUser.name')}" maxlength="100" onkeypress="markAsDirty()">
 	<f:validateRequired disabled="#{param['skipRequired'] == true}" />
 	<f:validateLength maximum="100" />
 </h:inputText>
 
 
-<h:message for="shopUser_name" styleClass="errorLabel" />
+<h:message for="shopUser_shopUser_name" styleClass="errorLabel" />
+
+</td></tr></table>
+
+</ui:fragment>
+
+
+	
+		</td>
+
+	</tr>
+
+	<tr>
+	
+		<td class="group_table_col_1">
+
+
+<ui:fragment rendered="#{jsfCtrl.isVisible('shopUser.password')}">
+
+<table class="#{!jsfCtrl.isValid('mainForm:shopUser_shopUser_password') ? 'error' : ''}">
+
+<tr><td class="colFieldSetLeft">
+
+<h:outputLabel escape="false" value="#{jsfCtrl.getLabel('shopUser.password', 'shopUser.shopUser.password')}" title="#{hh:label('tooltips', 'shopUser.shopUser.password')}"/>
+<h:outputLabel value="*" styleClass="mandatory_label" rendered="#{jsfCtrl.isMandatory('shopUser.password')}"/>
+
+</td>
+<td class="colFieldSetMid">
+<h:outputLabel value=":" />
+</td>
+<td class="colFieldSetRight">
+
+<h:inputSecret disabled="#{jsfCtrl.readonly('shopUser.password')}" id="shopUser_shopUser_password" value="#{jsfCtrl.entity.password}" label="#{jsfCtrl.getLabel('shopUser.password', 'shopUser.password')}" onkeypress="markAsDirty()">
+</h:inputSecret>
+
+<h:message for="shopUser_shopUser_password" styleClass="errorLabel" />
 
 </td></tr></table>
 
@@ -159,11 +169,11 @@
 
 <ui:fragment rendered="#{jsfCtrl.isVisible('shopUser.profile')}">
 
-<table class="#{!jsfCtrl.isValid('mainForm:shopUser_profile') ? 'error' : ''}">
+<table class="#{!jsfCtrl.isValid('mainForm:shopUser_shopUser_profile') ? 'error' : ''}">
 
 <tr><td class="colFieldSetLeft">
 
-<h:outputLabel escape="false" value="#{jsfCtrl.getLabel('shopUser.profile', 'shopUser.profile')}" title="#{hh:label('tooltips', 'shopUser.profile')}"/>
+<h:outputLabel escape="false" value="#{jsfCtrl.getLabel('shopUser.profile', 'shopUser.shopUser.profile')}" title="#{hh:label('tooltips', 'shopUser.shopUser.profile')}"/>
 <h:outputLabel value="*" styleClass="mandatory_label" rendered="#{jsfCtrl.isMandatory('shopUser.profile')}"/>
 
 </td>
@@ -172,12 +182,12 @@
 </td>
 <td class="colFieldSetRight">
 
-<h:selectOneMenu disabledClass="disabledCombo" disabled="#{jsfCtrl.readonly('shopUser.profile')}" id="shopUser_profile" value="#{jsfCtrl.entity.profile}" label="#{jsfCtrl.getLabel('shopUser.profile', 'shopUser.profile')}"  onchange="markAsDirty()">
+<h:selectOneMenu disabledClass="disabledCombo" disabled="#{jsfCtrl.readonly('shopUser.profile')}" id="shopUser_shopUser_profile" value="#{jsfCtrl.entity.profile}" label="#{jsfCtrl.getLabel('shopUser.profile', 'shopUser.profile')}"  onchange="markAsDirty()">
 
 	<f:selectItems value="#{jsfCtrl.entity.enumValues('profile')}" />
 </h:selectOneMenu>
 
-<h:message for="shopUser_profile" styleClass="errorLabel" />
+<h:message for="shopUser_shopUser_profile" styleClass="errorLabel" />
 
 </td></tr></table>
 

@@ -38,4 +38,9 @@ public class SecurityFunction implements Serializable {
 	public void setQuery(String query) {
 		this.query = query;
 	}
+
+	@Override
+	public String toString() {
+		return "SecurityFunction [entite=" + entite + ", action=" + action + ", query=" + query + "]";
+	}
 }

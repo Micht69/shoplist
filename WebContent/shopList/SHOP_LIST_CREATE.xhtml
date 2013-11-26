@@ -92,53 +92,12 @@
 	<tr>
 	
 		<td class="group_table_col_1">
-
-<h:panelGroup id="shopListInfos2" rendered="#{jsfCtrl.isVisible('shopListInfos2')}" layout="none">
-
-<table class="group_table">
-
-	<tr>
-	
-		<td class="group_table_col_2">
-
-
-<ui:fragment rendered="#{jsfCtrl.isVisible('shopList.createDate')}">
-
-<table class="#{!jsfCtrl.isValid('mainForm:shopListInfos2_shopList_createDate:dateInput') ? 'error' : ''}">
-
-<tr><td class="colFieldSetLeft">
-
-<h:outputLabel escape="false" value="#{jsfCtrl.getLabel('shopList.createDate', 'shopListInfos2.shopList.createDate')}" title="#{hh:label('tooltips', 'shopListInfos2.shopList.createDate')}"/>
-<h:outputLabel value="*" styleClass="mandatory_label" rendered="#{jsfCtrl.isMandatory('shopList.createDate')}"/>
-
-</td>
-<td class="colFieldSetMid">
-<h:outputLabel value=":" />
-</td>
-<td class="colFieldSetRight">
-
-<logica:datePicker disabled="#{jsfCtrl.readonly('shopList.createDate')}" rendered="true" id="shopListInfos2_shopList_createDate" value="#{jsfCtrl.entity.createDate}" size="10" converter="customDateTimeConverter" label="#{jsfCtrl.getLabel('shopList.createDate', 'shopList.createDate')}" onchange="markAsDirty()">
-
-</logica:datePicker>
-
-
-<h:message for="shopListInfos2_shopList_createDate:dateInput" styleClass="errorLabel" />
-
-</td></tr></table>
-
-</ui:fragment>
-
-
-	
-		</td>
-	
-		<td class="group_table_col_2">
 <ui:fragment rendered="#{jsfCtrl.isVisible('shopArticleLUser')}">
 				<table>
 					<tr>
 						<td class="colFieldSetLeft">
 							
-<h:outputLabel escape="false" value="#{jsfCtrl.getLabel('shopArticleLUser', 'shopListInfos2.0.shopArticleLUser')}" title="#{hh:label('tooltips', 'shopListInfos2.0.shopArticleLUser')}"/>
+<h:outputLabel escape="false" value="#{jsfCtrl.getLabel('shopArticleLUser', 'shopListInfos.0.shopArticleLUser')}" title="#{hh:label('tooltips', 'shopListInfos.0.shopArticleLUser')}"/>
 
 <h:outputLabel value="*" styleClass="mandatory_label" rendered="#{jsfCtrl.isMandatory('shopArticleLUser')}"/>
 
@@ -146,62 +105,18 @@
 			</td>
 			<td class="colFieldSetMid"><h:outputLabel value=":" /></td>
 			<td class="colFieldSetRight">
- <h:panelGroup>
-	<span class="link-actions-container">
-	<h:commandLink styleClass="link-attach" rendered="#{!jsfCtrl.readonly('shopArticleLUser')}" action="#{jsfCtrl.prepareSingleAction('shopUser', 1, 1, jsfCtrl.entity.links.shopArticleLUser.key, 'shopArticleLUser')}">
-		<h:graphicImage class="iconAction" library="img" name="link.png" alt="#{hh:label('labels', 'action.selectionner')}" title="#{hh:label('labels', 'action.selectionner')}" />
-		<f:param name="skipRequired" value="true" />
-	</h:commandLink>
+ 
+<h:selectOneMenu disabledClass="disabledCombo" disabled="#{jsfCtrl.readonly('shopArticleLUser')}" value="#{jsfCtrl.entity.links.shopArticleLUser.encodedValue}"  label="#{hh:label('genLabels', 'shopListInfos.0.shopArticleLUser')}" onchange="markAsDirty()">
 
-	</span>
-
-	<h:commandLink rendered="#{jsfCtrl.entity.links.shopArticleLUser.key != null and sessionCtrl.isActionRendered('SHOP_USER', 2)}" action="#{jsfCtrl.prepareSingleAction('shopUser', 2, 2, jsfCtrl.entity.links.shopArticleLUser.key, 'shopArticleLUser')}">
-		<h:outputText value="#{jsfCtrl.entity.links.shopArticleLUser.readValue}" id="shopListInfos2_0_shopArticleLUser" title="#{jsfCtrl.getLabel('shopArticleLUser', 'shopListInfos2.0.shopArticleLUser')}" />
-		<f:param name="skipRequired" value="true" />
-	</h:commandLink>
-	<h:outputText value="#{jsfCtrl.entity.links.shopArticleLUser.readValue}" id="shopListInfos2_0_shopArticleLUser-label" title="#{jsfCtrl.getLabel('shopArticleLUser', 'shopListInfos2.0.shopArticleLUser')}"
-		rendered="#{jsfCtrl.entity.links.shopArticleLUser.key != null and !sessionCtrl.isActionRendered('SHOP_USER', 2)}" />
-
-	<h:panelGroup rendered="#{!jsfCtrl.readonly('shopArticleLUser')}">
-	<span class="link-actions-container">
-	<a href="#" class="link-actions" onclick="return false;">
-		<span class="ui-icon ui-icon-circle-triangle-s"></span>
-	</a>
-	<div class="link-actions-buttons">
-		<ul>
-		<li><h:commandLink rendered="#{jsfCtrl.entity.links.shopArticleLUser.key == null and sessionCtrl.isActionRendered('SHOP_USER', 0)}" action="#{jsfCtrl.prepareSingleAction('shopUser', 0, 0, jsfCtrl.entity.links.shopArticleLUser.key, 'shopArticleLUser')}">			<h:outputLabel value="#{hh:label('genLabels', 'SHOP_USER_ACTION_0')}" />
-			<f:param name="skipRequired" value="true" />
-		</h:commandLink></li>
-		<li><h:commandLink rendered="#{jsfCtrl.entity.links.shopArticleLUser.key != null and sessionCtrl.isActionRendered('SHOP_USER', 2)}" action="#{jsfCtrl.prepareSingleAction('shopUser', 2, 2, jsfCtrl.entity.links.shopArticleLUser.key, 'shopArticleLUser')}">			<h:outputLabel value="#{hh:label('genLabels', 'SHOP_USER_ACTION_2')}" />
-			<f:param name="skipRequired" value="true" />
-		</h:commandLink></li>
-		<li><h:commandLink rendered="#{jsfCtrl.entity.links.shopArticleLUser.key != null and sessionCtrl.isActionRendered('SHOP_USER', 4)}" action="#{jsfCtrl.prepareSingleAction('shopUser', 4, 4, jsfCtrl.entity.links.shopArticleLUser.key, 'shopArticleLUser')}">			<h:outputLabel value="#{hh:label('genLabels', 'SHOP_USER_ACTION_4')}" />
-			<f:param name="skipRequired" value="true" />
-		</h:commandLink></li>
-		<li><h:commandLink rendered="#{jsfCtrl.entity.links.shopArticleLUser.key != null and sessionCtrl.isActionRendered('SHOP_USER', 5)}" action="#{jsfCtrl.prepareSingleAction('shopUser', 5, 5, jsfCtrl.entity.links.shopArticleLUser.key, 'shopArticleLUser')}">			<h:outputLabel value="#{hh:label('genLabels', 'SHOP_USER_ACTION_5')}" />
-			<f:param name="skipRequired" value="true" />
-		</h:commandLink></li>
-		</ul>
-	</div>
-	</span>
-	</h:panelGroup>
-
-</h:panelGroup>
-
+	<f:selectItem noSelectionOption="true" itemLabel=" "/>
+	<f:selectItems value="#{jsfCtrl.entity.links.shopArticleLUser.comboValues}" />
+	<f:validateRequired disabled="#{param['skipRequired'] == true}" />
+</h:selectOneMenu>
  
 						</td>
 					</tr>
 				</table>
 			</ui:fragment> 
-	
-		</td>
-
-	</tr>
-
-</table>
-
-</h:panelGroup>
-
 	
 		</td>
 

@@ -91,6 +91,7 @@ public class ShopUserModel extends EntityModel implements Serializable {
 
 		FIELDS.put("login", new EntityField("LOGIN", "VARCHAR2", 10, 0, Memory.NO, true, false, "Login"));
 		FIELDS.put("name", new EntityField("NAME", "VARCHAR2", 100, 0, Memory.NO, true, false, "Nom"));
+		FIELDS.put("password", new EntityField("PASSWORD", "VARCHAR2", 100, 0, Memory.NO, false, false, "Mot de passe"));
 		FIELDS.put("profile", new EntityField("PROFILE", "VARCHAR2", 10, 0, Memory.NO, false, false, "Profil"));
 		FIELDS.get("profile").setDefaultValue("USER", "USER"); 
 		FIELDS.get("profile").getCodes().add("USER");
@@ -99,6 +100,9 @@ public class ShopUserModel extends EntityModel implements Serializable {
 		FIELDS.get("profile").getCodes().add("ADMIN");
 		FIELDS.get("profile").getLabels().add("shopUser.profile.ADMIN");
 		FIELDS.get("profile").getValues().add("ADMIN"); 
+		FIELDS.get("profile").getCodes().add("BUYER");
+		FIELDS.get("profile").getLabels().add("shopUser.profile.BUYER");
+		FIELDS.get("profile").getValues().add("BUYER"); 
 		FIELDS.put("w$Desc", new EntityField("W$_DESC", "VARCHAR2", 100, 0, Memory.SQL, false, false, "Description")); 
 		FIELDS.get("w$Desc").setSqlExpr(":tableAlias.NAME");
 
@@ -210,6 +214,14 @@ public class ShopUserModel extends EntityModel implements Serializable {
 	 */
 	public EntityField getName() {
 		return FIELDS.get("name");
+	}
+
+	/**
+	 * Get field 'password'
+	 * @return the EntityField
+	 */
+	public EntityField getPassword() {
+		return FIELDS.get("password");
 	}
 
 	/**

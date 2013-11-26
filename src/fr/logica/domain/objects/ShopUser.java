@@ -27,6 +27,9 @@ public class ShopUser extends Entity implements Serializable {
 	/** Nom */
 	private String name ;
 
+	/** Mot de passe */
+	private String password ;
+
 	/** Profil */
 	private String profile = "USER";
 
@@ -126,6 +129,23 @@ public class ShopUser extends Entity implements Serializable {
 		this.name = name;
 	}
 	/**
+	 * Get the value from field Password.
+	 *
+	 * @return the value
+	 */
+	public String getPassword() {
+		return this.password;
+	}
+ 
+	/**
+	 * Set the value from field Password.
+	 *
+	 * @param password : the value to set
+	 */
+	public void setPassword(final String password) {
+		this.password = password;
+	}
+	/**
 	 * Get the value from field Profile.
 	 *
 	 * @return the value
@@ -165,6 +185,8 @@ public class ShopUser extends Entity implements Serializable {
 		String LOGIN = "login";
 		/** Var NAME */
 		String NAME = "name";
+		/** Var PASSWORD */
+		String PASSWORD = "password";
 		/** Var PROFILE */
 		String PROFILE = "profile";
 	}
@@ -176,6 +198,8 @@ public class ShopUser extends Entity implements Serializable {
 			String USER = "USER";	
 			/** Defined value */
 			String ADMIN = "ADMIN";	
+			/** Defined value */
+			String BUYER = "BUYER";	
 		}
 	}
 

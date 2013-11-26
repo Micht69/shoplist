@@ -21,15 +21,14 @@ public class ShopUserQuery extends AbstractEntityQuery {
 
 	static { 
 		QUERIES = new HashMap<String, DbQuery>();	
-				
-		DbQuery SHOP_USER = new DbQuery("shopUser", "T1");
+		
+		DbQuery SHOP_USER = new DbQuery("shopUser", "USR");
 		SHOP_USER.setName("SHOP_USER");
-		SHOP_USER.addColumn("login", "T1"); 
-		SHOP_USER.addColumn("name", "T1"); 
-		SHOP_USER.addColumn("profile", "T1"); 
-		SHOP_USER.addColumn("w$Desc", "T1"); 
+		SHOP_USER.addColumn("login", "USR");
+		SHOP_USER.addColumn("name", "USR");
+		SHOP_USER.addColumn("profile", "USR");
+		SHOP_USER.addSortBy("login", "USR", "ASC");
 		QUERIES.put("SHOP_USER", SHOP_USER);	
-	
 
 	}
 	
@@ -48,8 +47,8 @@ public class ShopUserQuery extends AbstractEntityQuery {
 	public interface Alias {
 		/** Aliases for query SHOP_USER */
 		public interface QUERY_SHOP_USER {
-			/** Alias T1 */
-			String SHOP_USER_T1 = "T1";
+			/** Alias USR */
+			String SHOP_USER_USR = "USR";
 		}
 	}
 	

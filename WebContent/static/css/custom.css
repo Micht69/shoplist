@@ -4,3 +4,81 @@
 	text-indent: -9999px;
 	width: 40px;
 }
+
+@media screen and (max-width: 980px) {
+	/**
+	 * Should be applied only on mobile device
+	 */
+	.wrapper 
+	{
+		width: 100%;
+		height: auto;
+		margin: 0 0;
+	}
+	.header { 
+		position: relative; 
+		width: 100%;
+		margin-bottom: 10px;
+	}
+	html>body .header {
+		position: relative;
+		margin-bottom: 10px;
+	}
+	.content {
+	    padding-top: 0px;
+	    padding-bottom: 0px;
+	    width: 100%;
+	}
+	.footer { 
+		position: relative; 
+		width: 100%;
+	}
+	html>body .footer {
+		position: relative;
+	}
+	.largeImg {
+		width: 100%;
+	}
+	.header_left {
+		width: 100%;
+		height: 40px;
+	}
+	.header_left .header_title {
+	}
+	.header_right {
+		display: none;
+	}
+	
+	.filter-line {
+		display: none;
+	}
+	.ariane {
+		display: none;
+	}
+	
+	/* Form fields */
+	span.quickSearch a ~ input {
+		width: 82%;
+	}
+	.colFieldSetRight > select {
+		width: 98%;
+	}
+	textarea, select, input[type="text"], input[type="password"], input[type="datetime"], 
+	input[type="datetime-local"], input[type="date"], input[type="month"], input[type="week"], 
+	input[type="time"], input[type="number"], input[type="url"], input[type="search"], 
+	input[type="email"], input[type="tel"], input[type="color"] {
+		width: 95%;
+	}
+	
+	/* icons for actions */
+	input[id="mainForm:validateAction"] {
+		background-image: url('../img/icons/validate.png');
+		font-size: 0px;
+		width: 34px;
+	}
+	input[id="mainForm:cancelAction"] {
+		background-image: url('../img/icons/cancel.png');
+		font-size: 0px;
+		width: 34px;
+	}
+}

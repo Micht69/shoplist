@@ -90,7 +90,7 @@
 
 				
 				<h:dataTable id="tableSHOP_USER"
-						columnClasses="first, default, default, defValue, default" rowClasses="odd,even"
+						columnClasses="first, default, default, defValue" rowClasses="odd,even"
 						value="#{jsfCtrl.results.list}" var="tempVar"
 						rendered="#{not empty jsfCtrl.results}"
 						onRowClick="launchAction('#{tempVar.primaryKey.encodedValue}');">
@@ -106,14 +106,14 @@
 							 
 						<f:facet name="header">
 							<h:commandLink action="#{jsfCtrl.sortBy('login')}">
-								<h:outputText value="#{jsfCtrl.results.titles.T1_login}" />
+								<h:outputText value="#{jsfCtrl.results.titles.USR_login}" />
 							</h:commandLink>
 							<h:outputText value=" " />
 							<h:graphicImage library="img" name="ico_up_on.png" rendered="#{jsfCtrl.sortAscBy('login')}" alt="up" />
 							<h:graphicImage library="img" name="ico_down_on.png" rendered="#{jsfCtrl.sortDescBy('login')}" alt="down" />
 						</f:facet>
 							 			
-						<h:outputLabel value="#{tempVar.T1_login}" />
+						<h:outputLabel value="#{tempVar.USR_login}" />
 					</h:column>
 
 					<h:column>
@@ -121,14 +121,14 @@
 							 
 						<f:facet name="header">
 							<h:commandLink action="#{jsfCtrl.sortBy('name')}">
-								<h:outputText value="#{jsfCtrl.results.titles.T1_name}" />
+								<h:outputText value="#{jsfCtrl.results.titles.USR_name}" />
 							</h:commandLink>
 							<h:outputText value=" " />
 							<h:graphicImage library="img" name="ico_up_on.png" rendered="#{jsfCtrl.sortAscBy('name')}" alt="up" />
 							<h:graphicImage library="img" name="ico_down_on.png" rendered="#{jsfCtrl.sortDescBy('name')}" alt="down" />
 						</f:facet>
 							 			
-						<h:outputLabel value="#{tempVar.T1_name}" />
+						<h:outputLabel value="#{tempVar.USR_name}" />
 					</h:column>
 
 					<h:column>
@@ -136,29 +136,14 @@
 							 
 						<f:facet name="header">
 							<h:commandLink action="#{jsfCtrl.sortBy('profile')}">
-								<h:outputText value="#{jsfCtrl.results.titles.T1_profile}" />
+								<h:outputText value="#{jsfCtrl.results.titles.USR_profile}" />
 							</h:commandLink>
 							<h:outputText value=" " />
 							<h:graphicImage library="img" name="ico_up_on.png" rendered="#{jsfCtrl.sortAscBy('profile')}" alt="up" />
 							<h:graphicImage library="img" name="ico_down_on.png" rendered="#{jsfCtrl.sortDescBy('profile')}" alt="down" />
 						</f:facet>
 							 			
-						<h:outputLabel value="#{tempVar.T1_profile}" />
-					</h:column>
-
-					<h:column>
-
-							 
-						<f:facet name="header">
-							<h:commandLink action="#{jsfCtrl.sortBy('w$Desc')}">
-								<h:outputText value="#{jsfCtrl.results.titles.T1_w$Desc}" />
-							</h:commandLink>
-							<h:outputText value=" " />
-							<h:graphicImage library="img" name="ico_up_on.png" rendered="#{jsfCtrl.sortAscBy('w$Desc')}" alt="up" />
-							<h:graphicImage library="img" name="ico_down_on.png" rendered="#{jsfCtrl.sortDescBy('w$Desc')}" alt="down" />
-						</f:facet>
-							 			
-						<h:outputLabel value="#{tempVar.T1_w$Desc}" />
+						<h:outputLabel value="#{tempVar.USR_profile}" />
 					</h:column>
 					<f:facet name="footer">
 						<h:commandButton image="/static/img/buttons/plus.png" rendered="#{jsfCtrl.results.list.size() &lt; jsfCtrl.results.resultSetCount}" styleClass="btn_more_lines" title="#{hh:label('labels', 'liste.data.more')}">

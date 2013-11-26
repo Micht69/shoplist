@@ -47,15 +47,15 @@ public class UiDescriptor {
 		actionPages.put("shopList", actPagesShopList);
 
 		UiPage SHOP_LIST = new UiPage();
-		UiElement SHOP_LIST_SHOP_ARTICLE_L_USER = new UiElement("shopUser", "shopArticleLUser", null, null, Type.LINK); 
-		SHOP_LIST.elements.add(SHOP_LIST_SHOP_ARTICLE_L_USER);
+		UiElement SHOP_LIST_SHOP_ARTICLE_L_USER_null = new UiElement("shopUser", "shopArticleLUser", null, null, Type.LINK_COMBO); 
+		SHOP_LIST.elements.add(SHOP_LIST_SHOP_ARTICLE_L_USER_null);
 		UiElement SHOP_LIST_SHOP_LIST_L_ARTICLE_L_LIST_SHOP_ARTICLES2 = new UiElement("shopListLArticle", "shopListLArticleLList", "SHOP_ARTICLES2", null, Type.BACK_REF_LIST); 
 		SHOP_LIST.elements.add(SHOP_LIST_SHOP_LIST_L_ARTICLE_L_LIST_SHOP_ARTICLES2);
 		pages.put("SHOP_LIST", SHOP_LIST);
 
 		UiPage SHOP_LIST_CREATE = new UiPage();
-		UiElement SHOP_LIST_CREATE_SHOP_ARTICLE_L_USER = new UiElement("shopUser", "shopArticleLUser", null, null, Type.LINK); 
-		SHOP_LIST_CREATE.elements.add(SHOP_LIST_CREATE_SHOP_ARTICLE_L_USER);
+		UiElement SHOP_LIST_CREATE_SHOP_ARTICLE_L_USER_null = new UiElement("shopUser", "shopArticleLUser", null, null, Type.LINK_COMBO); 
+		SHOP_LIST_CREATE.elements.add(SHOP_LIST_CREATE_SHOP_ARTICLE_L_USER_null);
 		pages.put("SHOP_LIST_CREATE", SHOP_LIST_CREATE);
 
 		UiPage SHOP_LIST_SHOPPING = new UiPage();
@@ -75,6 +75,8 @@ public class UiDescriptor {
 		UiPage SHOP_LIST_L_ARTICLE = new UiPage();
 		UiElement SHOP_LIST_L_ARTICLE_SHOP_LIST_L_ARTICLE_L_LIST_null = new UiElement("shopList", "shopListLArticleLList", null, null, Type.LINK_COMBO); 
 		SHOP_LIST_L_ARTICLE.elements.add(SHOP_LIST_L_ARTICLE_SHOP_LIST_L_ARTICLE_L_LIST_null);
+		UiElement SHOP_LIST_L_ARTICLE_SHOP_LIST_L_ARTICLE_L_ARTICLE = new UiElement("shopArticle", "shopListLArticleLArticle", null, null, Type.LINK_QUICK_SEARCH); 
+		SHOP_LIST_L_ARTICLE.elements.add(SHOP_LIST_L_ARTICLE_SHOP_LIST_L_ARTICLE_L_ARTICLE);
 		pages.put("SHOP_LIST_L_ARTICLE", SHOP_LIST_L_ARTICLE);
 
 		Map<Integer, String> actPagesShopShelf = new HashMap<Integer, String>();
@@ -99,9 +101,6 @@ public class UiDescriptor {
 
 		UiPage SHOP_USER = new UiPage();
 		pages.put("SHOP_USER", SHOP_USER);
-
-		UiPage SHOP_USER_READ = new UiPage();
-		pages.put("SHOP_USER_READ", SHOP_USER_READ);
 
 	}
 

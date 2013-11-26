@@ -26,7 +26,7 @@ public class ShopList extends Entity implements Serializable {
 	/** ID */
 	private Integer id ;
 
-	/** Nom */
+	/** Titre */
 	private String name ;
 
 	/** Créateur */
@@ -38,7 +38,7 @@ public class ShopList extends Entity implements Serializable {
 	/** Description */
 	private String w$Desc ;
 
-	/** Nombre d'articles */
+	/** Nbr d'articles */
 	private Integer articleCount ;
 
 

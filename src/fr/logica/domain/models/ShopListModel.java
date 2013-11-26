@@ -107,13 +107,13 @@ public class ShopListModel extends EntityModel implements Serializable {
 		AUTOINCREMENT_FIELDS.add("id");
 
 		FIELDS.put("id", new EntityField("ID", "INTEGER", 10, 0, Memory.NO, true, false, "ID"));
-		FIELDS.put("name", new EntityField("NAME", "VARCHAR2", 100, 0, Memory.NO, true, false, "Nom"));
+		FIELDS.put("name", new EntityField("NAME", "VARCHAR2", 100, 0, Memory.NO, true, false, "Titre"));
 		FIELDS.put("user", new EntityField("USER", "VARCHAR2", 10, 0, Memory.NO, true, false, "Créateur"));
 		FIELDS.put("createDate", new EntityField("CREATE_DATE", "DATE", 0, 0, Memory.NO, false, false, "Date de création"));
 		FIELDS.put("w$Desc", new EntityField("W$_DESC", "VARCHAR2", 200, 0, Memory.SQL, false, false, "Description")); 
 		FIELDS.get("w$Desc").setSqlExpr(":tableAlias.NAME");
 
-		FIELDS.put("articleCount", new EntityField("ARTICLE_COUNT", "INTEGER", 3, 0, Memory.ALWAYS, false, false, "Nombre d'articles"));
+		FIELDS.put("articleCount", new EntityField("ARTICLE_COUNT", "INTEGER", 3, 0, Memory.ALWAYS, false, false, "Nbr d'articles"));
 		ACTIONS = new HashMap<Integer, Action>();
 		ACTIONS.put(0, new Action(0, 0));
 		ACTIONS.put(2, new Action(2, 2));

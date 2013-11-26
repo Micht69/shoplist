@@ -3,22 +3,12 @@
 <h:body>
 <ui:composition>
 
-<li class="ui-menu-item">
-	<a href="#" class="ui-corner-all">
-		<span>
-			<h:panelGroup rendered="#{sessionCtrl.user != null}">
-                <h:outputLabel value="#{sessionCtrl.user.login}" /> 
-            </h:panelGroup>
-		</span>
-	</a>
-	<ul>
-
-		<li><h:commandLink action="#{sessionCtrl.logout}" onclick="return checkDirtyState(this);"><h:outputText value="#{labels['action.logout']}" /></h:commandLink></li>
-
-		<li><h:outputLink value="#" onclick="openScrollablePopUp('../#{sessionCtrl.help}', 800, 600);">#{labels['action.help']}</h:outputLink></li>
-
-	</ul>
+<li class="ui-menu-item" style="float: right;">
+	<h:commandLink onclick="return checkDirtyState(this);" action="#{sessionCtrl.logout}" style="padding-top: 0px; padding-bottom: 0px; font-size: 0px; height: 31px; vertical-align: middle;">
+		<span><img src="../static/img/menu/logout.png" title="Logout" style="border: 0px; padding-top: 3px;" />.</span>
+	</h:commandLink>
 </li>
+
 </ui:composition>
 </h:body>
 </html>
