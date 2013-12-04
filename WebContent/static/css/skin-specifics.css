@@ -60,6 +60,13 @@ div.jw-widget div.jw-content {
 	width: auto;
 }
 
+.login .colFieldSetLeft {
+	width:50%;
+}
+.login .colFieldSetRight {
+	width:50%;
+}
+
 
 
 /******************************************************************************

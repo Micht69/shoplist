@@ -164,14 +164,33 @@ button.btn_large {
 
 .colFieldSetRight > input,
 .colFieldSetRight > textarea {
-	width: 206px;
+	width: 432px;
+}
+.group_table_col_2 .colFieldSetRight > input,
+.group_table_col_2 .colFieldSetRight > textarea {
+	width: 216px;
+}
+
+.colFieldSetRight > .quickSearch input,
+.colFieldSetRight > .quickSearch textarea {
+	width: 384px;
+}
+.group_table_col_2 .colFieldSetRight > .quickSearch input,
+.group_table_col_2 .colFieldSetRight > .quickSearch textarea {
+	width: 168px;
 }
 
 .colFieldSetRight > select {
+	width: 446px;
+}
+.group_table_col_2 .colFieldSetRight > select {
 	width: 230px;
 }
 
 .colFieldSetRight > input.dateTime {
+	width: 336px;
+}
+.group_table_col_2 .colFieldSetRight > input.dateTime {
 	width: 168px;
 }
 

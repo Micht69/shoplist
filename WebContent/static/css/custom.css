@@ -57,7 +57,7 @@
 	}
 	
 	/* Form fields */
-	span.quickSearch a ~ input {
+	.colFieldSetRight > .quickSearch input {
 		width: 82%;
 	}
 	.colFieldSetRight > select {
@@ -80,5 +80,10 @@
 		background-image: url('../img/icons/cancel.png');
 		font-size: 0px;
 		width: 34px;
+	}
+	
+	.ui-accordion .ui-accordion-header {
+		padding: 3px 7px;
+		font-size: medium;
 	}
 }
