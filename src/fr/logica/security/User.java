@@ -17,6 +17,8 @@ public class User extends ApplicationUser {
 	private static final long serialVersionUID = 1L;
 
 	public final String profile;
+	public String eanCode;
+	public String eanShelf;
 
 	public User(String login) {
 		super(login);

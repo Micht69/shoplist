@@ -7,12 +7,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Serializable;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 
 import javax.faces.application.FacesMessage;
 import javax.faces.component.UIComponent;
@@ -27,7 +25,6 @@ import fr.logica.application.AbstractApplicationLogic.OpenCriteriaBehavior;
 import fr.logica.application.ApplicationUtils;
 import fr.logica.business.Action;
 import fr.logica.business.Constants;
-import fr.logica.business.Context;
 import fr.logica.business.Entity;
 import fr.logica.business.EntityManager;
 import fr.logica.business.EntityModel;
@@ -36,10 +33,8 @@ import fr.logica.business.Key;
 import fr.logica.business.Link;
 import fr.logica.business.MessageUtils;
 import fr.logica.business.Results;
-
 import fr.logica.controller.UiController;
 import fr.logica.db.ConnectionObject;
-
 import fr.logica.jsf.components.autocomplete.AutocompleteSuggestion;
 import fr.logica.jsf.components.schedule.ScheduleEvent;
 import fr.logica.jsf.components.wizard.WizardEvent;
@@ -943,6 +938,10 @@ public class JSFController implements Serializable {
 			return (ActionPage) page;
 		}
 		return null;
+	}
+
+	public void setPage(Page<Entity> p) {
+		page = p;
 	}
 
 	/**

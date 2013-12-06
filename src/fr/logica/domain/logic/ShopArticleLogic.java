@@ -23,7 +23,10 @@ import org.xml.sax.SAXException;
 import fr.logica.business.Action;
 import fr.logica.business.Context;
 import fr.logica.business.DefaultLogic;
+import fr.logica.business.Key;
+import fr.logica.domain.models.ShopShelfModel;
 import fr.logica.domain.objects.ShopArticle;
+import fr.logica.security.User;
 import fr.logica.ui.Message;
 
 /**
@@ -42,6 +45,22 @@ public class ShopArticleLogic extends DefaultLogic<ShopArticle> {
 			searchUPCdatabase(bean, ctx);
 		}
 		super.dbOnSave(bean, action, ctx);
+	}
+
+	@Override
+	public void dbPostLoad(ShopArticle bean, Action action, Context ctx) {
+		if (action.code == ShopArticle.Action.ACTION_50 && ctx.getUser() instanceof User) {
+			User user = (User) ctx.getUser();
+			if (user.eanCode != null) {
+				bean.setEan13(user.eanCode);
+				user.eanCode = null;
+			}
+			if (user.eanShelf != null) {
+				bean.setForeignKey("shopArticleRShelf", new Key(ShopShelfModel.ENTITY_NAME, user.eanShelf));
+				user.eanShelf = null;
+			}
+		}
+		super.dbPostLoad(bean, action, ctx);
 	}
 
 	private void searchUPCdatabase(ShopArticle bean, Context ctx) {
@@ -86,8 +105,8 @@ public class ShopArticleLogic extends DefaultLogic<ShopArticle> {
 		}
 
 		try {
-			//System.setProperty("http.proxyHost", "fr-proxy.groupinfra.com");
-			//System.setProperty("http.proxyPort", "3128");
+			// System.setProperty("http.proxyHost", "fr-proxy.groupinfra.com");
+			// System.setProperty("http.proxyPort", "3128");
 
 			XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
 			config.setServerURL(new URL("http://www.upcdatabase.com/xmlrpc"));

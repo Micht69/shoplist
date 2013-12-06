@@ -68,10 +68,4 @@
     <filter-name>Upload filter</filter-name>
     <url-pattern>/*</url-pattern>
   </filter-mapping>
-  <listener>
-    <listener-class>com.sun.faces.config.ConfigureListener</listener-class>
-  </listener>
-
-
-
 </web-app>
