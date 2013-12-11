@@ -11,10 +11,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import fr.logica.business.DateTimeUpgraded;
-import fr.logica.business.DateUtils;
-import java.util.Date;
-
 import fr.logica.business.Action;
 import fr.logica.business.EntityField;
 import fr.logica.business.EntityField.Memory;
@@ -23,7 +19,6 @@ import fr.logica.business.ForeignKeyModel;
 import fr.logica.business.Key;
 import fr.logica.business.KeyModel;
 import fr.logica.business.LinkModel;
-import fr.logica.business.MessageUtils;
 
 /**
  * Model class for the entity ShopList
@@ -35,7 +30,7 @@ public class ShopListModel extends EntityModel implements Serializable {
 	public static final long serialVersionUID = 1L;
 
 	/** Table name for this entity */
-	public static final String ENTITY_DB_NAME = "list";
+	public static final String ENTITY_DB_NAME = "LIST";
 
 	/** Name for this entity */
 	public static final String ENTITY_NAME = "shopList";

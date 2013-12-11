@@ -11,18 +11,18 @@ SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
 
 --
--- Base de données: `shoplist`
+-- Base de données: `SHOPLIST`
 --
-CREATE DATABASE IF NOT EXISTS `shoplist` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
-USE `shoplist`;
+CREATE DATABASE IF NOT EXISTS `SHOPLIST` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
+USE `SHOPLIST`;
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `article`
+-- Structure de la table `ARTICLE`
 --
 
-CREATE TABLE IF NOT EXISTS `article` (
+CREATE TABLE IF NOT EXISTS `ARTICLE` (
   `ID` int(11) NOT NULL,
   `NAME` varchar(128) NOT NULL,
   `DESCR` varchar(500) DEFAULT NULL,
@@ -33,16 +33,16 @@ CREATE TABLE IF NOT EXISTS `article` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
--- Contenu de la table `article`
+-- Contenu de la table `ARTICLE`
 --
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `list`
+-- Structure de la table `LIST`
 --
 
-CREATE TABLE IF NOT EXISTS `list` (
+CREATE TABLE IF NOT EXISTS `LIST` (
   `ID` int(11) NOT NULL,
   `NAME` varchar(100) NOT NULL,
   `USER` varchar(10) NOT NULL,
@@ -52,16 +52,16 @@ CREATE TABLE IF NOT EXISTS `list` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
--- Contenu de la table `list`
+-- Contenu de la table `LIST`
 --
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `shelf`
+-- Structure de la table `SHELF`
 --
 
-CREATE TABLE IF NOT EXISTS `shelf` (
+CREATE TABLE IF NOT EXISTS `SHELF` (
   `CODE` varchar(10) NOT NULL,
   `NAME` varchar(100) NOT NULL,
   `POSITION` int(11) NOT NULL,
@@ -69,10 +69,10 @@ CREATE TABLE IF NOT EXISTS `shelf` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
--- Contenu de la table `shelf`
+-- Contenu de la table `SHELF`
 --
 
-INSERT INTO `shelf` (`CODE`, `NAME`, `POSITION`) VALUES
+INSERT INTO `SHELF` (`CODE`, `NAME`, `POSITION`) VALUES
 ('CONS', 'Conserves', 40),
 ('DEJ', 'Petit-déjeuner', 90),
 ('FRAI', 'Frais', 50),
@@ -81,10 +81,10 @@ INSERT INTO `shelf` (`CODE`, `NAME`, `POSITION`) VALUES
 -- --------------------------------------------------------
 
 --
--- Structure de la table `shop_list_l_article`
+-- Structure de la table `SHOP_LIST_L_ARTICLE`
 --
 
-CREATE TABLE IF NOT EXISTS `shop_list_l_article` (
+CREATE TABLE IF NOT EXISTS `SHOP_LIST_L_ARTICLE` (
   `LIST_ID` int(11) NOT NULL,
   `ARTICLE_ID` int(11) NOT NULL,
   `QUANTITY` int(11) NOT NULL,
@@ -95,16 +95,16 @@ CREATE TABLE IF NOT EXISTS `shop_list_l_article` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
--- Contenu de la table `shop_list_l_article`
+-- Contenu de la table `SHOP_LIST_L_ARTICLE`
 --
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `user`
+-- Structure de la table `USER`
 --
 
-CREATE TABLE IF NOT EXISTS `user` (
+CREATE TABLE IF NOT EXISTS `USER` (
   `LOGIN` varchar(10) NOT NULL,
   `NAME` varchar(100) NOT NULL,
   `PASSWORD` varchar(100) DEFAULT NULL,
@@ -113,10 +113,10 @@ CREATE TABLE IF NOT EXISTS `user` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
--- Contenu de la table `user`
+-- Contenu de la table `USER`
 --
 
-INSERT INTO `user` (`LOGIN`, `NAME`, `PASSWORD`, `PROFILE`) VALUES
+INSERT INTO `USER` (`LOGIN`, `NAME`, `PASSWORD`, `PROFILE`) VALUES
 ('micht', 'Seb', 'titia1803', 'ADMIN'),
 ('titia', 'Laeti', 'sebastien', 'USER');
 
@@ -125,20 +125,20 @@ INSERT INTO `user` (`LOGIN`, `NAME`, `PASSWORD`, `PROFILE`) VALUES
 --
 
 --
--- Contraintes pour la table `article`
+-- Contraintes pour la table `ARTICLE`
 --
-ALTER TABLE `article`
-  ADD CONSTRAINT `SHOP_ARTICLE_L_SHELF` FOREIGN KEY (`SHELF`) REFERENCES `shelf` (`CODE`) ON UPDATE CASCADE;
+ALTER TABLE `ARTICLE`
+  ADD CONSTRAINT `SHOP_ARTICLE_L_SHELF` FOREIGN KEY (`SHELF`) REFERENCES `SHELF` (`CODE`) ON UPDATE CASCADE;
 
 --
--- Contraintes pour la table `list`
+-- Contraintes pour la table `LIST`
 --
-ALTER TABLE `list`
-  ADD CONSTRAINT `SHOP_ARTICLE_L_USER` FOREIGN KEY (`USER`) REFERENCES `user` (`LOGIN`) ON UPDATE CASCADE;
+ALTER TABLE `LIST`
+  ADD CONSTRAINT `SHOP_ARTICLE_L_USER` FOREIGN KEY (`USER`) REFERENCES `USER` (`LOGIN`) ON UPDATE CASCADE;
 
 --
--- Contraintes pour la table `shop_list_l_article`
+-- Contraintes pour la table `SHOP_LIST_L_ARTICLE`
 --
-ALTER TABLE `shop_list_l_article`
-  ADD CONSTRAINT `SHOP_LIST_L_ARTICLE_L_ARTICLE` FOREIGN KEY (`ARTICLE_ID`) REFERENCES `article` (`ID`) ON UPDATE CASCADE,
-  ADD CONSTRAINT `SHOP_LIST_L_ARTICLE_L_LIST` FOREIGN KEY (`LIST_ID`) REFERENCES `list` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `SHOP_LIST_L_ARTICLE`
+  ADD CONSTRAINT `SHOP_LIST_L_ARTICLE_L_ARTICLE` FOREIGN KEY (`ARTICLE_ID`) REFERENCES `ARTICLE` (`ID`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `SHOP_LIST_L_ARTICLE_L_LIST` FOREIGN KEY (`LIST_ID`) REFERENCES `LIST` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;

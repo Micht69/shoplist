@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-
 import fr.logica.business.Action;
 import fr.logica.business.EntityField;
 import fr.logica.business.EntityField.Memory;
@@ -20,7 +19,6 @@ import fr.logica.business.ForeignKeyModel;
 import fr.logica.business.Key;
 import fr.logica.business.KeyModel;
 import fr.logica.business.LinkModel;
-import fr.logica.business.MessageUtils;
 
 /**
  * Model class for the entity ShopShelf
@@ -32,7 +30,7 @@ public class ShopShelfModel extends EntityModel implements Serializable {
 	public static final long serialVersionUID = 1L;
 
 	/** Table name for this entity */
-	public static final String ENTITY_DB_NAME = "shelf";
+	public static final String ENTITY_DB_NAME = "SHELF";
 
 	/** Name for this entity */
 	public static final String ENTITY_NAME = "shopShelf";

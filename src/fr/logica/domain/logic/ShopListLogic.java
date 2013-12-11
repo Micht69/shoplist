@@ -30,8 +30,11 @@ public class ShopListLogic extends DefaultLogic<ShopList> {
 				if (dbm.next()) {
 					return dbm.getInt(1);
 				}
+			} catch (Exception e) {
+				return 0;
 			} finally {
-				dbm.close();
+				if (dbm != null)
+					dbm.close();
 			}
 		}
 		return super.uiListVarValue(vars, queryName, domainName, varName, ctx);
