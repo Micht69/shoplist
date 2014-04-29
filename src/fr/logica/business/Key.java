@@ -40,8 +40,7 @@ public class Key implements Serializable {
 	 * Fixe les valeurs de la clé courante avec les valeurs d'une autre clé dont les noms de champs sont potentiellement différents. Cette
 	 * méthode sert à fabriquer une clé primaire à partir d'une clé étrangère qui la référence ou l'inverse.
 	 * 
-	 * @param key
-	 *            Clé étrangère qui référence la clé primaire, ou l'inverse.
+	 * @param key Clé étrangère qui référence la clé primaire, ou l'inverse.
 	 */
 	public void setValue(Key key) {
 		if (key.getModel().getFields().size() != getModel().getFields().size()) {
@@ -140,8 +139,7 @@ public class Key implements Serializable {
 	 * instance, if key is (var1='pouet' and var2='toto') and partialKey is (var1=null and var2='toto'), it will return true.
 	 * 
 	 * 
-	 * @param partialKey
-	 *            A key with the same fields, but not all values.
+	 * @param partialKey A key with the same fields, but not all values.
 	 * @return <code>true</code> if all values of the partial Key are in the current key
 	 */
 	public boolean contains(Key partialKey) {
@@ -194,6 +192,34 @@ public class Key implements Serializable {
 			}
 		} else if (!values.equals(other.values)) {
 			return false;
+		}
+		return true;
+	}
+
+	/**
+	 * Compares values of current key instance with another key values. This method ensures that both keys have the same number of fields and
+	 * compares them based on field order. This method can be used to check if a foreign key values equals a primary key values.
+	 * 
+	 * @param otherKey The key to compare
+	 * @return true if both keys have the same number of fields and same values, false otherwise
+	 */
+	public boolean hasSameValues(Key otherKey) {
+		if (otherKey == null) {
+			return false;
+		}
+		if (otherKey.getModel().getFields().size() != this.model.getFields().size()) {
+			return false;
+		}
+
+		for (int i = 0; i < model.getFields().size(); i++) {
+			Object value = this.getValue(this.getModel().getFields().get(i));
+			Object otherValue = otherKey.getValue(otherKey.getModel().getFields().get(i));
+			if (value == null && otherValue != null) {
+				return false;
+			}
+			if (value != null && !value.equals(otherValue)) {
+				return false;
+			}
 		}
 		return true;
 	}

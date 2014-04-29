@@ -2,6 +2,8 @@
 <projectDescription>
 	<name>shoplist</name>
 	<comment></comment>
+	<projects>
+	</projects>
 	<buildSpec>
 		<buildCommand>
 			<name>org.eclipse.jdt.core.javabuilder</name>
@@ -20,6 +22,7 @@
 		</buildCommand>
 	</buildSpec>
 	<natures>
+		<nature>com.cgi.toy.tdt.core.toyNature</nature>
 		<nature>org.eclipse.jem.workbench.JavaEMFNature</nature>
 		<nature>org.eclipse.wst.common.modulecore.ModuleCoreNature</nature>
 		<nature>org.eclipse.wst.common.project.facet.core.nature</nature>

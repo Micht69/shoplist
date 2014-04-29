@@ -31,6 +31,7 @@
 	<target name="war" depends="clean, compile">
 		<war destfile="dist/shoplist.war" webxml="WebContent/WEB-INF/web.xml">
 			<fileset dir="WebContent"/>
+			<fileset dir="src/META-INF"/>
 			<lib dir="WebContent/WEB-INF/lib"/>
 			<classes dir="dist/build/classes"/>
 		</war>

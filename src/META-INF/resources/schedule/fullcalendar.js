@@ -5330,10 +5330,14 @@ $.fullCalendar.setDefaults({
 
 });
 
+var scheduleDayClicked = false; 
 function scheduleDayClick(ui, date, linkName, entityName) {
+	if (scheduleDayClicked) return; 
+	scheduleDayClicked = true; 
 	saveEventData(ui, 'date', date.getTime(), false);
-	$('input[id$="_launchActionSchedule"]').val(true);
-	launchLinkAction(linkName, entityName, 0, 0, null);
+	var scheduleName = "schedule_" + linkName + "_" + entityName;
+	$('input[id$="' + scheduleName + '-selectedEvent"]').val(null);
+	$('input[id$="' + scheduleName + '_launchAction"]').click();
 }
 
 function saveEventData(ui, key, value, change) {

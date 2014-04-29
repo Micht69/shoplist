@@ -24,9 +24,7 @@
 		<div class="header_left">
 			<a href="../" title="#{labels['back.home']}" class="logo_client" onclick="return checkDirtyState(this);"><img src="../static/img/logo_client.jpg" align="left" alt="" border="0" /></a>
 			<h1 class="header_title">
-
 				<h:outputText value="#{hh:label('genlabels', '_application.description')}" />
-
 			</h1>
 		</div>
 		<div class="header_right">
@@ -34,23 +32,20 @@
 		</div>
 		<div class="clear"></div>
 	    <!-- Menu start -->
-	    <h:form id="menuForm" rendered="#{sessionCtrl.user != null}">
+	    <h:form id="menuForm" rendered="#{sessionCtrl.context.user != null}">
 	        <div class="menu">
 	        <ul id="menu" class="ui-menu ui-widget ui-widget-content ui-corner-all">
 	        	<ui:include src="../includes/menu.xhtml" />
-	        	<ui:include src="../includes/customMenu.xhtml" />
+	        	<ui:include src="../includes/custom/customMenu.xhtml" />
 	        </ul>
 	        </div>			
 	    </h:form>
 	    <!-- Menu end-->
-
-
-		<h:form id="breadcrumbForm" rendered="#{sessionCtrl.page != null}">
-			<hh:breadcrumbs page="#{sessionCtrl.page}" method="#{jsfCtrl.back}" id="breadcrumb"
-				 onclick="return checkDirtyState(this);" rendered="#{sessionCtrl.user != null}" immediate="true" />
+		<ui:include src="../includes/custom/customHeader.xhtml" />
+		<h:form id="breadcrumbForm" rendered="#{jsfCtrl.currentView != null}">
+			<hh:breadcrumbs view="#{jsfCtrl.currentView}" method="#{jsfCtrl.back}" id="breadcrumb"
+				 onclick="return checkDirtyState(this);" immediate="true" />
 		</h:form>
-
-
 	</div>
     <!-- Header end -->
 </ui:composition>

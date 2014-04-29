@@ -7,7 +7,8 @@
 	margin-left: 0;
 }
 
-.listButtons .btn_medium input {
+.listButtons .btn_medium input,
+.fc-header-right .fc-button {
 	font-size: 14px;
 	margin-left: -1px;
 	-webkit-border-radius: 0;
@@ -15,14 +16,18 @@
 	        border-radius: 0;
 }
 
-.listButtons a:first-child input {
+.listButtons a:first-child input,
+.fc-header-right .fc-button:first-child,
+.fc-header-left .fc-button-prev {
 	margin-left: 0;
 	-webkit-border-radius: 4px 0 0 4px;
 	   -moz-border-radius: 4px 0 0 4px;
 	        border-radius: 4px 0 0 4px;
 }
 
-.listButtons a:last-child input {
+.listButtons a:last-child input,
+.fc-header-right .fc-button:last-child,
+.fc-header-left .fc-button-next {
 	-webkit-border-radius: 0 4px 4px 0;
 	   -moz-border-radius: 0 4px 4px 0;
 	        border-radius: 0 4px 4px 0;
@@ -85,8 +90,9 @@ table tr td a.btn_tablerow input {
 	border-style: solid;
 }
 
-.table_container table td.tabedit-editable-cell {
-	border-style: dotted;
+.list_results_container table tr,
+.results_container table tr {
+	height: 20px;
 }
 
 .list_results_container table > tbody > tr > td.first,
@@ -232,3 +238,32 @@ table tr td a.btn_tablerow input {
 	margin-top: 5px; 
 	margin-right: 10px; 
 }
+
+.no-result {
+	color: red;
+	font-style: italic;
+}
+
+.tabedit-editable-table tr.odd:hover td.tabedit-active {
+	background-color: #eeeeee;
+	color: #333333;
+}
+
+.tabedit-editable-table tr.even:hover td.tabedit-active {
+	background-color: #ffffff;
+	color: #333333;
+}
+
+div.tabedit-editable-write input,
+div.tabedit-editable-write select,
+div.tabedit-editable-write textarea {
+	margin: 0;
+	width: 95%;
+	width: calc(100% - 13px);/* 100% - (padding + border) */
+}
+
+div.tabedit-editable-write input.hasDatepicker {
+	width: 85%;
+	width: calc(100% - 39px);/* 100% - (padding + border + button) */
+}
+

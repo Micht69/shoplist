@@ -10,17 +10,22 @@ import javax.naming.RefAddr;
 import javax.naming.Reference;
 import javax.naming.spi.ObjectFactory;
 
+import org.apache.log4j.Logger;
+
 public class LdapConfigFactory implements ObjectFactory {
+
+	/** Log4j logger */
+	private static final Logger LOGGER = Logger.getLogger(LdapConfigFactory.class);
 
 	@Override
 	public Object getObjectInstance(Object obj, Name name, Context nameCtx, Hashtable<?, ?> environment) throws Exception {
 		LdapConfig config = new LdapConfig();
-		
+
 		Reference ref = (Reference) obj;
 		Enumeration<RefAddr> addrs = ref.getAll();
 		while (addrs.hasMoreElements()) {
 			RefAddr addr = addrs.nextElement();
-			
+
 			if (addr.getType().equals("java.naming.provider.url")) {
 				config.url = addr.getContent().toString();
 			} else if (addr.getType().equals("java.naming.security.authentication")) {
@@ -35,11 +40,11 @@ public class LdapConfigFactory implements ObjectFactory {
 					Field f = config.getClass().getDeclaredField(attr);
 					f.set(config, addr.getContent().toString());
 				} catch (Exception e) {
-					e.printStackTrace();
+					LOGGER.error(e.getMessage(), e);
 				}
 			}
 		}
-		
+
 		return config;
 	}
 

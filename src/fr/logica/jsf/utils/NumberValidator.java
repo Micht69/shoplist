@@ -34,12 +34,12 @@ public class NumberValidator implements Validator {
 		try {
 			precision = Integer.parseInt((String) component.getAttributes().get("precision"));
 		} catch (NumberFormatException nfe) {
-			// raf
+			precision = 0;
 		}
 		try {
 			scale = Integer.parseInt((String) component.getAttributes().get("scale"));
 		} catch (NumberFormatException nfe) {
-			// raf
+			scale = 0;
 		}
 		int nbInteger = precision - scale;
 		int nbFraction = scale;

@@ -51,7 +51,7 @@ public class MapRenderer extends HiddenRenderer {
 		writer.startElement("script", null);
 		writer.writeAttribute("type", "text/javascript", null);
 		String script = "";
-		script += "\n\t" + "OpenLayers.ImgPath = \"/" + context.getExternalContext().getContextName() + "/static/img/map/\";";
+		script += "\n\t" + "OpenLayers.ImgPath = \"../static/img/map/\";";
 		script += "\n\t" + "var mapUtils = new MapUtils(\"" + clientId + "\", " + map.isDisabled() + ");";
 
 		Geometry point = (Geometry) map.getValue();

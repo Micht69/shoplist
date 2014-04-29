@@ -19,7 +19,7 @@ public class SecurityUtils {
 	public static synchronized AbstractSecurityManager getSecurityManager() {
 		if (sm == null) {
 			try {
-				sm = (AbstractSecurityManager) Class.forName("fr.logica.security.SecurityManager").newInstance();
+				sm = (AbstractSecurityManager) Class.forName("fr.logica.application.logic.SecurityManager").newInstance();
 			} catch (InstantiationException e) {
 				LOGGER.error("Error", e);
 			} catch (IllegalAccessException e) {
@@ -34,15 +34,15 @@ public class SecurityUtils {
 		return sm;
 	}
 
-	private static byte[] computeHash(String x) {
+	private static byte[] computeHash(String x, String algo) {
 		try {
 			java.security.MessageDigest d = null;
-			d = java.security.MessageDigest.getInstance("SHA-1");
+			d = java.security.MessageDigest.getInstance(algo);
 			d.reset();
 			d.update(x.getBytes());
 			return d.digest();
 		} catch (NoSuchAlgorithmException ex) {
-			throw new TechnicalException("Impossible to instantiate SHA-1 Algorithm");
+			throw new TechnicalException("Impossible to instantiate " + algo + " Algorithm");
 		}
 	}
 
@@ -58,7 +58,11 @@ public class SecurityUtils {
 	}
 
 	public static String hash(String password) {
-		return byteArrayToHexString(computeHash(password));
+		return byteArrayToHexString(computeHash(password, "SHA-1"));
+	}
+	
+	public static String hashMD5(String password) {
+		return byteArrayToHexString(computeHash(password, "MD5"));
 	}
 
 }

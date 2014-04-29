@@ -1,5 +1,10 @@
 package fr.logica.jsf.utils;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.ConverterException;
@@ -7,57 +12,57 @@ import javax.faces.convert.DateTimeConverter;
 
 import com.sun.faces.util.MessageFactory;
 
-import fr.logica.business.Constants;
+import fr.logica.jsf.components.calendar.Calendar;
 
 public class CustomDateTimeConverter extends DateTimeConverter {
 
-	/** Siècle par défaut. */
-	private static final String DEFAULT_CENTURY = "20";
-
-	/** Longueur des dates dont l'année est sur deux chiffres. */
-	private static final int SHORT_LENGTH = 8;
-
-	/** Index du premier caractère de l'année. */
-	private static final int YEAR_BEGIN = 6;
-
-	/**
-	 * Constructeur de DateTimeConverter personnalisé.
-	 */
 	public CustomDateTimeConverter() {
 		super();
-		this.setPattern(Constants.FORMAT_DATE);
 	}
 
 	@Override
-	public Object getAsObject(FacesContext facesContext, UIComponent component, String value) {
-		String valeur = value;
-		// try {
-		// ESAPI.validator().getValidDate("DateTime", valeur, new SimpleDateFormat("dd/MM/yyyy"), true);
-		// } catch (ValidationException e) {
-		// throw new ValidationException("toto", null);
-		// }
-		if (value != null && value.length() == SHORT_LENGTH) {
-			StringBuffer buffer = new StringBuffer(value.substring(0, YEAR_BEGIN));
-			String year = DEFAULT_CENTURY.concat(value.substring(YEAR_BEGIN));
-			buffer.append(year);
-			valeur = buffer.toString();
+	public Object getAsObject(FacesContext context, UIComponent component, String value) {
+
+		if (value != null && !value.isEmpty()) {
+			if (component instanceof Calendar) {
+				Calendar calendar = (Calendar) component;
+				String pattern = calendar.getPattern().replace('l', 'S');
+				DateFormat format = new SimpleDateFormat(pattern);
+				try {
+					return format.parse(value);
+				} catch (ParseException pe) {
+					String precision = calendar.getPrecision();
+					String key;
+
+					if ("date".equals(precision)) {
+						key = "javax.faces.converter.DateTimeConverter.DATE";
+
+					} else if ("datetime".equals(precision)) {
+						key = "javax.faces.converter.DateTimeConverter.DATETIME";
+
+					} else if ("timestamp".equals(precision)) {
+						key = "javax.faces.converter.DateTimeConverter.TIMESTAMP";
+
+					} else {
+						key = "javax.faces.converter.DateTimeConverter.TIME";
+					}
+					throw new ConverterException(MessageFactory.getMessage(key, calendar.getLabel(), format.format(new Date())), pe);
+				}
+			}
 		}
-		Object res = null;
-		try {
-			res = super.getAsObject(facesContext, component, valeur);
-		} catch (ConverterException e) {
-			Object label = getAttribute(facesContext, component, "label");
-			throw new ConverterException(MessageFactory.getMessage("javax.faces.converter.DateTimeConverter.DATE",
-					label), e);
-		}
-		return res;
+		return super.getAsObject(context, component, value);
 	}
 
-	Object getAttribute(FacesContext c, UIComponent component, String name) {
-		Object result = component.getAttributes().get(name);
-		if (result == null && component.getParent() != null) {
-			result = getAttribute(c, component.getParent(), name);
+	@Override
+	public String getAsString(FacesContext context, UIComponent component, Object value) {
+
+		if (value instanceof Date && component instanceof Calendar) {
+			Calendar calendar = (Calendar) component;
+			String pattern = calendar.getPattern().replace('l', 'S');
+			DateFormat format = new SimpleDateFormat(pattern);
+			return format.format((Date) value);
 		}
-		return result;
+		return super.getAsString(context, component, value);
 	}
+
 }

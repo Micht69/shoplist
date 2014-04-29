@@ -1,4 +1,3 @@
-
 package fr.logica.jsf.controller;
 
 import java.io.Serializable;
@@ -58,7 +57,7 @@ public class CommentController implements Serializable {
 
 	public void saveComment() {
 		// Complete comment data
-		comment.setUser(sessionCtrl.getUser().getLogin());
+		comment.setUser(sessionCtrl.getContext().getUser().getLogin());
 		comment.setDate(DateFormat.getDateInstance().format(new Date()));
 		comments.add(comment);
 

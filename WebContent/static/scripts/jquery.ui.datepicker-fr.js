@@ -30,16 +30,23 @@ $.timepicker.regional['fr'] = {
 	closeText: 'Fermer',
 	timeFormat: 'HH:mm',
 	timeSuffix: '',
-	timeOnlyTitle: 'Choose Time',
+	timeOnlyTitle: 'Sélectionner une heure',
 	timeText: '',
 	hourText: 'Heure :',
 	minuteText: '',
-	secondText: 'Seconde',
-	millisecText: 'Milliseconde',
+	secondText: '',
+	millisecText: '',
 	timezoneText: 'Time Zone',
 	isRTL: false
 };
 $.timepicker.setDefaults($.timepicker.regional['fr']);
+
+$.timepicker.setDefaults({
+	controlType: 'select',
+	showTime: false,
+	millisecMax: 0,
+	timezoneList: []
+});
 
 /* datepicker widget does not use the widget factory, so to override it, we use the old school way. */
 /* We keep a reference to the original function _attachHandlers. */

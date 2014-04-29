@@ -2,9 +2,10 @@ package fr.logica.domain.objects;
 
 import java.io.Serializable;
 
-import fr.logica.business.Context;
+
 import fr.logica.business.Entity;
 import fr.logica.business.Key;
+import fr.logica.business.context.RequestContext;
 import fr.logica.db.DB;
 import fr.logica.domain.models.ShopListLArticleModel;
 
@@ -29,6 +30,9 @@ public class ShopListLArticle extends Entity implements Serializable {
 
 	/** Statut */
 	private String status = "BUY";
+
+	/** Récapitulatif */
+	private String deleteInfos ;
 
 
 	public ShopListLArticle() {
@@ -56,16 +60,15 @@ public class ShopListLArticle extends Entity implements Serializable {
 	 * <b>This method does not call the logic method dbPostLoad().</b>
 	 * @param listId Liste
 	 * @param articleId Article
-
 	 * @param ctx Current context with open database connection.
 	 * @return	<code>true</code> if the bean has been loaded, <code>false</code> if no entity was found.  
 	 */
-	public boolean find(Integer listId, Integer articleId, Context ctx) {
+	public boolean find(Integer listId, Integer articleId, RequestContext ctx) {
 		Key primaryKey = ShopListLArticleModel.buildPrimaryKey(listId, articleId);
 		if (!primaryKey.isFull()) {
 			return false;
 		}
-		ShopListLArticle dbInstance = DB.get($NAME, primaryKey, ctx);
+		ShopListLArticle dbInstance = DB.get(NAME, primaryKey, ctx);
 		if (dbInstance != null) {
 			syncFromBean(dbInstance);
 			return true; 
@@ -79,14 +82,13 @@ public class ShopListLArticle extends Entity implements Serializable {
 
 	/** Entity name */
 	@Override
-	public String $_getName() {
+	public String name() {
 		return "shopListLArticle";
 	}
 
-
 	/** Entity description */
 	@Override
-	public String $_getDesc() {
+	public String description() {
 		return null;
 	}
 
@@ -107,6 +109,9 @@ public class ShopListLArticle extends Entity implements Serializable {
 	public void setListId(final Integer listId) {
 		this.listId = listId;
 	}
+	
+
+
 	/**
 	 * Get the value from field ArticleId.
 	 *
@@ -124,6 +129,9 @@ public class ShopListLArticle extends Entity implements Serializable {
 	public void setArticleId(final Integer articleId) {
 		this.articleId = articleId;
 	}
+	
+
+
 	/**
 	 * Get the value from field Quantity.
 	 *
@@ -141,6 +149,9 @@ public class ShopListLArticle extends Entity implements Serializable {
 	public void setQuantity(final Integer quantity) {
 		this.quantity = quantity;
 	}
+	
+
+
 	/**
 	 * Get the value from field Status.
 	 *
@@ -158,6 +169,29 @@ public class ShopListLArticle extends Entity implements Serializable {
 	public void setStatus(final String status) {
 		this.status = status;
 	}
+	
+
+
+	/**
+	 * Get the value from field DeleteInfos.
+	 *
+	 * @return the value
+	 */
+	public String getDeleteInfos() {
+		return this.deleteInfos;
+	}
+ 
+	/**
+	 * Set the value from field DeleteInfos.
+	 *
+	 * @param deleteInfos : the value to set
+	 */
+	public void setDeleteInfos(final String deleteInfos) {
+		this.deleteInfos = deleteInfos;
+	}
+	
+
+
 	/** Holder for the var names */
 	public interface Var {
 		/** Var LIST_ID */
@@ -168,15 +202,17 @@ public class ShopListLArticle extends Entity implements Serializable {
 		String QUANTITY = "quantity";
 		/** Var STATUS */
 		String STATUS = "status";
+		/** Var DELETE_INFOS */
+		String DELETE_INFOS = "deleteInfos";
 	}
 	
 	/** Holder for the defined values */
 	public interface ValueList {
 		public interface STATUS {
-			/** Defined value */
-			String BUY = "BUY";	
-			/** Defined value */
-			String DONE = "DONE";	
+			/** A acheter */
+			String BUY = "BUY";
+			/** Acheté */
+			String DONE = "DONE";
 		}
 	}
 
@@ -187,7 +223,7 @@ public class ShopListLArticle extends Entity implements Serializable {
 	 * @param ctx Current context
 	 * @return Instance of ShopList matching the link pays if any, null otherwise.
 	 */
-	public ShopList getRef_ShopListLArticleListFk(Context ctx) {
+	public ShopList getRef_ShopListLArticleListFk(RequestContext ctx) {
 		return (ShopList) DB.getRef(this, ShopListLArticleModel.LINK_SHOP_LIST_L_ARTICLE_L_LIST, ctx);
 	}
 	
@@ -213,7 +249,7 @@ public class ShopListLArticle extends Entity implements Serializable {
 	 * @param ctx Current context
 	 * @return Instance of ShopArticle matching the link pays if any, null otherwise.
 	 */
-	public ShopArticle getRef_ShopListLArticleArticleFk(Context ctx) {
+	public ShopArticle getRef_ShopListLArticleArticleFk(RequestContext ctx) {
 		return (ShopArticle) DB.getRef(this, ShopListLArticleModel.LINK_SHOP_LIST_L_ARTICLE_L_ARTICLE, ctx);
 	}
 	
@@ -235,20 +271,43 @@ public class ShopListLArticle extends Entity implements Serializable {
 
 	/** Holder for the action names */
 	public interface Action {
-		/** Create. */
+		/** Créer. */
 		int ACTION_0 = 0;
-		/** Modify. */
-		int ACTION_2 = 2;
-		/** Delete. */
-		int ACTION_4 = 4;
-		/** Display. */
-		int ACTION_5 = 5;
-		/** Create. */
+		/** Créer. */
 		int ACTION_51 = 51;
-		/** Mark done. */
+		/** Sélectionner articles. */
+		int ACTION_70 = 70;
+		/** Modifier. */
+		int ACTION_2 = 2;
+		/** Supprimer. */
+		int ACTION_20 = 20;
+		/** Marquer acheté. */
 		int ACTION_60 = 60;
     }
 
 	/** Nom de l'entité. */
-	public static final String $NAME = "shopListLArticle";
+	public static final String NAME = "shopListLArticle";
+	
+	/**
+	 * Clones the current bean.
+	 */
+	@Override
+	public ShopListLArticle clone() {
+		ShopListLArticle clone = (ShopListLArticle) super.clone();
+		clone.removeDefaultValues();
+		for (String f : getModel().getFields()) {
+			clone.invokeSetter(f, invokeGetter(f));
+		}
+		clone.resetLinksAndBackRefs();
+		return clone;
+	}
+
+	/** 
+	 * Removes all initial values from the bean and sets everything to null
+	 */
+	@Override
+	public void removeDefaultValues() {
+		quantity = null; 
+		status = null; 
+	}
 }

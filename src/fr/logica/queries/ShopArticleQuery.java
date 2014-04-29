@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import fr.logica.business.TechnicalException;
 import fr.logica.db.AbstractEntityQuery;
 import fr.logica.db.DbQuery;
 import fr.logica.db.DbQuery.Join;
@@ -19,23 +20,30 @@ public class ShopArticleQuery extends AbstractEntityQuery {
 	/** Queries for entity ShopArticle */
 	public static final Map<String, DbQuery> QUERIES;
 
+	/** Initialize internal query repository */
 	static { 
 		QUERIES = new HashMap<String, DbQuery>();	
 		
-		DbQuery SHOP_ARTICLE = new DbQuery("shopArticle", "ART");
-		SHOP_ARTICLE.setName("SHOP_ARTICLE");
-		SHOP_ARTICLE.addEntity("shopShelf", "SH", "shopArticleLShelf", null, Join.LOOSE);
-		SHOP_ARTICLE.addColumn("id", "ART", Visibility.INVISIBLE);
-		SHOP_ARTICLE.addColumn("position", "SH", Visibility.INVISIBLE);
-		SHOP_ARTICLE.addColumn("name", "SH");
-		SHOP_ARTICLE.addColumn("name", "ART");
-		SHOP_ARTICLE.addColumn("ean13", "ART");
-		SHOP_ARTICLE.addSortBy("name", "SH", "ASC");
-		SHOP_ARTICLE.addSortBy("name", "ART", "ASC");
-		QUERIES.put("SHOP_ARTICLE", SHOP_ARTICLE);	
+		// Initialization of query SHOP_ARTICLE
+		DbQuery shopArticle = new DbQuery("shopArticle", "ART");
+		shopArticle.setName("SHOP_ARTICLE");
+		shopArticle.addEntity("shopShelf", "SH", "shopArticleLShelf", null, Join.LOOSE);
+		shopArticle.addColumn("id", "ART", Visibility.INVISIBLE);
+		shopArticle.addColumn("position", "SH", Visibility.INVISIBLE);
+		shopArticle.addColumn("name", "SH");
+		shopArticle.addColumn("name", "ART");
+		shopArticle.addColumn("ean13", "ART");
+		shopArticle.addSortBy("name", "SH", "ASC");
+		shopArticle.addSortBy("name", "ART", "ASC");
+		QUERIES.put("SHOP_ARTICLE", shopArticle);	
 
 	}
 	
+	/**
+	 * Gets a query from internal query cache
+	 * @param queryName query name
+	 * @return Cached query
+	 */
 	@Override
 	public DbQuery getQuery(String queryName) {
 		return QUERIES.get(queryName);
@@ -47,7 +55,7 @@ public class ShopArticleQuery extends AbstractEntityQuery {
 		String QUERY_SHOP_ARTICLE = "SHOP_ARTICLE";
 	}
 	
-	/** Holder for the query entityes aliases */
+	/** Holder for the query entities aliases */
 	public interface Alias {
 		/** Aliases for query SHOP_ARTICLE */
 		public interface QUERY_SHOP_ARTICLE {
@@ -63,5 +71,16 @@ public class ShopArticleQuery extends AbstractEntityQuery {
 	public Set<String> getQueryNames() {
 		return QUERIES.keySet();
 	}
+
+	/**
+	 * Returns a clone of DbQuery named SHOP_ARTICLE
+	 * 
+	 * @return clone of DbQuery named SHOP_ARTICLE
+	 */
+	public static DbQuery getShopArticleQuery() {
+		return QUERIES.get(Query.QUERY_SHOP_ARTICLE).clone();
+	}
+
+
 }
 

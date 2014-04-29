@@ -2,21 +2,22 @@ package fr.logica.db;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Map;
 
-import fr.logica.business.Context;
 import fr.logica.business.Entity;
+import fr.logica.business.context.RequestContext;
 
 public class DbManagerUpdatable extends DbManager {
 
-	public DbManagerUpdatable(DbConnection dbcnx, String sql) {
-		super(dbcnx, sql, null, ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+	public DbManagerUpdatable(RequestContext ctx, String sql) {
+		super(ctx, sql, null, ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
 	}
 
-	public DbManagerUpdatable(DbConnection dbcnx, String sql, Object[] parms) {
-		super(dbcnx, sql, parms, ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+	public DbManagerUpdatable(RequestContext ctx, String sql, Object[] parms) {
+		super(ctx, sql, parms, ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
 	}
 
-	public DbManagerUpdatable(Context ctx, DbQuery query) {
+	public DbManagerUpdatable(RequestContext ctx, DbQuery query) {
 		super(ctx, query, query.getBindValues().toArray(), ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
 	}
 
@@ -64,17 +65,17 @@ public class DbManagerUpdatable extends DbManager {
 	 * Gestion des id : si seulement un id est du type Compteur, alors set automatique avec la nextVal
 	 * 
 	 * @param entity
-	 * @param dbConnection
+	 * @param RequestContext
 	 * @return
 	 */
-	public static Entity fillAutoIncrement(Entity entity, DbConnection dbcnx) {
+	public static Entity fillAutoIncrement(Entity entity, RequestContext ctx) {
 		for (String fieldName : entity.getModel().getFields()) {
 			if (entity.getModel().isAutoIncrementField(fieldName) && entity.invokeGetter(fieldName) == null) {
 				// Auto Increment field is not filled
 				String selectNextValSql = "SELECT MAX(" + entity.getModel().getField(fieldName).getSqlName() + ") + 1 FROM "
-						+ entity.getModel().$_getDbName();
+						+ entity.getModel().dbName();
 
-				DbManager dbManager = new DbManager(dbcnx, selectNextValSql);
+				DbManager dbManager = new DbManager(ctx, selectNextValSql);
 				Integer nextVal = 1;
 				if (dbManager.next()) {
 					nextVal = dbManager.getInt(1);
@@ -85,6 +86,5 @@ public class DbManagerUpdatable extends DbManager {
 		}
 		return entity;
 	}
-	
 
 }

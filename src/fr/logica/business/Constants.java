@@ -47,8 +47,10 @@ public final class Constants {
 	public static final int DISPLAY_FILE = -3;
 	public static final int DELETE_FILE = -2;
 	public static final int DETACH = -1;
+	public static final int DETACH_BR = -111;
 	public static final int CREATE = 0;
 	public static final int SELECT = 1;
+	public static final int SELECT_BR = 111;
 	public static final int MODIFY = 2;
 	public static final int COPY = 3;
 	public static final int DELETE = 4;
@@ -61,6 +63,8 @@ public final class Constants {
 	public static final int CUSTOM_ACTION_DISPLAY = 11;
 	public static final int SINGLE_ELT_CUSTOM_ACTION = 16;
 	public static final int SINGLE_ELT_CUSTOM_ACTION_DISPLAY = 13;
+	public static final int SEARCH = -4;
+	public static final int RENAME = -5;
 
 	/* code action par défaut */
 	public static final int ACTION_CREATE = 0;
@@ -70,9 +74,10 @@ public final class Constants {
 	public static final int ACTION_DISPLAY = 5;
 
 	/* Chaines utilisÃ©es pour identifier des trucs dans le code */
-	public static final String FILTER_FIELD = "filterField";
     public static final String RESULT_PK = "primaryKey";
     public static final String RESULT_ROWNUM = "$rownum";
+	public static final String CUSTOM_DATA = "cData_key_";
+	public static final String PERMALINK_LOGIN_KEY = "permalinkKey"; 
 
 	public static final String EVENT = "event";
 	public static final String EVENT_TITLE = "title";
@@ -94,7 +99,12 @@ public final class Constants {
 	/* Ressources binaires gérées manuellement */
 	public static final String CUSTOM_RESSOURCE = "customRessource";
 
+	/** Maximum number of rows initially defined on the criteria page */
 	public static final int MAX_ROW = 200;
+	
+	/** Absolute maximum for the number of row, impossible for the user to bypass. Not applicable to custom code. */
+	public static final int MAX_ROW_ABSOLUTE = 9999;
+	
 	public static final int AUTOCOMPLETE_MAX_ROW = 20;
 	public static final int EVENT_CREATE_DEFAULT_DURATION = 2;
 

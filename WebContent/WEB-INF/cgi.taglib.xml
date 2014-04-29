@@ -49,10 +49,9 @@
 		<component>
 			<component-type>logica.faces.autocomplete</component-type>
 			<renderer-type>logica.faces.AutocompleteRenderer</renderer-type>
-			<handler-class>fr.logica.jsf.components.autocomplete.AutocompleteHandler</handler-class>
 		</component>
 		<attribute>
-			<name>autocompleteMethod</name>
+			<name>model</name>
 			<required>true</required>
 		</attribute>
 		<attribute>
@@ -357,10 +356,10 @@
 			<handler-class>fr.logica.jsf.components.breadcrumbs.BreadcrumbsHandler</handler-class>
 		</component>
 		<attribute>
-			<description>Deepest page for the breadcrumbs</description>
-			<name>page</name>
+			<description>Deepest view for the breadcrumbs</description>
+			<name>view</name>
 			<required>true</required>
-			<type>fr.logica.ui.Page</type>
+			<type>fr.logica.jsf.webflow.View</type>
 		</attribute>
 		<attribute>
 			<description>Which method to call with the crumb chosen</description>

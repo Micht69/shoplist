@@ -83,6 +83,7 @@ div.ui-dialog {
 
 div.ui-dialog div.ui-dialog-titlebar {
 	border: 1px solid rgb(0, 116, 202);
+	border-radius: 4px 0 4px 0;
 	margin-top: -1px;
 	margin-left: -1px;
 	padding: 6px 15px;
@@ -90,12 +91,10 @@ div.ui-dialog div.ui-dialog-titlebar {
 	font-size: 21px;
 	font-weight: normal;
 	text-shadow: none;
-	border-top-left-radius: 4px;
-	border-bottom-right-radius: 4px;
 	background-color: rgb(243, 248, 253);
 	background-image: none;
 	display: inline-block;
-	width: auto;	
+	width: auto;
 }
 
 div.ui-dialog div.ui-dialog-buttonpane {

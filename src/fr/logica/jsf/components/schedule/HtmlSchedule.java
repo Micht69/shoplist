@@ -26,6 +26,8 @@ import javax.faces.event.PostAddToViewEvent;
 
 import com.sun.faces.util.MessageFactory;
 
+import fr.logica.business.data.ScheduleEvent;
+
 @ResourceDependencies({
 		@ResourceDependency(name = "schedule/fullcalendar.css"),
 		@ResourceDependency(name = "schedule/fullcalendar.js", target = "body")

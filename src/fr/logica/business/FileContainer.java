@@ -3,6 +3,7 @@ package fr.logica.business;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.Arrays;
 
 import javax.activation.MimetypesFileTypeMap;
 
@@ -27,6 +28,7 @@ public class FileContainer implements Serializable {
 	/** File content. */
 	private byte[] content;
 
+	// FIXME remove this var. test the var content instead
 	private boolean isNull;
 
 	public String getName() {
@@ -46,7 +48,11 @@ public class FileContainer implements Serializable {
 	}
 
 	public void setContent(byte[] data) {
-		this.content = data;
+		if (data == null) {
+			this.content = null;
+		} else {
+			this.content = Arrays.copyOf(data, data.length);
+		}
 	}
 
 	public boolean isNull() {
@@ -97,6 +103,39 @@ public class FileContainer implements Serializable {
 	@Override
 	public String toString() {
 		return name;
+	}
+
+	@Override
+	public int hashCode() {
+		return Arrays.hashCode(content);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		FileContainer other = (FileContainer) obj;
+		if (!Arrays.equals(content, other.content)) {
+			return false;
+		}
+		if (isNull != other.isNull) {
+			return false;
+		}
+		if (name == null) {
+			if (other.name != null) {
+				return false;
+			}
+		} else if (!name.equals(other.name)) {
+			return false;
+		}
+		return true;
 	}
 
 }

@@ -1,15 +1,16 @@
 package fr.logica.domain.objects;
 
 import java.io.Serializable;
+
 import java.util.HashSet;
 import java.util.Set;
 
 import java.util.Date;
-
-import fr.logica.business.Context;
 import fr.logica.business.DateUtils;
+
 import fr.logica.business.Entity;
 import fr.logica.business.Key;
+import fr.logica.business.context.RequestContext;
 import fr.logica.db.DB;
 import fr.logica.domain.models.ShopListModel;
 
@@ -33,10 +34,10 @@ public class ShopList extends Entity implements Serializable {
 	private String user ;
 
 	/** Date de création */
-	private Date createDate = DateUtils.today();
+	private Date createDate = fr.logica.business.DateUtils.today();
 
 	/** Description */
-	private String w$Desc ;
+	private String internalCaption ;
 
 	/** Nbr d'articles */
 	private Integer articleCount ;
@@ -65,16 +66,15 @@ public class ShopList extends Entity implements Serializable {
 	 * Load a bean from database based on its primary key
 	 * <b>This method does not call the logic method dbPostLoad().</b>
 	 * @param id ID
-
 	 * @param ctx Current context with open database connection.
 	 * @return	<code>true</code> if the bean has been loaded, <code>false</code> if no entity was found.  
 	 */
-	public boolean find(Integer id, Context ctx) {
+	public boolean find(Integer id, RequestContext ctx) {
 		Key primaryKey = ShopListModel.buildPrimaryKey(id);
 		if (!primaryKey.isFull()) {
 			return false;
 		}
-		ShopList dbInstance = DB.get($NAME, primaryKey, ctx);
+		ShopList dbInstance = DB.get(NAME, primaryKey, ctx);
 		if (dbInstance != null) {
 			syncFromBean(dbInstance);
 			return true; 
@@ -88,15 +88,14 @@ public class ShopList extends Entity implements Serializable {
 
 	/** Entity name */
 	@Override
-	public String $_getName() {
+	public String name() {
 		return "shopList";
 	}
 
-
 	/** Entity description */
 	@Override
-	public String $_getDesc() {
-		return "name";
+	public String description() {
+		return getInternalCaption(); 
 	}
 
 	/**
@@ -116,6 +115,9 @@ public class ShopList extends Entity implements Serializable {
 	public void setId(final Integer id) {
 		this.id = id;
 	}
+	
+
+
 	/**
 	 * Get the value from field Name.
 	 *
@@ -133,6 +135,9 @@ public class ShopList extends Entity implements Serializable {
 	public void setName(final String name) {
 		this.name = name;
 	}
+	
+
+
 	/**
 	 * Get the value from field User.
 	 *
@@ -150,6 +155,9 @@ public class ShopList extends Entity implements Serializable {
 	public void setUser(final String user) {
 		this.user = user;
 	}
+	
+
+
 	/**
 	 * Get the value from field CreateDate.
 	 *
@@ -167,23 +175,47 @@ public class ShopList extends Entity implements Serializable {
 	public void setCreateDate(final Date createDate) {
 		this.createDate = createDate;
 	}
+	
+
+
 	/**
-	 * Get the value from field W$Desc.
+	 * Gets the value from field InternalCaption. This getter respects real Java naming convention. 
 	 *
 	 * @return the value
 	 */
-	public String getW$Desc() {
-		return this.w$Desc;
+	public String getw$Desc() {
+		return getInternalCaption();
 	}
  
 	/**
-	 * Set the value from field W$Desc.
+	 * Sets the value from field InternalCaption. This setter respects real Java naming convention
 	 *
-	 * @param w$Desc : the value to set
+	 * @param internalCaption : the value to set
 	 */
-	public void setW$Desc(final String w$Desc) {
-		this.w$Desc = w$Desc;
+	public void setw$Desc(final String internalCaption) {
+		setInternalCaption(internalCaption); 
 	}
+
+	/**
+	 * Get the value from field InternalCaption.
+	 *
+	 * @return the value
+	 */
+	public String getInternalCaption() {
+		return this.internalCaption;
+	}
+ 
+	/**
+	 * Set the value from field InternalCaption.
+	 *
+	 * @param internalCaption : the value to set
+	 */
+	public void setInternalCaption(final String internalCaption) {
+		this.internalCaption = internalCaption;
+	}
+	
+
+
 	/**
 	 * Get the value from field ArticleCount.
 	 *
@@ -201,6 +233,9 @@ public class ShopList extends Entity implements Serializable {
 	public void setArticleCount(final Integer articleCount) {
 		this.articleCount = articleCount;
 	}
+	
+
+
 	/** Holder for the var names */
 	public interface Var {
 		/** Var ID */
@@ -223,7 +258,7 @@ public class ShopList extends Entity implements Serializable {
 	 * @param ctx Current context
 	 * @return Instance of ShopUser matching the link pays if any, null otherwise.
 	 */
-	public ShopUser getRef_ShopListUserFk(Context ctx) {
+	public ShopUser getRef_ShopListUserFk(RequestContext ctx) {
 		return (ShopUser) DB.getRef(this, ShopListModel.LINK_SHOP_ARTICLE_L_USER, ctx);
 	}
 	
@@ -244,13 +279,18 @@ public class ShopList extends Entity implements Serializable {
 
 	/**
 	 * This methods gets all instances of ShopListLArticle back referenced by the current ShopList instance via link ShopListLArticleLList. <br/>
-	 * <b>Warning: this method does not cache its results and will connect to database on every call.</b>
+	 * <b>Warning: this method does not cache its results and will connect to database on every call.</b> <br/>
+	 * <i>Note: if the PK is incomplete, an empty set will be returned.</i>
 	 * 
 	 * @param ctx Current context with open database connection.
 	 * @return Set containing instances for every ShopListLArticle related to the current ShopList via link ShopListLArticleLList.
 	 */
-	public Set<ShopListLArticle> getList_ShopListLArticleLList(Context ctx) {
+	public Set<ShopListLArticle> getList_ShopListLArticleLList(RequestContext ctx) {
 		Set<ShopListLArticle> s = new HashSet<ShopListLArticle>();
+		if (this.getPrimaryKey() == null || !this.getPrimaryKey().isFull()) {
+			// Do not get linked entities if PK is incomplete
+			return s;
+		}
 		for (Entity e : DB.getLinkedEntities(this, ShopListModel.LINK_SHOP_LIST_L_ARTICLE_L_LIST, ctx)) {
 			s.add((ShopListLArticle) e);
 		}
@@ -260,18 +300,40 @@ public class ShopList extends Entity implements Serializable {
 
 	/** Holder for the action names */
 	public interface Action {
-		/** Create. */
+		/** Créer. */
 		int ACTION_0 = 0;
-		/** Modify. */
+		/** Modifier. */
 		int ACTION_2 = 2;
-		/** Delete. */
+		/** Supprimer. */
 		int ACTION_4 = 4;
-		/** Display. */
+		/** Afficher. */
 		int ACTION_5 = 5;
-		/** Shopping. */
+		/** Réaliser les course. */
 		int ACTION_50 = 50;
     }
 
 	/** Nom de l'entité. */
-	public static final String $NAME = "shopList";
+	public static final String NAME = "shopList";
+	
+	/**
+	 * Clones the current bean.
+	 */
+	@Override
+	public ShopList clone() {
+		ShopList clone = (ShopList) super.clone();
+		clone.removeDefaultValues();
+		for (String f : getModel().getFields()) {
+			clone.invokeSetter(f, invokeGetter(f));
+		}
+		clone.resetLinksAndBackRefs();
+		return clone;
+	}
+
+	/** 
+	 * Removes all initial values from the bean and sets everything to null
+	 */
+	@Override
+	public void removeDefaultValues() {
+		createDate = null; 
+	}
 }

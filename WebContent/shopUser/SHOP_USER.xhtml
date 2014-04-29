@@ -3,8 +3,9 @@
 
 <ui:define name="metadata">
 	<f:metadata>
-		<f:event type="preRenderView" listener="#{jsfCtrl.prepareUiAccess('mainForm')}" />
-		<f:attribute name="entity" value="shopUser" />
+		<f:attribute name="entityName" value="shopUser" />
+		<f:event type="preRenderView" listener="#{requestCtrl.initializeViewContext(jsfCtrl)}" />
+		<f:event type="preRenderView" listener="#{jsfCtrl.initializeView}" />
 	</f:metadata>
 </ui:define>
 
@@ -25,207 +26,139 @@
 					<h:outputText value=" "/>
 					<h:commandButton id="printAction" styleClass="btn_print" image="../static/img/buttons/print.png" title="#{hh:label('labels', 'boutons.print')}" onclick="window.print(); return false;" />
 					<h:outputText value=" "/>
-					<h:panelGroup id="socialActions" rendered="#{jsfCtrl.socialPanelEnabled}">
-<div class="g-plusone" data-size="standard" data-annotation="none"></div>
-
-<script type="text/javascript">
-  (function() {
-    var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
-    po.src = 'https://apis.google.com/js/plusone.js';
-    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
-  })();
-</script>
-					</h:panelGroup>
 				</div>
 			</td>
 			<td width="99%" style="text-align: right; white-space: nowrap;">
-				<h:commandButton id="validateAction" rendered="#{!jsfCtrl.noValidateButton}" styleClass="btn_medium" value="#{hh:label('labels', 'boutons.valider')}" action="#{jsfCtrl.validate}"  onclick="if ($('#mainForm').submitted) { alert('Traitement en cours. Veuillez patienter...');return false;} else { $('#mainForm').submitted = true; return true; }" />
+				<h:commandButton id="validateAction" rendered="#{!jsfCtrl.displaySubActions()}" styleClass="btn_medium" value="#{hh:label('labels', 'boutons.valider')}"
+					action="#{jsfCtrl.validate}" onclick="if (actionClicked) { alert('Traitement en cours. Veuillez patienter...');return false;} else { actionClicked = true; return true; }" />
 				<h:outputText value=" "/>
-				<h:commandButton id="cancelAction" immediate="true" styleClass="btn_medium" value="#{hh:label('labels', 'boutons.annuler')}" action="#{jsfCtrl.cancel}" onclick="return checkDirtyState(this);" />
+				<h:commandButton id="cancelAction" immediate="true" styleClass="btn_medium" value="#{hh:label('labels', 'boutons.annuler')}"
+					action="#{jsfCtrl.cancel}" onclick="return checkDirtyState(this);" />
 			</td>
 		</tr>
 	</table>
 	</div>
-
-<h:panelGroup id="shopUser" rendered="#{jsfCtrl.isVisible('shopUser')}" layout="none">
-
-<table class="group_table">
-
-	<tr>
-	
-		<td class="group_table_col_1">
-
-
-<ui:fragment rendered="#{jsfCtrl.isVisible('shopUser.login')}">
-
-<table class="#{!jsfCtrl.isValid('mainForm:shopUser_shopUser_login') ? 'error' : ''}">
-
-<tr><td class="colFieldSetLeft">
-
-<h:outputLabel escape="false" value="#{jsfCtrl.getLabel('shopUser.login', 'shopUser.shopUser.login')}" title="#{hh:label('tooltips', 'shopUser.shopUser.login')}"/>
-<h:outputLabel value="*" styleClass="mandatory_label" rendered="#{jsfCtrl.isMandatory('shopUser.login')}"/>
-
-</td>
-<td class="colFieldSetMid">
-<h:outputLabel value=":" />
-</td>
-<td class="colFieldSetRight">
-
-<h:inputText style="" disabled="#{jsfCtrl.readonly('shopUser.login')}" id="shopUser_shopUser_login" value="#{jsfCtrl.entity.login}" label="#{jsfCtrl.getLabel('shopUser.login', 'shopUser.login')}" maxlength="10" onkeypress="markAsDirty()">
-	<f:validateRequired disabled="#{param['skipRequired'] == true}" />
-	<f:validateLength maximum="10" />
-</h:inputText>
-
-
-<h:message for="shopUser_shopUser_login" styleClass="errorLabel" />
-
-</td></tr></table>
-
-</ui:fragment>
-
-
-	
-		</td>
-
-	</tr>
-
-	<tr>
-	
-		<td class="group_table_col_1">
-
-
-<ui:fragment rendered="#{jsfCtrl.isVisible('shopUser.name')}">
-
-<table class="#{!jsfCtrl.isValid('mainForm:shopUser_shopUser_name') ? 'error' : ''}">
-
-<tr><td class="colFieldSetLeft">
-
-<h:outputLabel escape="false" value="#{jsfCtrl.getLabel('shopUser.name', 'shopUser.shopUser.name')}" title="#{hh:label('tooltips', 'shopUser.shopUser.name')}"/>
-<h:outputLabel value="*" styleClass="mandatory_label" rendered="#{jsfCtrl.isMandatory('shopUser.name')}"/>
-
-</td>
-<td class="colFieldSetMid">
-<h:outputLabel value=":" />
-</td>
-<td class="colFieldSetRight">
-
-<h:inputText style="" disabled="#{jsfCtrl.readonly('shopUser.name')}" id="shopUser_shopUser_name" value="#{jsfCtrl.entity.name}" label="#{jsfCtrl.getLabel('shopUser.name', 'shopUser.name')}" maxlength="100" onkeypress="markAsDirty()">
-	<f:validateRequired disabled="#{param['skipRequired'] == true}" />
-	<f:validateLength maximum="100" />
-</h:inputText>
-
-
-<h:message for="shopUser_shopUser_name" styleClass="errorLabel" />
-
-</td></tr></table>
-
-</ui:fragment>
-
-
-	
-		</td>
-
-	</tr>
-
-	<tr>
-	
-		<td class="group_table_col_1">
-
-
-<ui:fragment rendered="#{jsfCtrl.isVisible('shopUser.password')}">
-
-<table class="#{!jsfCtrl.isValid('mainForm:shopUser_shopUser_password') ? 'error' : ''}">
-
-<tr><td class="colFieldSetLeft">
-
-<h:outputLabel escape="false" value="#{jsfCtrl.getLabel('shopUser.password', 'shopUser.shopUser.password')}" title="#{hh:label('tooltips', 'shopUser.shopUser.password')}"/>
-<h:outputLabel value="*" styleClass="mandatory_label" rendered="#{jsfCtrl.isMandatory('shopUser.password')}"/>
-
-</td>
-<td class="colFieldSetMid">
-<h:outputLabel value=":" />
-</td>
-<td class="colFieldSetRight">
-
-<h:inputSecret disabled="#{jsfCtrl.readonly('shopUser.password')}" id="shopUser_shopUser_password" value="#{jsfCtrl.entity.password}" label="#{jsfCtrl.getLabel('shopUser.password', 'shopUser.password')}" onkeypress="markAsDirty()">
-</h:inputSecret>
-
-<h:message for="shopUser_shopUser_password" styleClass="errorLabel" />
-
-</td></tr></table>
-
-</ui:fragment>
-
-
-	
-		</td>
-
-	</tr>
-
-	<tr>
-	
-		<td class="group_table_col_1">
-
-
-<ui:fragment rendered="#{jsfCtrl.isVisible('shopUser.profile')}">
-
-<table class="#{!jsfCtrl.isValid('mainForm:shopUser_shopUser_profile') ? 'error' : ''}">
-
-<tr><td class="colFieldSetLeft">
-
-<h:outputLabel escape="false" value="#{jsfCtrl.getLabel('shopUser.profile', 'shopUser.shopUser.profile')}" title="#{hh:label('tooltips', 'shopUser.shopUser.profile')}"/>
-<h:outputLabel value="*" styleClass="mandatory_label" rendered="#{jsfCtrl.isMandatory('shopUser.profile')}"/>
-
-</td>
-<td class="colFieldSetMid">
-<h:outputLabel value=":" />
-</td>
-<td class="colFieldSetRight">
-
-<h:selectOneMenu disabledClass="disabledCombo" disabled="#{jsfCtrl.readonly('shopUser.profile')}" id="shopUser_shopUser_profile" value="#{jsfCtrl.entity.profile}" label="#{jsfCtrl.getLabel('shopUser.profile', 'shopUser.profile')}"  onchange="markAsDirty()">
-
-	<f:selectItems value="#{jsfCtrl.entity.enumValues('profile')}" />
-</h:selectOneMenu>
-
-<h:message for="shopUser_shopUser_profile" styleClass="errorLabel" />
-
-</td></tr></table>
-
-</ui:fragment>
-
-
-	
-		</td>
-
-	</tr>
-
-</table>
-
-</h:panelGroup>
-
-
+	<h:panelGroup id="shopUser" rendered="#{jsfCtrl.uiGroupPanel('', 'shopUser', 'shopUser').visible}" layout="none">
+		<table class="group_table">
+			<tr>
+				<td class="group_table_col_1">
+					<ui:fragment rendered="#{jsfCtrl.isVisible('shopUser.login')}">
+						<table class="#{!jsfCtrl.isValid('mainForm:shopUser_shopUser_login') ? 'error' : ''}">
+							<tr>
+								<td class="colFieldSetLeft">
+									<h:outputLabel id="i1_shopUser_shopUser_login" escape="false" value="#{jsfCtrl.getLabel('shopUser.login', 'shopUser.shopUser.login')}" title="#{hh:label('tooltips', 'shopUser.shopUser.login')}"/>
+									<h:outputLabel value="*" styleClass="mandatory_label" rendered="#{jsfCtrl.isMandatory('shopUser.login')}"/>
+								</td>
+								<td class="colFieldSetMid">
+									<h:outputLabel value=":" />
+								</td>
+								<td class="colFieldSetRight">
+									<h:inputText style=""  disabled="#{jsfCtrl.readonly('','shopUser','login')}" id="i0_shopUser_shopUser_login" value="#{jsfCtrl.entity.login}" label="#{jsfCtrl.getLabel('shopUser.login', 'shopUser.login')}" maxlength="10" onkeypress="markAsDirty(this)">
+										<f:validateRequired disabled="#{param['skipRequired'] == true}" />
+										<f:validateLength maximum="10" />
+									</h:inputText>
+									<h:message for="i0_shopUser_shopUser_login" styleClass="errorLabel" />
+								</td>
+							</tr>
+						</table>
+					</ui:fragment>
+				</td>
+			</tr>
+			<tr>
+				<td class="group_table_col_1">
+					<ui:fragment rendered="#{jsfCtrl.isVisible('shopUser.name')}">
+						<table class="#{!jsfCtrl.isValid('mainForm:shopUser_shopUser_name') ? 'error' : ''}">
+							<tr>
+								<td class="colFieldSetLeft">
+									<h:outputLabel id="i1_shopUser_shopUser_name" escape="false" value="#{jsfCtrl.getLabel('shopUser.name', 'shopUser.shopUser.name')}" title="#{hh:label('tooltips', 'shopUser.shopUser.name')}"/>
+									<h:outputLabel value="*" styleClass="mandatory_label" rendered="#{jsfCtrl.isMandatory('shopUser.name')}"/>
+								</td>
+								<td class="colFieldSetMid">
+									<h:outputLabel value=":" />
+								</td>
+								<td class="colFieldSetRight">
+									<h:inputText style=""  disabled="#{jsfCtrl.readonly('','shopUser','name')}" id="i0_shopUser_shopUser_name" value="#{jsfCtrl.entity.name}" label="#{jsfCtrl.getLabel('shopUser.name', 'shopUser.name')}" maxlength="100" onkeypress="markAsDirty(this)">
+										<f:validateRequired disabled="#{param['skipRequired'] == true}" />
+										<f:validateLength maximum="100" />
+									</h:inputText>
+									<h:message for="i0_shopUser_shopUser_name" styleClass="errorLabel" />
+								</td>
+							</tr>
+						</table>
+					</ui:fragment>
+				</td>
+			</tr>
+			<tr>
+				<td class="group_table_col_1">
+					<ui:fragment rendered="#{jsfCtrl.isVisible('shopUser.password')}">
+						<table class="#{!jsfCtrl.isValid('mainForm:shopUser_shopUser_password') ? 'error' : ''}">
+							<tr>
+								<td class="colFieldSetLeft">
+									<h:outputLabel id="i1_shopUser_shopUser_password" escape="false" value="#{jsfCtrl.getLabel('shopUser.password', 'shopUser.shopUser.password')}" title="#{hh:label('tooltips', 'shopUser.shopUser.password')}"/>
+									<h:outputLabel value="*" styleClass="mandatory_label" rendered="#{jsfCtrl.isMandatory('shopUser.password')}"/>
+								</td>
+								<td class="colFieldSetMid">
+									<h:outputLabel value=":" />
+								</td>
+								<td class="colFieldSetRight">
+									<h:inputSecret disabled="#{jsfCtrl.readonly('shopUser.password')}" id="i0_shopUser_shopUser_password" value="#{jsfCtrl.entity.password}" label="#{jsfCtrl.getLabel('shopUser.password', 'shopUser.password')}" onkeypress="markAsDirty(this)">
+									</h:inputSecret>
+									<h:message for="i0_shopUser_shopUser_password" styleClass="errorLabel" />
+								</td>
+							</tr>
+						</table>
+					</ui:fragment>
+				</td>
+			</tr>
+			<tr>
+				<td class="group_table_col_1">
+					<ui:fragment rendered="#{jsfCtrl.isVisible('shopUser.profile')}">
+						<table class="#{!jsfCtrl.isValid('mainForm:shopUser_shopUser_profile') ? 'error' : ''}">
+							<tr>
+								<td class="colFieldSetLeft">
+									<h:outputLabel id="i1_shopUser_shopUser_profile" escape="false" value="#{jsfCtrl.getLabel('shopUser.profile', 'shopUser.shopUser.profile')}" title="#{hh:label('tooltips', 'shopUser.shopUser.profile')}"/>
+									<h:outputLabel value="*" styleClass="mandatory_label" rendered="#{jsfCtrl.isMandatory('shopUser.profile')}"/>
+								</td>
+								<td class="colFieldSetMid">
+									<h:outputLabel value=":" />
+								</td>
+								<td class="colFieldSetRight">
+									<h:selectOneMenu disabledClass="disabledCombo" disabled="#{jsfCtrl.readonly('shopUser.profile')}" id="i0_shopUser_shopUser_profile" value="#{jsfCtrl.entity.profile}" label="#{jsfCtrl.getLabel('shopUser.profile', 'shopUser.profile')}"  onchange="markAsDirty(this)">
+									
+										<f:selectItems value="#{jsfCtrl.entity.enumValues('profile')}" />
+									</h:selectOneMenu>
+									<h:message for="i0_shopUser_shopUser_profile" styleClass="errorLabel" />
+								</td>
+							</tr>
+						</table>
+					</ui:fragment>
+				</td>
+			</tr>
+		</table>
+	</h:panelGroup>
 	<div class="actions bottomActions">
 	<table style="width: 100%">
 		<tr>
 			<td style="text-align: right;">
-				<h:commandButton id="validateAction2" rendered="#{!jsfCtrl.noValidateButton}" styleClass="btn_medium" value="#{hh:label('labels', 'boutons.valider')}" action="#{jsfCtrl.validate}"  onclick="if ($('#mainForm').submitted) { alert('Traitement en cours. Veuillez patienter...');return false;} else { $('#mainForm').submitted = true; return true; }" />
+				<h:commandButton id="validateAction2" rendered="#{!jsfCtrl.displaySubActions()}" styleClass="btn_medium" value="#{hh:label('labels', 'boutons.valider')}"
+					action="#{jsfCtrl.validate}"  onclick="if (actionClicked) { alert('Traitement en cours. Veuillez patienter...');return false;} else { actionClicked = true; return true; }" />
 				<h:outputText value=" "/>
-				<h:commandButton id="cancelAction2" immediate="true" styleClass="btn_medium" value="#{hh:label('labels', 'boutons.annuler')}" action="#{jsfCtrl.cancel}" onclick="return checkDirtyState(this);" />
+				<h:commandButton id="cancelAction2" immediate="true" styleClass="btn_medium" value="#{hh:label('labels', 'boutons.annuler')}"
+					action="#{jsfCtrl.cancel}" onclick="return checkDirtyState(this);" />
 			</td>
 		</tr>
 	</table>
 	</div>
-<script type="text/javascript">
-$(document).ready(function() {
-	try { 
-		<h:outputText value="doPageCustomize('SHOP_USER');" rendered="#{!sessionCtrl.disableJS}"/>
-		$('td[class="first"]').click(function(event){
-			event.stopPropagation();
-		});
-	} catch (e) {}
-});
+	<script type="text/javascript">
+	$(document).ready(function() {
+		try { 
+			<h:outputText value="doPageCustomize('SHOP_USER');" rendered="#{!sessionCtrl.disableJS}"/>
+			$('td[class="first"]').click(function(event){
+				event.stopPropagation();
+			});
+		} catch (e) {}
+	});
 </script>
-
 </ui:define>
 </ui:composition>
 

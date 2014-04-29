@@ -1,43 +1,71 @@
 <?xml version="1.0"?>
+
 <faces-config xmlns="http://java.sun.com/xml/ns/javaee"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-facesconfig_2_0.xsd"
 	version="2.0">
-    
+
+    <managed-bean>
+		<managed-bean-name>applicationCtrl</managed-bean-name>
+		<managed-bean-class>fr.logica.jsf.controller.ApplicationController</managed-bean-class>
+		<managed-bean-scope>application</managed-bean-scope>
+	</managed-bean>
+
     <managed-bean>
 		<managed-bean-name>sessionCtrl</managed-bean-name>
 		<managed-bean-class>fr.logica.jsf.controller.SessionController</managed-bean-class>
 		<managed-bean-scope>session</managed-bean-scope>
-	</managed-bean>
-	
-	<managed-bean>
-		<managed-bean-name>jsfCtrl</managed-bean-name>
-		<managed-bean-class>fr.logica.jsf.controller.JSFController</managed-bean-class>
-		<managed-bean-scope>session</managed-bean-scope>
 		<managed-property>
-			<property-name>sessionCtrl</property-name>
-			<value>#{sessionCtrl}</value>
+			<property-name>applicationCtrl</property-name>
+			<value>#{applicationCtrl}</value>
 		</managed-property>
 	</managed-bean>
-	
+
 	<managed-bean>
-		<managed-bean-name>commentCtrl</managed-bean-name>
-		<managed-bean-class>fr.logica.jsf.controller.CommentController</managed-bean-class>
-		<managed-bean-scope>session</managed-bean-scope>
+		<managed-bean-name>jsfCtrl</managed-bean-name>
+		<managed-bean-class>fr.logica.jsf.controller.ViewController</managed-bean-class>
+		<managed-bean-scope>view</managed-bean-scope>
 		<managed-property>
 			<property-name>sessionCtrl</property-name>
 			<value>#{sessionCtrl}</value>
 		</managed-property>
 	</managed-bean>
 
-    <managed-bean>
-		<managed-bean-name>tabeditCtrl</managed-bean-name>
-		<managed-bean-class>fr.logica.jsf.controller.TabeditController</managed-bean-class>
+	<managed-bean>
+		<managed-bean-name>menuCtrl</managed-bean-name>
+		<managed-bean-class>fr.logica.jsf.controller.MenuController</managed-bean-class>
+		<managed-bean-scope>view</managed-bean-scope>
+		<managed-property>
+			<property-name>sessionCtrl</property-name>
+			<value>#{sessionCtrl}</value>
+		</managed-property>
+	</managed-bean>
+
+	<managed-bean>
+		<managed-bean-name>requestCtrl</managed-bean-name>
+		<managed-bean-class>fr.logica.jsf.controller.RequestController</managed-bean-class>
+		<managed-bean-scope>request</managed-bean-scope>
+		<managed-property>
+			<property-name>sessionCtrl</property-name>
+			<value>#{sessionCtrl}</value>
+		</managed-property>
+	</managed-bean>
+	
+	<managed-bean>
+		<managed-bean-name>viewAccessCtrl</managed-bean-name>
+		<managed-bean-class>fr.logica.jsf.controller.ViewAccessController</managed-bean-class>
 		<managed-bean-scope>view</managed-bean-scope>
 		<managed-property>
 			<property-name>jsfCtrl</property-name>
 			<value>#{jsfCtrl}</value>
 		</managed-property>
+	</managed-bean>
+
+
+	<managed-bean>
+		<managed-bean-name>commentCtrl</managed-bean-name>
+		<managed-bean-class>fr.logica.jsf.controller.CommentController</managed-bean-class>
+		<managed-bean-scope>session</managed-bean-scope>
 		<managed-property>
 			<property-name>sessionCtrl</property-name>
 			<value>#{sessionCtrl}</value>
@@ -98,11 +126,21 @@
 		<exception-handler-factory>fr.logica.jsf.exception.LogicaExceptionHandlerFactory</exception-handler-factory>
 	</factory>
 
+	<component>
+		<component-type>org.primefaces.component.Calendar</component-type>
+		<component-class>fr.logica.jsf.components.calendar.Calendar</component-class>
+	</component>
+
 	<converter>
 		<converter-id>customDateTimeConverter</converter-id>
 		<converter-class>fr.logica.jsf.utils.CustomDateTimeConverter</converter-class>
 	</converter>
 	
+	<converter>
+		<converter-id>toUpperCaseConverter</converter-id>
+		<converter-class>fr.logica.jsf.utils.ToUpperCaseConverter</converter-class>
+	</converter>
+
 	<converter>
 		<converter-id>customTimestampConverter</converter-id>
 		<converter-class>fr.logica.jsf.utils.CustomTimestampConverter</converter-class>
@@ -117,7 +155,7 @@
 		<converter-id>defaultIntegerConverter</converter-id>
 		<converter-class>javax.faces.convert.IntegerConverter</converter-class>
 	</converter>
-	
+
 	<converter>
 		<converter-id>customBigDecimalConverter</converter-id>
 		<converter-class>fr.logica.jsf.utils.CustomBigDecimalConverter</converter-class>
@@ -135,7 +173,7 @@
 			<attribute-class>java.lang.String</attribute-class>
 		</attribute>
 	</validator> 
-	
+
 	<render-kit>
 	    <renderer>
 	        <component-family>javax.faces.SelectOne</component-family>
@@ -158,4 +196,10 @@
 	        <renderer-class>fr.logica.jsf.renderer.TreeTableRenderer</renderer-class>
 	    </renderer>
 	</render-kit>
+
+	<lifecycle>
+		<phase-listener>fr.logica.jsf.listener.BrowserNavigationListener</phase-listener>
+		<phase-listener>fr.logica.jsf.listener.PostRedirectGetListener</phase-listener>
+	</lifecycle>
+
 </faces-config>

@@ -3,7 +3,10 @@
 
 <ui:define name="metadata">
 	<f:metadata>
-		<f:event type="preRenderView" listener="#{jsfCtrl.prepareUiAccess('mainForm:criterias')}" />
+		<f:attribute name="entityName" value="shopUser" />
+		<f:attribute name="queryName" value="SHOP_USER" />
+		<f:event type="preRenderView" listener="#{requestCtrl.initializeViewContext(jsfCtrl)}" />
+		<f:event type="preRenderView" listener="#{jsfCtrl.initializeView}" />
 	</f:metadata>
 </ui:define>
 
@@ -12,17 +15,22 @@
 <ui:define name="body">
 	<input type="hidden" value="SHOP_USER" id="tableIdList" />
 	<div class="content_title">
+	
+	<h:inputHidden id="displayCriterias" value="#{jsfCtrl.uiList('SHOP_USER').displayCriterias}" />
 
 	<div class="ui-accordion ui-widget ui-helper-reset ui-accordion-icons developed">
 		<h3 class="ui-accordion-header ui-helper-reset ui-state-default ui-state-active ui-corner-top" onclick="displayResults();">
 			<table style="width: 100%; height: 100%;">
 				<tr>
 					<td class="open-close-image">
-						<span id="openResultats" style="display: none"><h:graphicImage library="img" name="open_content.gif" alt="open" /></span>
-						<span id="closeResultats" style="display: block"><h:graphicImage library="img" name="close_content.gif" alt="close" /></span>
+						<span id="openResultats" style="display: #{jsfCtrl.uiList('SHOP_USER').displayCriterias ? 'block' : 'none'}"><h:graphicImage library="img" name="open_content.gif" alt="open" /></span>
+						<span id="closeResultats" style="display: #{jsfCtrl.uiList('SHOP_USER').displayCriterias ? 'none' : 'block'}"><h:graphicImage library="img" name="close_content.gif" alt="close" /></span>
 					</td>
 					<td class="accordion-title"><h:outputText value="#{hh:label('labels', 'liste.resultats')}" /></td>
-					<td class="accordion-title-description"><h:outputText id="resultCount" value="#{jsfCtrl.resultCount}" /><h:outputText value="#{jsfCtrl.totalResultCount}" /></td>
+					<td class="accordion-title-description">
+						<h:outputText class="result-count #{jsfCtrl.uiList('SHOP_USER').resultCountStyle}" id="resultCount" value="#{jsfCtrl.uiList('SHOP_USER').resultCount}" />
+						<h:outputText class="total-result-count" id="totalResultCount" value="#{jsfCtrl.uiList('SHOP_USER').totalResultCount}" />
+					</td>
 				</tr>
 			</table>
 		</h3>
@@ -31,126 +39,116 @@
 
 		<div class="table_container">
 		
+		<div class="actions">
+			<table style="width: 100%">
+				<tr>
+					<td style="text-align: left;">
+						<span class="filter-line">
+							<span><h:outputText value="#{hh:label('labels', 'filtrer')}" /></span>
+							<h:outputText value=" " />
+							<h:inputText id="globalFilter_SHOP_USER" value="#{jsfCtrl.uiList('SHOP_USER').jsFilter}" onkeyup="showLines(null, this.value, 'SHOP_USER')" styleClass="filter" />
+							<span id="filterCount_SHOP_USER"> </span>
+						</span>
+					</td>
+					<td style="text-align: right;"><span class="allActionButtons">
+						<h:panelGroup rendered="#{jsfCtrl.select}">
+							<span class="listButtons" id="buttonSHOP_USER">
+								<h:commandButton id="SHOP_USER_buttonSelect" alt="commandButtonSelect" styleClass="btn_medium" value="#{hh:label('labels', 'action.selectionner')}" action="#{jsfCtrl.validate}"/>
+							</span>
+							<h:commandButton id="SHOP_USER_buttonCancel" alt="cancelButtonSelect" styleClass="btn_medium" value="#{hh:label('labels', 'action.annuler')}" action="#{jsfCtrl.cancel}"/>
+						</h:panelGroup>
+						<h:panelGroup rendered="#{applicationCtrl.displaySelectActions}">
 		
-<div class="actions">
-	<table style="width: 100%">
-		<tr>
-			<td style="text-align: left;">
-				<span class="filter-line">
-					<span><h:outputText value="#{hh:label('labels', 'filtrer')}" /></span>
-					<h:outputText value=" " />
-					<h:inputText id="globalFilter_SHOP_USER" value="#{jsfCtrl.jsFilterMap.SHOP_USER}" onkeyup="showLines(null, this.value, 'SHOP_USER')" class="filter" />
-					<span id="filterCount_SHOP_USER"> </span>
-				</span>
-			</td>
-			<td style="text-align: right;"><span class="allActionButtons">
-				<h:panelGroup rendered="#{!jsfCtrl.select}">
-
-					<h:commandButton id="SHOP_USER_button0" alt='commandButton0' styleClass="btn_icon btn_medium"
-						rendered="#{sessionCtrl.isActionRendered('SHOP_USER', 0)}"
-						value="#{hh:label('genLabels', 'SHOP_USER_ACTION_0')}" action="#{jsfCtrl.prepareSingleAction('shopUser', 0, 0, null, null)}" style="background-image: url('#{application.contextPath}/static/img/icons/create.png');" />
-
-					<span class="listButtons" id="buttonSHOP_USER">
-
-						<h:commandButton id="SHOP_USER_button2" alt='commandButton2' styleClass="btn_icon btn_medium"
-							rendered="#{sessionCtrl.isActionRendered('SHOP_USER', 2)}"
-							value="#{hh:label('genLabels', 'SHOP_USER_ACTION_2')}" action="#{jsfCtrl.prepareMultiAction('shopUser', 2, 2, jsfCtrl.results.selectedPk, null)}" style="background-image: url('#{application.contextPath}/static/img/icons/edit.png');" />
-
-						<h:commandButton id="SHOP_USER_button4" alt='commandButton4' styleClass="btn_icon btn_medium"
-							rendered="#{sessionCtrl.isActionRendered('SHOP_USER', 4)}"
-							value="#{hh:label('genLabels', 'SHOP_USER_ACTION_4')}" action="#{jsfCtrl.prepareMultiAction('shopUser', 4, 4, jsfCtrl.results.selectedPk, null)}" style="background-image: url('#{application.contextPath}/static/img/icons/delete.png');" />
-
-						<h:commandButton id="SHOP_USER_button5" alt='commandButton5' styleClass="btn_icon btn_medium"
-							rendered="#{sessionCtrl.isActionRendered('SHOP_USER', 5)}"
-							value="#{hh:label('genLabels', 'SHOP_USER_ACTION_5')}" action="#{jsfCtrl.prepareMultiAction('shopUser', 5, 5, jsfCtrl.results.selectedPk, null)}" style="background-image: url('#{application.contextPath}/static/img/icons/display.png');" />
-
-					</span>
-				</h:panelGroup>
-
-
-
-	<h:panelGroup rendered="#{jsfCtrl.select}">
-		<span class="listButtons" id="buttonSHOP_USER">
-			<h:commandButton id="SHOP_USER_buttonSelect" alt="commandButtonSelect" styleClass="btn_medium" value="#{hh:label('labels', 'action.selectionner')}" action="#{jsfCtrl.select(jsfCtrl.results.selectedPk)}"/>
-		</span>
-		<h:commandButton id="SHOP_USER_buttonCancel" alt="cancelButtonSelect" styleClass="btn_medium" value="#{hh:label('labels', 'action.annuler')}" action="#{jsfCtrl.cancel}"/>
-	</h:panelGroup>
-	
-			</span></td>
-		</tr>
-	</table>
-
-	<h:commandButton id="launchAction" action="#{jsfCtrl.prepareDefaultAction('2,4,5')}" style="display:none;"/> 
-	<h:inputText id="launchActionSelected" value="#{jsfCtrl.selectedRowEncodedKey}" style="display:none" />
-</div>
-
+							<h:commandButton id="SHOP_USER_button0" alt='commandButton0' styleClass="btn_icon btn_medium"
+								rendered="#{sessionCtrl.isActionRendered('shopUser', 0)}"
+								value="#{hh:label('genLabels', 'SHOP_USER_ACTION_0')}" title="#{hh:label('genLabels', 'SHOP_USER_ACTION_0')}" action="#{jsfCtrl.uiList('SHOP_USER').prepareActionCode(0)}" style="background-image: url('#{application.contextPath}/static/img/icons/create.png');" />
+		
+							<span class="listButtons" id="buttonSHOP_USER">
+		
+								<h:commandButton id="SHOP_USER_button2" alt='commandButton2' styleClass="btn_icon btn_medium"
+									rendered="#{sessionCtrl.isActionRendered('shopUser', 2)}"
+									value="#{hh:label('genLabels', 'SHOP_USER_ACTION_2')}" title="#{hh:label('genLabels', 'SHOP_USER_ACTION_2')}" action="#{jsfCtrl.uiList('SHOP_USER').prepareActionCode(2)}" style="background-image: url('#{application.contextPath}/static/img/icons/edit.png');" />
+		
+								<h:commandButton id="SHOP_USER_button4" alt='commandButton4' styleClass="btn_icon btn_medium"
+									rendered="#{sessionCtrl.isActionRendered('shopUser', 4)}"
+									value="#{hh:label('genLabels', 'SHOP_USER_ACTION_4')}" title="#{hh:label('genLabels', 'SHOP_USER_ACTION_4')}" action="#{jsfCtrl.uiList('SHOP_USER').prepareActionCode(4)}" style="background-image: url('#{application.contextPath}/static/img/icons/delete.png');" />
+		
+								<h:commandButton id="SHOP_USER_button5" alt='commandButton5' styleClass="btn_icon btn_medium"
+									rendered="#{sessionCtrl.isActionRendered('shopUser', 5)}"
+									value="#{hh:label('genLabels', 'SHOP_USER_ACTION_5')}" title="#{hh:label('genLabels', 'SHOP_USER_ACTION_5')}" action="#{jsfCtrl.uiList('SHOP_USER').prepareActionCode(5)}" style="background-image: url('#{application.contextPath}/static/img/icons/display.png');" />
+		
+							</span>
+						</h:panelGroup>
+							<h:commandButton id="SHOP_USER_buttonXls" alt='commandButtonXlsExport' styleClass="btn_medium" rendered="#{!jsfCtrl.select and applicationCtrl.displayXlsExport}" value="#{hh:label('labels', 'boutons.exportExcel')}" action="#{jsfCtrl.uiList('SHOP_USER').export('xls')}" />
+		
+					</span></td>
+				</tr>
+			</table>
+		
+			<h:commandButton id="launchAction" action="#{jsfCtrl.uiList('SHOP_USER').prepareDefaultAction('2,4,5')}" disabled="#{not jsfCtrl.uiList('SHOP_USER').hasAvailableActionIn('2,4,5')}" style="display:none;"/> 
+			<h:inputText id="launchActionSelected" value="#{jsfCtrl.uiList('SHOP_USER').selectedRowEncodedKey}" style="display:none" />
+		</div>
 	
 			<div class="list_results_container">
-				<font color="red" style="font-style: italic;"><h:outputText value="#{hh:label('labels', 'results.nodata')}" rendered="#{empty jsfCtrl.results.list}" /></font>
+				<h:panelGroup id="noResult" layout="block" styleClass="no-result">
+					<h:outputText value="#{hh:label('labels', 'results.nodata')}" rendered="#{empty jsfCtrl.uiList('SHOP_USER').rows}" />
+				</h:panelGroup>
+				<h:panelGroup id="results" layout="block">
 
 				
-				<h:dataTable id="tableSHOP_USER"
+				<h:dataTable vanilla="false" id="tableSHOP_USER"
 						columnClasses="first, default, default, defValue" rowClasses="odd,even"
-						value="#{jsfCtrl.results.list}" var="tempVar"
-						rendered="#{not empty jsfCtrl.results}"
+						value="#{jsfCtrl.uiList('SHOP_USER').rows}" var="tempVar"
+						rendered="#{not empty jsfCtrl.uiList('SHOP_USER').rows}"
 						onRowClick="launchAction('#{tempVar.primaryKey.encodedValue}');">
 
 					<h:column headerClass="first">
 						<f:facet name="header"><input type="checkbox" onclick="manageChecks(this, 'SHOP_USER');" /></f:facet>
 						<h:selectBooleanCheckbox value="#{tempVar.checked}" onclick="clickCheck(this, 'SHOP_USER');"/>
-						<input type="hidden" name="trdataSHOP_USER" value="#{tempVar.filterField}"/>
 					</h:column>			
 
-					<h:column>
-
-							 
-						<f:facet name="header">
-							<h:commandLink action="#{jsfCtrl.sortBy('login')}">
-								<h:outputText value="#{jsfCtrl.results.titles.USR_login}" />
+					<h:column rendered="#{jsfCtrl.uiList('SHOP_USER').columns.USR_login.visible}">
+ 						<f:facet name="header">
+							<h:commandLink style="#{jsfCtrl.uiList('SHOP_USER').sortedStyle('USR_login')}">
+								<f:ajax onevent="updateList" render=":mainForm:messages :mainForm:results" listener="#{jsfCtrl.uiList('SHOP_USER').sortBy('USR_login')}"></f:ajax>
+								<h:outputText value="#{jsfCtrl.uiList('SHOP_USER').columns.USR_login.title}" />
 							</h:commandLink>
 							<h:outputText value=" " />
-							<h:graphicImage library="img" name="ico_up_on.png" rendered="#{jsfCtrl.sortAscBy('login')}" alt="up" />
-							<h:graphicImage library="img" name="ico_down_on.png" rendered="#{jsfCtrl.sortDescBy('login')}" alt="down" />
 						</f:facet>
 							 			
 						<h:outputLabel value="#{tempVar.USR_login}" />
 					</h:column>
 
-					<h:column>
-
-							 
-						<f:facet name="header">
-							<h:commandLink action="#{jsfCtrl.sortBy('name')}">
-								<h:outputText value="#{jsfCtrl.results.titles.USR_name}" />
+					<h:column rendered="#{jsfCtrl.uiList('SHOP_USER').columns.USR_name.visible}">
+ 						<f:facet name="header">
+							<h:commandLink style="#{jsfCtrl.uiList('SHOP_USER').sortedStyle('USR_name')}">
+								<f:ajax onevent="updateList" render=":mainForm:messages :mainForm:results" listener="#{jsfCtrl.uiList('SHOP_USER').sortBy('USR_name')}"></f:ajax>
+								<h:outputText value="#{jsfCtrl.uiList('SHOP_USER').columns.USR_name.title}" />
 							</h:commandLink>
 							<h:outputText value=" " />
-							<h:graphicImage library="img" name="ico_up_on.png" rendered="#{jsfCtrl.sortAscBy('name')}" alt="up" />
-							<h:graphicImage library="img" name="ico_down_on.png" rendered="#{jsfCtrl.sortDescBy('name')}" alt="down" />
 						</f:facet>
 							 			
 						<h:outputLabel value="#{tempVar.USR_name}" />
 					</h:column>
 
-					<h:column>
-
-							 
-						<f:facet name="header">
-							<h:commandLink action="#{jsfCtrl.sortBy('profile')}">
-								<h:outputText value="#{jsfCtrl.results.titles.USR_profile}" />
+					<h:column rendered="#{jsfCtrl.uiList('SHOP_USER').columns.USR_profile.visible}">
+ 						<f:facet name="header">
+							<h:commandLink style="#{jsfCtrl.uiList('SHOP_USER').sortedStyle('USR_profile')}">
+								<f:ajax onevent="updateList" render=":mainForm:messages :mainForm:results" listener="#{jsfCtrl.uiList('SHOP_USER').sortBy('USR_profile')}"></f:ajax>
+								<h:outputText value="#{jsfCtrl.uiList('SHOP_USER').columns.USR_profile.title}" />
 							</h:commandLink>
 							<h:outputText value=" " />
-							<h:graphicImage library="img" name="ico_up_on.png" rendered="#{jsfCtrl.sortAscBy('profile')}" alt="up" />
-							<h:graphicImage library="img" name="ico_down_on.png" rendered="#{jsfCtrl.sortDescBy('profile')}" alt="down" />
 						</f:facet>
 							 			
 						<h:outputLabel value="#{tempVar.USR_profile}" />
 					</h:column>
 					<f:facet name="footer">
-						<h:commandButton image="/static/img/buttons/plus.png" rendered="#{jsfCtrl.results.list.size() &lt; jsfCtrl.results.resultSetCount}" styleClass="btn_more_lines" title="#{hh:label('labels', 'liste.data.more')}">
-							<f:ajax event="click" render=":mainForm:messages :mainForm:resultCount tableSHOP_USER" listener="#{jsfCtrl.moreLines(jsfCtrl.results)}"/> 
+						<h:commandButton image="/static/img/buttons/plus.png" rendered="#{jsfCtrl.uiList('SHOP_USER').hasMoreRows()}" styleClass="btn_more_lines" title="#{hh:label('labels', 'liste.data.more')}">
+							<f:ajax event="click" onevent="updateList" render=":mainForm:messages :mainForm:resultCount :mainForm:results" listener="#{jsfCtrl.uiList('SHOP_USER').moreLines}"/> 
 						</h:commandButton>
 					</f:facet>
 				</h:dataTable>
+				</h:panelGroup>
 				
 
 
@@ -160,13 +158,24 @@
 	</div>
 	</div>
 <script type="text/javascript">
+	function updateList(data) {
+		if (data.status === "success") {
+			if (!$('#resultatsBody').is(':visible') &amp;&amp; $('#mainForm\\:tableSHOP_USER').length > 0) {
+				displayResults();
+			}
+			initList('SHOP_USER');
+
+		}
+	}
+</script>
+<script type="text/javascript">
 $(document).ready(function() {
 	try {
 		initList('SHOP_USER');
-		#{sessionCtrl.page.displayCriterias ? 'listInitialized = false;' : ''}
+		#{jsfCtrl.uiList('SHOP_USER').displayCriterias ? 'listInitialized = false;' : ''}
 
 		<h:outputText value="doListCustomize('SHOP_USER', 'SHOP_USER_LIST');" rendered="#{!sessionCtrl.disableJS}"/>
-		showLines(null, '#{jsfCtrl.jsFilterMap.SHOP_USER}', 'SHOP_USER');
+		showLines(null, '#{jsfCtrl.uiList('SHOP_USER').jsFilter}', 'SHOP_USER');
 	} catch (e) {}
 });
 </script>

@@ -18,7 +18,7 @@ public class DbConnection {
 	private static final Logger LOGGER = Logger.getLogger(DbConnection.class);
 
 	public enum Type {
-		ORACLE, MySQL, PostgreSQL
+		ORACLE, MySQL, PostgreSQL, DB2
 	}
 
 	public static final String CONTEXT_ROOT = "java:comp/env";
@@ -27,7 +27,7 @@ public class DbConnection {
 
 	protected Connection cnx;
 
-	public static Type dbType;
+	private static Type dbType;
 
 	/** Unique id of the connection (for the ConnectionLogger). */
 	private int id;
@@ -37,32 +37,69 @@ public class DbConnection {
 			Context context = (Context) new InitialContext().lookup(CONTEXT_ROOT);
 			dataSource = (DataSource) context.lookup(MessageUtils.getServerProperty(DATASOURCE));
 			cnx = dataSource.getConnection();
-			String driverName = cnx.getMetaData().getDriverName().toUpperCase();
+			cnx.setAutoCommit(false);
 
+			// Register the connection's opening.
+			id = ConnectionLogger.getInstance().register(this);
+		} catch (SQLException e) {
+			LOGGER.fatal("Connection failed.", e);
+			throw new DbException("Connection failed.", e);
+		} catch (NamingException e) {
+			LOGGER.fatal("Datasource not found", e);
+			throw new Error("ERROR: Datasource not found: " + e, e);
+		}
+	}
+
+	private static synchronized void initializeDbType(Connection cnx) {
+		DbConnection localDbConnection = null;
+		Connection localConnection = null;
+		if (cnx != null) {
+			localConnection = cnx;
+		} else {
+			localDbConnection = new DbConnection();
+			localConnection = localDbConnection.getCnx();
+		}
+		try {
+			String driverName = null;
+			driverName = localConnection.getMetaData().getDriverName().toUpperCase();
 			if (driverName.contains("ORACLE")) {
 				DbConnection.dbType = Type.ORACLE;
 			} else if (driverName.contains("MYSQL")) {
 				DbConnection.dbType = Type.MySQL;
 			} else if (driverName.contains("POSTGRESQL")) {
 				DbConnection.dbType = Type.PostgreSQL;
+			} else if (driverName.contains("DB2") || driverName.contains("IBM")) {
+				DbConnection.dbType = Type.DB2;
 			} else {
 				throw new TechnicalException("Driver type not supported : " + driverName);
 			}
-			cnx.setAutoCommit(false);
-			
-			// Register the connection's opening.
-			id = ConnectionLogger.getInstance().register(this);
 		} catch (SQLException e) {
 			LOGGER.fatal("Connection failed.", e);
-			throw new RuntimeException("Connection failed.", e);
-		} catch (NamingException e) {
-			LOGGER.fatal("Datasource not supported", e);
-			throw new Error("ERROR: Datasource not supported: " + e, e);
+			throw new DbException("Connection failed.", e);
+		} finally {
+			if (localDbConnection != null) {
+				localDbConnection.close();
+			}
 		}
+
+	}
+
+	public static synchronized DbConnection.Type getDbType() {
+		if (dbType == null) {
+			initializeDbType(null);
+		}
+		return dbType;
 	}
 
 	public DbConnection(StandaloneDbConnection standalone) {
 		cnx = standalone.getCnx();
+		if (dbType == null) {
+			initializeDbType(cnx);
+		}
+	}
+
+	public DbConnection(Connection connection) {
+		cnx = connection;
 	}
 
 	public Connection getCnx() {

@@ -22,7 +22,7 @@ public class CustomBigDecimalConverter extends BigDecimalConverter {
 		} catch (ConverterException e) {
 			Object label = getAttribute(facesContext, component, "label");
 			throw new ConverterException(MessageFactory.getMessage("javax.faces.converter.BigDecimalConverter.DECIMAL",
-					label, "198.23"), e);
+					label, "19.23"), e);
 		}
 		return res;
 	}

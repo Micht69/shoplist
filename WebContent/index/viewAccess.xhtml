@@ -1,0 +1,36 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd" >
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core">
+<f:metadata>
+	<f:attribute name="entityName" value="contact" />
+	<f:event type="preRenderView" listener="#{requestCtrl.initializeViewContext(jsfCtrl)}" />
+	<f:event type="preRenderView" listener="#{viewAccessCtrl.initializeViewAccess}" />
+</f:metadata>
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<script type="text/javascript" src="../static/scripts/jquery-1.9.1.min.js" />
+	<title>Direct view access</title>
+	
+	<link rel="stylesheet" type="text/css" href="../static/css/skin-header-footer.css" />
+	
+</h:head>
+<h:body>
+	<h:form id="mainForm">
+	
+       	<h:panelGroup id="messageGroup" layout="block" styleClass="messages">
+       		<h:messages layout="list" errorClass="message_error" styleClass="message" id="messages" />
+   		</h:panelGroup>
+       		
+		<h:panelGroup rendered="#{viewAccessCtrl.request != null}">
+			<h:outputLabel value="#{labels['permalink.redirect.message']}" />
+			<br/>
+			<h:commandButton id="view_access" value="#{labels['action.redirect']}" action="#{viewAccessCtrl.viewAccess}" />
+			<script type="text/javascript">
+				$(document).ready(function() {
+					$('input[id$="view_access"]').click();
+				});
+			</script>
+		</h:panelGroup>
+	</h:form>
+</h:body>
+</html>

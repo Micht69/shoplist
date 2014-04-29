@@ -139,9 +139,7 @@
 		formattedTime: '',
 		formattedDateTime: '',
 		timezoneList: null,
-		//Mantis #751 - disable 'second','millisec' to speed up rendering on IE7
-		//units: ['hour','minute','second','millisec'],
-		units: ['hour','minute'],
+		units: ['hour','minute','second','millisec'],
 		control: null,
 
 		/* 

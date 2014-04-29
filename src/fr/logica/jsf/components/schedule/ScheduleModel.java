@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
+import fr.logica.business.data.ScheduleEvent;
+
 /**
  * Data model used by the schedule component.
  */
@@ -66,17 +68,15 @@ public class ScheduleModel implements Serializable {
 
 	@Override
 	public String toString() {
-		String toString = "ScheduleModel [selectedDate=" + selectedDate + ", selectedEvent=" + selectedEvent + ", selectedView=" + selectedView
-				+ ", events={";
-
+		StringBuilder toString = new StringBuilder("ScheduleModel [selectedDate=").append(selectedDate).append(", selectedEvent=")
+				.append(selectedEvent).append(", selectedView=").append(selectedView).append(", events={");
 		if (null != events) {
-
 			for (ScheduleEvent event : events) {
-				toString += "\n" + event.toString();
+				toString.append("\n").append(event.toString());
 			}
 		}
-		toString += "}]";
-		return toString;
+		toString.append("}]");
+		return toString.toString();
 	}
 
 }

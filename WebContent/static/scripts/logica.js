@@ -36,7 +36,7 @@ cgi.debug = function() {
 if (String.prototype.trim === undefined) {
 	String.prototype.trim = function() {
 		return this.replace(/^\s+|\s+$/g,"");
-	}
+	};
 }
 
 // Caractères invalides, exemple:
@@ -72,6 +72,8 @@ function displayCriteres() {
 		$resultatsBody.closest(".ui-accordion").addClass("reduced").removeClass("developed");
 	}
 	
+	$("input[id$='displayCriterias']").val($criteresBody.is(":visible")); 
+	
 	if (!listInitialized) {
 		var listName = $('#tableIdList').val();
 		$('#datatable-div-data-' + listName).css('height', '');
@@ -87,19 +89,6 @@ function displayResults() {
 }
 
 $(document).ready(function() {
-	// Fix content width
-	var contentWidth = $(".content").width();
-	if (contentWidth < 1000) {
-		var maxWidth = $(window).width();
-		if (maxWidth > 1000) {
-			contentWidth = 1000;
-		} else {
-			contentWidth = (maxWidth - 20);
-		}
-	}
-	$(".content").width(contentWidth); // Also allow convertion from % to px
-	
-	
 	/* Collapsable fieldsets */
 	$('.actionContent').each(function() {
 		this.closeOpen = function() {
@@ -108,10 +97,10 @@ $(document).ready(function() {
 			var block;
 
 			if (contentImage.parent().hasClass('table_title')) {
-				block = contentImage.parents('.mainTable_container');
+				block = contentImage.parents('.mainTable_container').first();
 				contentTable = block.children('.table_container');
 			} else {
-				block = contentImage.parents('.form_container');
+				block = contentImage.parents('.form_container').first();
 				contentTable = block.children('table');
 			}
 
@@ -124,6 +113,17 @@ $(document).ready(function() {
 					contentTable.stop().show();
 					contentImageSrc = contentImage.attr('src').replace(/open/ig, "close");
 					block.addClass("developed").removeClass("reduced");
+					if (window.initMap) {
+						initMap();
+					}
+					contentTable.find('.schedule').each(function() {
+						var schedule = $(this).children('.ui-widget');
+
+						if (schedule.length > 0 && schedule.data('full-calendar')) {
+							schedule.fullCalendar('render');
+						}
+					});
+					displayTables(contentTable);
 				}
 				contentImage.attr('src', contentImageSrc);
 			}
@@ -131,7 +131,7 @@ $(document).ready(function() {
 	});
 
 	$('.actionContent').click(function() {this.closeOpen();});
-	$('.actionContent').parent().click(function() {$(this).children('.actionContent')[0].closeOpen()});
+	$('.actionContent').parent().click(function() {$(this).children('.actionContent')[0].closeOpen();});
 
 	// Gestion des champs "disabled"
 	$("select:disabled").each(function(idx) {
@@ -157,7 +157,7 @@ $(document).ready(function() {
 	$.each($("input[id*='tabs-selected']"), function(index, value) {
 		// value is the inputText field which may contain previously selected tab
 		if (value.value != '') {
-			var selected = "#tabs-" + value.id.split("tabs-selected_")[1] + "_" + value.value;
+			var selected = "#tabs-" + value.value;
 			selectedTabs[value.id.replace("mainForm:", "") + "-tabs"] = selected;
 		}
 	});
@@ -170,7 +170,7 @@ $(document).ready(function() {
 			var tabId = ui.newPanel.attr('id');
 			var tabGroupName = tabId.split('_')[0].substring(5);
 			var tabsSelectedMapId = 'tabs-selected_' + tabGroupName;
-			$("input[id$='" + tabsSelectedMapId + "']").val(tabId.substring(5).split('_')[1]);
+			$("input[id$='" + tabsSelectedMapId + "']").val(tabId.substring(5));
 
 			textareaResizeToContent(ui.newPanel);
 			if (window.initMap) {
@@ -181,12 +181,7 @@ $(document).ready(function() {
 						console.error(e.message);
 				}
 			}
-
-			datatableId = ui.newPanel.find('.mainTable_container').attr('id');
-			if (datatableId) {
-				datatableAlignColumns(datatableId.substring(5));
-			}
-
+			displayTables(ui.newPanel);
 		}
 	});
 	textareaResizeToContent();
@@ -314,12 +309,12 @@ $(document).ready(function() {
 
 	$("input[id$='_launchActionSchedule']").val('');
 
-	initSearch();
 	initButtons();
 
 	$('[id$="maxRowCriteria"]').keyup(function () { 
 		this.value = this.value.replace(/[^0-9\.]/g,'');
 	});
+	$('.linklist-filter').trigger('keyup');
 });
 Array.prototype.contains = function(obj) {
 	var i = this.length;
@@ -436,8 +431,14 @@ function errDate(s) {
 function cleanDirty() {
 	document.getElementById("mainForm:dirty").value = "false";
 }
-function markAsDirty() {
+
+function markAsDirty(element) {
 	document.getElementById("mainForm:dirty").value = "true";
+}
+
+function isPageDirty() {
+	var dirty = document.getElementById("mainForm:dirty");
+	return dirty != null && dirty.value == "true";
 }
 
 function downloadFile() {
@@ -456,11 +457,12 @@ function checkDirtyState(trigger) {
 	};
 
 	var onYes = function() {
+		cleanDirty();
 		setTimeout(clickAgain, 100);
 		return false;
 	};
 
-	return cgi.checkDirtyStateCustom(onYes);
+	return cgi.doCheckDirtyState(onYes);
 }
 
 /**
@@ -469,23 +471,17 @@ function checkDirtyState(trigger) {
  * @param onAbandon : function to execute when chosing to abandon modifications (by clicking the yes button).
  * @param onClose : function to execute when closing the modal in any way (clicking yes, no or hitting Escape), default
  *            is to do nothing. Called before onAbandon, if both are pertinent.
- * 
+ * @param evaluation {Function} : Function used to test the dirty state, default is function isPageDirty.
  */
-cgi.checkDirtyStateCustom = function(onAbandon, onClose) {
-	var dirty = document.getElementById("mainForm:dirty");
+cgi.doCheckDirtyState = function(onAbandon, onClose, evaluation) {
+	var evaluationFunc = evaluation || isPageDirty;
 
-	if (dirty == null || dirty.value != "true") {
+	if (!evaluationFunc()) {
 		return true;
 	}
 
-	/* Default action on No button */
-	if (onClose === undefined) {
-		onClose = function() {
-		};
-	}
-
+	var onCloseFunc = onClose || $.noop;
 	var modalBox = $('#modalConfirmDirty');
-	
 	var boxTitle =  modalBox.attr("title");
 	var yesButton = $('#modalYesButton').attr("title");
 	var noButton = $('#modalNoButton').attr("title");
@@ -493,7 +489,6 @@ cgi.checkDirtyStateCustom = function(onAbandon, onClose) {
 	var buttons = {};
 	buttons[yesButton] = function() {
 		$(this).dialog('close');
-		cleanDirty();
 		onAbandon();
 	};
 	buttons[noButton] = function() {
@@ -508,14 +503,14 @@ cgi.checkDirtyStateCustom = function(onAbandon, onClose) {
 		position : [ 'center', 200 ],
 		title : boxTitle,
 		buttons : buttons,
-		close : onClose
+		close : onCloseFunc
 	});
 
 	/* don't transmit clicks */
 	$(".ui-front").click(function() {
 		return false;
 	});
-	
+
 	/* copy missing title attribute */
 	modalBox.attr("title", boxTitle);
 
@@ -531,13 +526,9 @@ cgi.checkDirtyStateCustom = function(onAbandon, onClose) {
  * modal if one is necessary.
  * @return true if no confirmation box was necessary
  */
-cgi.withCheckDirty = function(onContinue, onAnyCase) {
-	if (onAnyCase === undefined) {
-		onAnyCase = function() {
-		};
-	}
+cgi.withCheckDirty = function(onContinue, onAnyCase, evaluation) {
+	var bool = cgi.doCheckDirtyState(onContinue, onAnyCase, evaluation);
 
-	var bool = cgi.checkDirtyStateCustom(onContinue, onAnyCase);
 	if (bool) {
 		onAnyCase();
 		onContinue();
@@ -550,13 +541,18 @@ var padding = 0;
 function initList(listName) {
 	// Compute list height
 	var listResultsContainer = $('.list_results_container').first();
+	var newListHeight;
 
-	var windowHeight = $(window).height();
-	var documentHeight = $(document).height();
-	var overflow = documentHeight - windowHeight;
-	
-	var newListHeight = listResultsContainer.outerHeight(true) - overflow - 20; // FIXME Why 20 as magic number ?
-	listResultsContainer.height(newListHeight);
+	if (!listResultsContainer.attr('style')) {
+		var windowHeight = $(window).height();
+		var documentHeight = $(document).height();
+		var overflow = documentHeight - windowHeight;
+
+		newListHeight = listResultsContainer.outerHeight(true) - overflow - 20; // FIXME Why 20 as magic number ?
+		listResultsContainer.height(newListHeight);
+	} else {
+		newListHeight = listResultsContainer.height();
+	}
 	
 	// Adjust with list headers
 	var listHeaderHeight = $('#datatable-div-header-' + listName).height();
@@ -616,30 +612,21 @@ function initTreeTable(listName) {
 	treeTable.css('display', 'block');
 }
 
-var launchActionClicked = false;
+var actionClicked = false;
 function launchAction(encodedKey) {
-	if (launchActionClicked)
-		return;
-
-	launchActionClicked = true;
+	if (actionClicked) return;
+	actionClicked = true;
+	
 	$("input[id$='launchActionSelected']").val(encodedKey);
 	$("input[id$='launchAction']").click();
 }
 
-var launchLinkActionClicked = false;
-function launchLinkAction(linkName, entityName, action, type, encodedKey, listName) {
-	if (launchLinkActionClicked)
-		return;
-
-	launchLinkActionClicked = true;
+function launchLinkAction(encodedKey, listName) {
+	if (actionClicked) return;
+	actionClicked = true;
+	var commandName = listName + '_launchAction';
 	$("input[id$='_launchActionSelected']").val(encodedKey);
-	$("input[id$='_launchActionEntity']").val(entityName);
-	$("input[id$='_launchActionCode']").val(action);
-	$("input[id$='_launchActionLink']").val(linkName);
-	$("input[id$='_launchActionType']").val(type);
-	$("input[id$='_launchActionList']").val(listName);
-
-	$("input[id$='launchAction']")[0].click();
+	$("input[id$='" + commandName + "']").click();
 }
 
 var launchTreeActionClicked = false;
@@ -819,7 +806,7 @@ delayedModal = function(jqDialog, delay, onceOpened) {
  * Uses the "saveInProgess div defined in the generic template.
  */
 prepareProgressIndicator = function() {
-	var div = $("#modalSaveInProgress");
+	var div = $("#modalWorkInProgress");
 
 	/* preparing modal dialog */
 	div.dialog({
@@ -839,7 +826,7 @@ prepareProgressIndicator = function() {
 		});
 
 		/* no closing icon */
-		$("#modalSaveInProgress").parent().find(".ui-dialog-titlebar-close").hide();
+		$("#modalWorkInProgress").parent().find(".ui-dialog-titlebar-close").hide();
 	};
 
 	return delayedModal(div, 500, onceOpened);
@@ -918,4 +905,17 @@ function initPopup() {
 				$("#mainForm\\\:createNewCriteriaDialogName").val("");
 		 }
 	 });
+}
+
+function displayTables($container) {
+	var tables = $container.find('.mainTable_container');
+
+	if (tables.length > 0) {
+		tables.each(function() {
+			var datatableId = $(this).attr('id');
+			if (datatableId) {
+				datatableAlignColumns(datatableId.substring(5));
+			}
+		});
+	}
 }

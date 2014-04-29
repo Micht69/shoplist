@@ -1,0 +1,220 @@
+package fr.logica.jsf.model.list;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
+
+import fr.logica.business.Action;
+import fr.logica.business.Action.Input;
+import fr.logica.business.Action.Persistence;
+import fr.logica.business.Action.UserInterface;
+import fr.logica.business.Constants;
+import fr.logica.business.EntityManager;
+import fr.logica.business.EntityModel;
+import fr.logica.business.Key;
+import fr.logica.business.MessageUtils;
+import fr.logica.business.context.RequestContext;
+import fr.logica.business.data.ColumnData;
+import fr.logica.business.data.ListCriteria;
+import fr.logica.business.data.ListData;
+import fr.logica.business.data.Row;
+import fr.logica.jsf.controller.ViewController;
+import fr.logica.jsf.model.DataModel;
+import fr.logica.security.SecurityUtils;
+
+public abstract class AbstractListModel extends DataModel implements Serializable {
+
+	/** serialUID */
+	private static final long serialVersionUID = -4595841921651081630L;
+
+	protected ListData data;
+
+	protected String entityName;
+
+	protected String selectedRowEncodedKey;
+
+	/** Store javascript filter fields data */
+	protected String jsFilter;
+	private static final String JS_FILTER = "jsFilter";
+
+	protected ListCriteria criteria;
+
+	public AbstractListModel(ViewController viewCtrl, Map<String, String> store, String entityName) {
+		super(viewCtrl);
+		this.entityName = entityName;
+		this.criteria = new ListCriteria();
+		this.jsFilter = store.get(JS_FILTER);
+		Action currentAction = viewCtrl.getCurrentView().getAction();
+		if (currentAction.getPersistence() == Persistence.DELETE || currentAction.getUi() == UserInterface.READONLY) {
+			isProtected = true;
+		}
+	}
+
+	@Override
+	public List<Key> getSelected() {
+		List<Key> keys = new ArrayList<Key>();
+		if (selectedRowEncodedKey != null) {
+			// Line selected via default action
+			Key primaryKey = new Key(entityName);
+			primaryKey.setEncodedValue(selectedRowEncodedKey);
+			keys.add(primaryKey);
+			selectedRowEncodedKey = null;
+		} else {
+			for (Row row : data.getRows()) {
+				if (row.checked()) {
+					keys.add(row.getPk());
+				}
+			}
+		}
+		return keys;
+	}
+
+	public void sortBy(String field) {
+		criteria.sortBy(field);
+		reload();
+	}
+
+	public String sortedStyle(String field) {
+		if (field.equals(criteria.orderByField)) {
+			return "datatable-header-sort-" + criteria.orderByDirection.toLowerCase();
+		}
+		return "datatable-header-sort-no";
+	}
+
+	public String getResultCount() {
+		if (data.getRows().size() == 0) {
+			return MessageUtils.getInstance().getLabel("results.nodata", null);
+		}
+		if (data.getRows().size() == 1) {
+			return "1 " + MessageUtils.getInstance().getLabel("liste.result.resultat", null);
+		}
+		return data.getRows().size() + " " + MessageUtils.getInstance().getLabel("liste.result.resultats", null);
+	}
+
+	public String getResultCountStyle() {
+		if (data.getRows().size() == 0) {
+			return "results-nodata";
+		}
+		return "";
+	}
+
+	public String getTotalResultCount() {
+		if (data.getRows().size() > 0 && data.getTotalRowCount() > data.getRows().size()) {
+			return " " + MessageUtils.getInstance().getLabel("liste.result.total", new Object[] { Integer.valueOf(data.getTotalRowCount()) });
+		}
+		return "";
+	}
+
+	/**
+	 * Returns <code>true</code> if at least one of the actions passed (as space-separated codes) is available (especially regarding the
+	 * current's user authorizations).
+	 */
+	public boolean hasAvailableActionIn(String actionsString) {
+		return viewCtrl.isSelect() || (getDefaultAction(actionsString) != null);
+	}
+
+	protected Action getDefaultAction(String actionsString) {
+		return getDefaultAction(actionsString, Input.ONE);
+	}
+
+	protected Action getDefaultAction(String actionsString, Input inputType) {
+		if (actionsString == null || actionsString.trim().length() == 0) {
+			return null;
+		}
+		String[] actions = actionsString.split(",");
+		RequestContext context = new RequestContext(viewCtrl.getSessionCtrl().getContext());
+		try {
+			for (String actionCodeString : actions) {
+				Integer actionCode = null;
+				try {
+					actionCode = Integer.parseInt(actionCodeString);
+				} catch (NumberFormatException ex) {
+					FacesContext.getCurrentInstance().addMessage(null,
+							new FacesMessage(FacesMessage.SEVERITY_ERROR, "Invalid default action : " + actionCodeString, null));
+					return null;
+				}
+				if (actionCode == Constants.DETACH) {
+					continue;
+				}
+
+				EntityModel model = EntityManager.getEntityModel(entityName);
+				Action action = model.getAction(actionCode);
+				if (isProtected && (action.getUi() != UserInterface.READONLY || action.getPersistence() != Persistence.NONE)) {
+					continue;
+				}
+				if (action.getInput() != inputType) {
+					continue;
+				}
+				if (!SecurityUtils.getSecurityManager().isActionRendered(model.name(), action.getCode(),
+						viewCtrl.getSessionCtrl().getContext())) {
+					continue;
+				}
+				return action;
+			}
+		} finally {
+			context.close();
+		}
+		return null;
+	}
+
+	@Override
+	public void storeViewData(Map<String, String> store) {
+		store.put(JS_FILTER, jsFilter);
+	}
+
+	public void export(String exportType) {
+		RequestContext context = null;
+		try {
+			context = new RequestContext(viewCtrl.getSessionCtrl().getContext());
+			export(exportType, context);
+		} finally {
+			if (context != null) {
+				context.close();
+			}
+		}
+	}
+
+	public abstract void export(String exportType, RequestContext context);
+
+	public Integer getMaxRow() {
+		return criteria.maxRow;
+	}
+
+	public void setMaxRow(Integer maxRow) {
+		if (maxRow == null) {
+			this.criteria.maxRow = Constants.MAX_ROW;
+		} else if (maxRow <= 0 || maxRow > Constants.MAX_ROW_ABSOLUTE) {
+			this.criteria.maxRow = Constants.MAX_ROW_ABSOLUTE;
+		} else {
+			this.criteria.maxRow = maxRow;
+		}
+	}
+
+	public List<Row> getRows() {
+		return data.getRows();
+	}
+
+	public Map<String, ColumnData> getColumns() {
+		return data.getColumns();
+	}
+
+	public String getJsFilter() {
+		return jsFilter;
+	}
+
+	public void setJsFilter(String jsFilter) {
+		this.jsFilter = jsFilter;
+	}
+
+	public String getSelectedRowEncodedKey() {
+		return selectedRowEncodedKey;
+	}
+
+	public void setSelectedRowEncodedKey(String selectedRowEncodedKey) {
+		this.selectedRowEncodedKey = selectedRowEncodedKey;
+	}
+}

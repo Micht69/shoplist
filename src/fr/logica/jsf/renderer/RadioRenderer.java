@@ -10,6 +10,7 @@ import javax.faces.context.ResponseWriter;
 import javax.faces.convert.Converter;
 import javax.faces.model.SelectItem;
 
+import com.sun.faces.RIConstants;
 import com.sun.faces.renderkit.Attribute;
 import com.sun.faces.renderkit.AttributeManager;
 import com.sun.faces.renderkit.RenderKitUtils;
@@ -21,6 +22,8 @@ import com.sun.faces.renderkit.RenderKitUtils;
  * </p>
  */
 public class RadioRenderer extends com.sun.faces.renderkit.html_basic.RadioRenderer {
+
+	private static final String NULL_VALUE = "$null$";
 
 	private static final Attribute[] ATTRIBUTES =
 			AttributeManager.getAttributes(AttributeManager.Key.SELECTONERADIO);
@@ -80,10 +83,11 @@ public class RadioRenderer extends com.sun.faces.renderkit.html_basic.RadioRende
 				+ Integer.toString(itemNumber);
 		writer.writeAttribute("id", idString, "id");
 
-		writer.writeAttribute("value",
-				(getFormattedValue(context, component,
-						curItem.getValue(), converter)),
-				"value");
+		if (null == curItem.getValue()) {
+			writer.writeAttribute("value", NULL_VALUE, "value");
+		} else {
+			writer.writeAttribute("value", getFormattedValue(context, component, curItem.getValue(), converter), "value");
+		}
 
 		// Don't render the disabled attribute twice if the 'parent'
 		// component is already marked disabled.
@@ -133,6 +137,15 @@ public class RadioRenderer extends com.sun.faces.renderkit.html_basic.RadioRende
 			writer.writeText("\t", component, null);
 			writer.endElement("tr");
 			writer.writeText("\n", component, null);
+		}
+	}
+
+	@Override
+	public void setSubmittedValue(UIComponent component, Object value) {
+		if (NULL_VALUE.equals(value)) {
+			super.setSubmittedValue(component, RIConstants.NO_VALUE);
+		} else {
+			super.setSubmittedValue(component, value);
 		}
 	}
 

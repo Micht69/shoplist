@@ -3,6 +3,8 @@
 				xmlns:logica="http://java.sun.com/jsf/composite/logica" xmlns:hh="http://cgi.com/jsf/html"
 				template="/templates/generic.xhtml">
 
+
+
 <ui:define name="title">Application - <h:outputText value="#{sessionCtrl.version}" /></ui:define>
 <ui:define name="body">
 
@@ -10,9 +12,9 @@
 	<hh:tab id="tabListConnections" title="#{hh:label('labels', 'adminPage.connectionTitle')}">
 		<div class="mainTable_container">
 			<div class="form_container" id="connection#{conn.id}">
-				<font color="red" style="font-style: italic;"><h:outputText value="#{hh:label('labels', 'results.nodata')}" rendered="#{empty jsfCtrl.listConnections}" /></font>
+				<font color="red" style="font-style: italic;"><h:outputText value="#{hh:label('labels', 'results.nodata')}" rendered="#{empty applicationCtrl.listConnections}" /></font>
 			</div>
-			<ui:repeat var="conn" value="${jsfCtrl.listConnections}">
+			<ui:repeat var="conn" value="${applicationCtrl.listConnections}">
 				<h:panelGroup id="connection#{conn.id}" layout="none">
 				<div class="form_container" id="connection#{conn.id}">
 					<div class="form_title">
@@ -27,7 +29,7 @@
 								<td style="text-align: right;">
 									<h:commandButton id="fermerConnectionButton" alt='fermerConnectionButton' styleClass="btn_large" 
 									 value="#{hh:label('labels', 'action.fermerConnection')}"
-									 action="#{jsfCtrl.prepareAdminPageWithClosingConnection(conn.id)}" />
+									 action="#{applicationCtrl.closeConnection(conn.id)}" />
 								</td>
 							</tr>
 						</table>
@@ -64,10 +66,12 @@
 		<ul>
 			<li><h:selectBooleanCheckbox id="disableJS" value="${sessionCtrl.disableJS}"></h:selectBooleanCheckbox> <h:outputText value="#{hh:label('labels', 'adminPage.disableJS')}" /></li>
 			<li><h:selectBooleanCheckbox id="disableCustom" value="${sessionCtrl.disableCustom}"></h:selectBooleanCheckbox> <h:outputText value="#{hh:label('labels', 'adminPage.disableCustom')}" /></li>
-			<li><h:selectBooleanCheckbox id="disableCSS" value="${sessionCtrl.disableCSS}"></h:selectBooleanCheckbox> <h:outputText value="#{hh:label('labels', 'adminPage.disableCSS')}" /></li>
-			<li><h:commandButton value="#{hh:label('labels', 'adminPage.save')}" /> </li>
+			<li><h:selectBooleanCheckbox id="disableCSS" value="${sessionCtrl.disableCSS}"></h:selectBooleanCheckbox> <h:outputText value="#{hh:label('labels', 'adminPage.disableCSS')}" /></li>	
+			<li><h:commandButton style=" margin-top:10px; margin-left:10px; margin-right:10px;" value="#{hh:label('labels', 'adminPage.save')}" styleClass="btn_large"/></li>
+		
 		</ul>
 	</hh:tab>
+	
 </hh:tabPanel>
 
 <script type="text/javascript" >

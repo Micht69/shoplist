@@ -1,0 +1,25 @@
+.treeExpendable {
+	cursor: pointer;
+	vertical-align: middle;
+}
+
+.treeNotExpendable {
+	vertical-align: middle;
+}
+
+.treeRightAccess {
+	cursor: pointer;
+	vertical-align: middle;
+	margin-left: -6px;
+	margin-right: 2px;
+	margin-top: -3px;
+}
+
+.treeDivWithTab {
+	margin-left: 30px;
+	display: none;
+}
+
+#treeGlobalDiv {
+	margin: 30px;
+}

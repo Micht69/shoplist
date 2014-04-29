@@ -1,13 +1,14 @@
 package fr.logica.domain.objects;
 
 import java.io.Serializable;
+
 import java.util.HashSet;
 import java.util.Set;
 
 
-import fr.logica.business.Context;
 import fr.logica.business.Entity;
 import fr.logica.business.Key;
+import fr.logica.business.context.RequestContext;
 import fr.logica.db.DB;
 import fr.logica.domain.models.ShopUserModel;
 
@@ -34,7 +35,7 @@ public class ShopUser extends Entity implements Serializable {
 	private String profile = "USER";
 
 	/** Description */
-	private String w$Desc ;
+	private String internalCaption ;
 
 
 	public ShopUser() {
@@ -60,16 +61,15 @@ public class ShopUser extends Entity implements Serializable {
 	 * Load a bean from database based on its primary key
 	 * <b>This method does not call the logic method dbPostLoad().</b>
 	 * @param login Login
-
 	 * @param ctx Current context with open database connection.
 	 * @return	<code>true</code> if the bean has been loaded, <code>false</code> if no entity was found.  
 	 */
-	public boolean find(String login, Context ctx) {
+	public boolean find(String login, RequestContext ctx) {
 		Key primaryKey = ShopUserModel.buildPrimaryKey(login);
 		if (!primaryKey.isFull()) {
 			return false;
 		}
-		ShopUser dbInstance = DB.get($NAME, primaryKey, ctx);
+		ShopUser dbInstance = DB.get(NAME, primaryKey, ctx);
 		if (dbInstance != null) {
 			syncFromBean(dbInstance);
 			return true; 
@@ -83,15 +83,14 @@ public class ShopUser extends Entity implements Serializable {
 
 	/** Entity name */
 	@Override
-	public String $_getName() {
+	public String name() {
 		return "shopUser";
 	}
 
-
 	/** Entity description */
 	@Override
-	public String $_getDesc() {
-		return "name";
+	public String description() {
+		return getInternalCaption(); 
 	}
 
 	/**
@@ -111,6 +110,9 @@ public class ShopUser extends Entity implements Serializable {
 	public void setLogin(final String login) {
 		this.login = login;
 	}
+	
+
+
 	/**
 	 * Get the value from field Name.
 	 *
@@ -128,6 +130,9 @@ public class ShopUser extends Entity implements Serializable {
 	public void setName(final String name) {
 		this.name = name;
 	}
+	
+
+
 	/**
 	 * Get the value from field Password.
 	 *
@@ -145,6 +150,9 @@ public class ShopUser extends Entity implements Serializable {
 	public void setPassword(final String password) {
 		this.password = password;
 	}
+	
+
+
 	/**
 	 * Get the value from field Profile.
 	 *
@@ -162,23 +170,47 @@ public class ShopUser extends Entity implements Serializable {
 	public void setProfile(final String profile) {
 		this.profile = profile;
 	}
+	
+
+
 	/**
-	 * Get the value from field W$Desc.
+	 * Gets the value from field InternalCaption. This getter respects real Java naming convention. 
 	 *
 	 * @return the value
 	 */
-	public String getW$Desc() {
-		return this.w$Desc;
+	public String getw$Desc() {
+		return getInternalCaption();
 	}
  
 	/**
-	 * Set the value from field W$Desc.
+	 * Sets the value from field InternalCaption. This setter respects real Java naming convention
 	 *
-	 * @param w$Desc : the value to set
+	 * @param internalCaption : the value to set
 	 */
-	public void setW$Desc(final String w$Desc) {
-		this.w$Desc = w$Desc;
+	public void setw$Desc(final String internalCaption) {
+		setInternalCaption(internalCaption); 
 	}
+
+	/**
+	 * Get the value from field InternalCaption.
+	 *
+	 * @return the value
+	 */
+	public String getInternalCaption() {
+		return this.internalCaption;
+	}
+ 
+	/**
+	 * Set the value from field InternalCaption.
+	 *
+	 * @param internalCaption : the value to set
+	 */
+	public void setInternalCaption(final String internalCaption) {
+		this.internalCaption = internalCaption;
+	}
+	
+
+
 	/** Holder for the var names */
 	public interface Var {
 		/** Var LOGIN */
@@ -194,24 +226,29 @@ public class ShopUser extends Entity implements Serializable {
 	/** Holder for the defined values */
 	public interface ValueList {
 		public interface PROFILE {
-			/** Defined value */
-			String USER = "USER";	
-			/** Defined value */
-			String ADMIN = "ADMIN";	
-			/** Defined value */
-			String BUYER = "BUYER";	
+			/** Utilisateur */
+			String USER = "USER";
+			/** Administrateur */
+			String ADMIN = "ADMIN";
+			/** Acheteur */
+			String BUYER = "BUYER";
 		}
 	}
 
 	/**
 	 * This methods gets all instances of ShopList back referenced by the current ShopUser instance via link ShopArticleLUser. <br/>
-	 * <b>Warning: this method does not cache its results and will connect to database on every call.</b>
+	 * <b>Warning: this method does not cache its results and will connect to database on every call.</b> <br/>
+	 * <i>Note: if the PK is incomplete, an empty set will be returned.</i>
 	 * 
 	 * @param ctx Current context with open database connection.
 	 * @return Set containing instances for every ShopList related to the current ShopUser via link ShopArticleLUser.
 	 */
-	public Set<ShopList> getList_ShopArticleLUser(Context ctx) {
+	public Set<ShopList> getList_ShopArticleLUser(RequestContext ctx) {
 		Set<ShopList> s = new HashSet<ShopList>();
+		if (this.getPrimaryKey() == null || !this.getPrimaryKey().isFull()) {
+			// Do not get linked entities if PK is incomplete
+			return s;
+		}
 		for (Entity e : DB.getLinkedEntities(this, ShopUserModel.LINK_SHOP_ARTICLE_L_USER, ctx)) {
 			s.add((ShopList) e);
 		}
@@ -221,16 +258,38 @@ public class ShopUser extends Entity implements Serializable {
 
 	/** Holder for the action names */
 	public interface Action {
-		/** Create. */
+		/** Créer. */
 		int ACTION_0 = 0;
-		/** Modify. */
+		/** Modifier. */
 		int ACTION_2 = 2;
-		/** Delete. */
+		/** Supprimer. */
 		int ACTION_4 = 4;
-		/** Display. */
+		/** Afficher. */
 		int ACTION_5 = 5;
     }
 
 	/** Nom de l'entité. */
-	public static final String $NAME = "shopUser";
+	public static final String NAME = "shopUser";
+	
+	/**
+	 * Clones the current bean.
+	 */
+	@Override
+	public ShopUser clone() {
+		ShopUser clone = (ShopUser) super.clone();
+		clone.removeDefaultValues();
+		for (String f : getModel().getFields()) {
+			clone.invokeSetter(f, invokeGetter(f));
+		}
+		clone.resetLinksAndBackRefs();
+		return clone;
+	}
+
+	/** 
+	 * Removes all initial values from the bean and sets everything to null
+	 */
+	@Override
+	public void removeDefaultValues() {
+		profile = null; 
+	}
 }

@@ -21,8 +21,8 @@ public class DateTimeUpgraded {
 				return DateUtils.stringToDate(valeur);
 			}
 		} catch (Exception e) {
+			return null;
 		}
-		return null;
 	}
 
 	public Time getTime()
@@ -34,8 +34,8 @@ public class DateTimeUpgraded {
 				return DateUtils.stringToTime(valeur);
 			}
 		} catch (Exception e) {
+			return null;
 		}
-		return null;
 	}
 
 	public Timestamp getTimestamp()
@@ -47,7 +47,7 @@ public class DateTimeUpgraded {
 				return DateUtils.stringToTimestamp(valeur);
 			}
 		} catch (Exception e) {
+			return null;
 		}
-		return null;
 	}
 }

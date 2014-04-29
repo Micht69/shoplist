@@ -1,25 +1,24 @@
 package fr.logica.db;
 
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
 import java.util.List;
 
 import fr.logica.business.Action;
 import fr.logica.business.Constants;
-import fr.logica.business.Context;
 import fr.logica.business.DomainLogic;
 import fr.logica.business.Entity;
 import fr.logica.business.EntityField;
 import fr.logica.business.EntityManager;
 import fr.logica.business.EntityModel;
+import fr.logica.business.FunctionalException;
 import fr.logica.business.Key;
 import fr.logica.business.Link;
 import fr.logica.business.LinkModel;
-import fr.logica.business.Results;
+import fr.logica.business.MessageUtils;
 import fr.logica.business.TechnicalException;
-import fr.logica.db.DbFactory;
-import fr.logica.db.DbManager;
-import fr.logica.db.DbQuery;
+import fr.logica.business.context.RequestContext;
 import fr.logica.db.DbQuery.Join;
 import fr.logica.reflect.DomainUtils;
 
@@ -41,13 +40,11 @@ public class DbEntity {
 	 * @throws DbException
 	 *             Exception thrown if an error occurs.
 	 */
-
-	public Entity getRef(Entity e, LinkModel linkModel, Context ctx) throws DbException {
+	public Entity getRef(Entity e, LinkModel linkModel, RequestContext ctx) throws DbException {
 		Key foreignKey = e.getForeignKey(linkModel.getKeyName());
 		if (!foreignKey.isFull()) {
 			return null;
 		}
-		// FIXME we assume that target key is the primary key !
 		Key primaryKey = new Key(linkModel.getRefEntityName());
 		primaryKey.setValue(foreignKey);
 		return get(linkModel.getRefEntityName(), primaryKey, ctx);
@@ -66,25 +63,25 @@ public class DbEntity {
 	 * @throws DbException
 	 *             Exception thrown if an error occurs.
 	 */
-
-	public Entity get(String domainName, Key primaryKey, Context ctx) throws DbException {
+	public Entity get(String domainName, Key primaryKey, RequestContext ctx) throws DbException {
 		if (primaryKey == null || domainName == null) {
 			throw new TechnicalException("Unable to find domain object of class " + domainName + " for primary key : " + primaryKey);
 		}
 		DbQuery dbQuery = DB.createQuery(ctx, domainName, "T1");
 		dbQuery.addCondKey(primaryKey, "T1");
-		DbManager mgr = null;
 		Entity e = null;
+		DbManager mgr = new DbManager(ctx, dbQuery);
 		try {
-			mgr = new DbManager(ctx, dbQuery);
-
 			if (mgr.next()) {
 				e = mgr.getEntity("T1", DomainUtils.newDomain(domainName), ctx);
 			}
 		} finally {
-			if (null != mgr) {
-				mgr.close();
-			}
+			mgr.close();
+		}
+		if (e != null) {
+			Key initialKey = new Key(e.getPrimaryKey().getModel());
+			initialKey.setValue(e.getPrimaryKey());
+			e.setInitialKey(initialKey);
 		}
 		return e;
 	}
@@ -99,14 +96,13 @@ public class DbEntity {
 	 * @throws DbException
 	 *             Exception thrown if an error occurs or if entity already exists in database
 	 */
-
-	public void insert(Entity entity, Context ctx) throws DbException {
+	public void insert(Entity entity, RequestContext ctx) throws DbException {
 		DbManagerUpdatable dbMgr = null;
 
 		try {
-			DbManagerUpdatable.fillAutoIncrement(entity, ctx.getConnection());
+			DbManagerUpdatable.fillAutoIncrement(entity, ctx);
 
-			DbQuery query = DB.createQuery(ctx, entity.$_getName(), "T01");
+			DbQuery query = DB.createQuery(ctx, entity.name(), "T01");
 			query.addCondKey(entity.getPrimaryKey(), "T01");
 			query.setForUpdate(true);
 
@@ -132,22 +128,24 @@ public class DbEntity {
 	 * @throws DbException
 	 *             Exception thrown if an error occurs or if entity does not exists in database
 	 */
-
-	public void update(Entity entity, Context ctx) throws DbException {
+	public void update(Entity entity, RequestContext ctx) throws DbException {
 		DbManagerUpdatable dbMgr = null;
 
 		try {
-			DbManagerUpdatable.fillAutoIncrement(entity, ctx.getConnection());
+			DbManagerUpdatable.fillAutoIncrement(entity, ctx);
 
-			DbQuery query = DB.createQuery(ctx, entity.$_getName(), "T01");
-			query.addCondKey(entity.getPrimaryKey(), "T01");
+			DbQuery query = DB.createQuery(ctx, entity.name(), "T01");
+			if (entity.getInitialKey() != null) {
+				query.addCondKey(entity.getInitialKey(), "T01");
+			} else {
+				query.addCondKey(entity.getPrimaryKey(), "T01");
+			}
 			query.setForUpdate(true);
 
 			dbMgr = new DbManagerUpdatable(ctx, query);
 			if (dbMgr.rs.next()) {
 				dbMgr.updateRow(entity);
 			}
-
 		} catch (SQLException sqlEx) {
 			throw new DbException(sqlEx.getMessage(), sqlEx);
 		} finally {
@@ -166,15 +164,18 @@ public class DbEntity {
 	 *            Current context
 	 * @return <code>true</code> if domain object has been inserted, <code>false</code> if it has been updated.
 	 */
-
-	public boolean persist(Entity domain, Context ctx) throws DbException {
+	public boolean persist(Entity domain, RequestContext ctx) throws DbException {
 		DbManagerUpdatable dbMgr = null;
 
 		try {
-			DbManagerUpdatable.fillAutoIncrement(domain, ctx.getConnection());
+			DbManagerUpdatable.fillAutoIncrement(domain, ctx);
 
-			DbQuery query = DB.createQuery(ctx, domain.$_getName(), "T01");
-			query.addCondKey(domain.getPrimaryKey(), "T01");
+			DbQuery query = DB.createQuery(ctx, domain.name(), "T01");
+			if (domain.getInitialKey() != null) {
+				query.addCondKey(domain.getInitialKey(), "T01");
+			} else {
+				query.addCondKey(domain.getPrimaryKey(), "T01");
+			}
 			query.setForUpdate(true);
 
 			dbMgr = new DbManagerUpdatable(ctx, query);
@@ -185,9 +186,7 @@ public class DbEntity {
 				dbMgr.insertRow(domain);
 				return true;
 			}
-
 		} catch (SQLException sqlEx) {
-			System.out.println(domain.$_getName());
 			throw new DbException(sqlEx.getMessage(), sqlEx);
 		} finally {
 			if (null != dbMgr) {
@@ -210,9 +209,8 @@ public class DbEntity {
 	 * @throws DbException
 	 *             Exception thrown if an error occurs.
 	 */
-
-	public void persistAssociations(Entity baseBean, String linkName, List<Key> selectedKeys, Context ctx) throws DbException {
-		Link link = baseBean.getLink(linkName);
+	public void persistAssociations(Entity baseBean, String linkName, List<Key> selectedKeys, RequestContext ctx) throws DbException {
+		Link link = baseBean.getBackRef(linkName);
 		EntityModel entityModel = EntityManager.getEntityModel(link.getModel().getEntityName());
 		String associatedLinkName = entityModel.getAssociatedLink(linkName);
 		String associatedKeyName = entityModel.getLinkModel(associatedLinkName).getKeyName();
@@ -237,12 +235,12 @@ public class DbEntity {
 	 * @throws DbException
 	 *             Exception thrown if an error occurs.
 	 */
-	public boolean remove(Entity entity, Context ctx) throws DbException {
+	public boolean remove(Entity entity, RequestContext ctx) throws DbException {
 		DbManagerUpdatable dbMgr = null;
 
 		try {
 			boolean removed = false;
-			DbQuery query = DB.createQuery(ctx, entity.$_getName(), "T01");
+			DbQuery query = DB.createQuery(ctx, entity.name(), "T01");
 			query.addCondKey(entity.getPrimaryKey(), "T01");
 			query.setForUpdate(true);
 			dbMgr = new DbManagerUpdatable(ctx, query);
@@ -251,6 +249,9 @@ public class DbEntity {
 				removed = true;
 			}
 			return removed;
+		} catch (SQLIntegrityConstraintViolationException sqlEx) {
+			throw new TechnicalException(MessageUtils.getInstance()
+					.getMessage("db.remove.error.constraint") + sqlEx.getMessage());
 		} catch (SQLException sqlEx) {
 			throw new DbException(sqlEx.getMessage(), sqlEx);
 		} finally {
@@ -274,8 +275,8 @@ public class DbEntity {
 	 * @throws DbException
 	 *             Exception thrown if an error occurs.
 	 */
-	public void removeAssociations(Entity baseBean, String linkName, List<Key> selectedKeys, Context ctx) throws DbException {
-		Link link = baseBean.getLink(linkName);
+	public void removeAssociations(Entity baseBean, String linkName, List<Key> selectedKeys, RequestContext ctx) throws DbException {
+		Link link = baseBean.getBackRef(linkName);
 		EntityModel entityModel = EntityManager.getEntityModel(link.getModel().getEntityName());
 		String associatedLinkName = entityModel.getAssociatedLink(linkName);
 		String associatedKeyName = entityModel.getLinkModel(associatedLinkName).getKeyName();
@@ -296,8 +297,6 @@ public class DbEntity {
 	 *            Entity linked to the domain objects to retrieve.
 	 * @param linkName
 	 *            Name of the link between the given entity and the domain objects to retrieve.
-	 * @param queryName
-	 *            Name of the query to use.
 	 * @param ctx
 	 *            Current context.
 	 * @return A list of domain objects linked to the given entity or an empty list.
@@ -305,57 +304,24 @@ public class DbEntity {
 	 *             Exception thrown if an error occurs.
 	 */
 
-	public Results getList(Entity entity, String linkName, String queryName, Context ctx) throws DbException {
-		DbQuery dbQuery = getLinkQuery(entity, linkName, queryName, false, ctx);
-		DbManager dbManager = null;
-
-		try {
-			dbManager = new DbManager(ctx, dbQuery);
-			Results results = dbManager.toResults();
-			results.setResultSetCount(dbManager.count());
-			DomainLogic<? extends Entity> domainLogic = DomainUtils.getLogic(dbQuery.getMainEntity());
-			EntityModel eModel = EntityManager.getEntityModel(entity.$_getName());
-			LinkModel backRefModel = eModel.getBackRefModel(linkName);
-
-			for (DbQuery.Var var : dbQuery.getOutVars()) {
-				String columnKey = var.tableId + "_" + var.name;
-				results.getTitles().put(columnKey, domainLogic.internalUiListColumnCaption(dbQuery, backRefModel, columnKey, ctx));
-			}
-			return results;
-
-		} catch (Exception e) {
-			throw new DbException(e.getMessage(), e);
-		} finally {
-			if (null != dbManager) {
-				dbManager.close();
-			}
-		}
-	}
-
-	/**
-	 * Retrieves a list of domain objects linked to the given entity.
-	 * 
-	 * @param entity
-	 *            Entity linked to the domain objects to retrieve.
-	 * @param linkName
-	 *            Name of the link between the given entity and the domain objects to retrieve.
-	 * @param ctx
-	 *            Current context.
-	 * @return A list of domain objects linked to the given entity or an empty list.
-	 * @throws DbException
-	 *             Exception thrown if an error occurs.
-	 */
-
-	public List<Entity> getLinkedEntities(Entity entity, String linkName, Context ctx) throws DbException {
+	public List<Entity> getLinkedEntities(Entity entity, String linkName, RequestContext ctx) throws DbException {
 		DbQuery dbQuery = getLinkQuery(entity, linkName, null, true, ctx);
-		// dbQuery.setForUpdate(true);
+		String sourceEntityName = entity.getModel().getBackRefModel(linkName).getEntityName();
+		if (EntityManager.getEntityModel(sourceEntityName).isAssociative()) {
+			EntityModel assoModel = EntityManager.getEntityModel(sourceEntityName);
+			String associatedLinkName = assoModel.getAssociatedLink(linkName);
+			sourceEntityName = assoModel.getLinkModel(associatedLinkName)
+					.getRefEntityName();
+		}
+		((DomainLogic<Entity>) DomainUtils.getLogic(sourceEntityName)).internalUiListPrepare(dbQuery,
+				entity, linkName, ctx);
 		List<Entity> list = new ArrayList<Entity>();
 		DbManager dbManager = null;
 
 		try {
 			dbManager = new DbManager(ctx, dbQuery);
 			while (dbManager.next()) {
-				list.add(dbManager.getEntity(dbQuery.getMainEntityAlias(), DomainUtils.newDomain(dbQuery.getMainEntity().$_getName()), ctx));
+				list.add(dbManager.getEntity(dbQuery.getMainEntityAlias(), DomainUtils.newDomain(dbQuery.getMainEntity().name()), ctx));
 			}
 			return list;
 
@@ -369,15 +335,24 @@ public class DbEntity {
 
 	}
 
-	public List<Entity> getLinkedEntities(Entity entity, String linkName, String queryName, Context ctx) throws DbException {
+	public List<Entity> getLinkedEntities(Entity entity, String linkName, String queryName, RequestContext ctx) throws DbException {
 		DbQuery dbQuery = getLinkQuery(entity, linkName, queryName, queryName == null, ctx);
+		String sourceEntityName = entity.getModel().getBackRefModel(linkName).getEntityName();
+		if (EntityManager.getEntityModel(sourceEntityName).isAssociative()) {
+			EntityModel assoModel = EntityManager.getEntityModel(sourceEntityName);
+			String associatedLinkName = assoModel.getAssociatedLink(linkName);
+			sourceEntityName = assoModel.getLinkModel(associatedLinkName)
+					.getRefEntityName();
+		}
+		((DomainLogic<Entity>) DomainUtils.getLogic(sourceEntityName)).internalUiListPrepare(dbQuery,
+				entity, linkName, ctx);
 		List<Entity> list = new ArrayList<Entity>();
 		DbManager dbManager = null;
 
 		try {
 			dbManager = new DbManager(ctx, dbQuery);
 			while (dbManager.next()) {
-				list.add(dbManager.getEntity(dbQuery.getMainEntityAlias(), DomainUtils.newDomain(dbQuery.getMainEntity().$_getName()), ctx));
+				list.add(dbManager.getEntity(dbQuery.getMainEntityAlias(), DomainUtils.newDomain(dbQuery.getMainEntity().name()), ctx));
 			}
 			return list;
 
@@ -399,10 +374,10 @@ public class DbEntity {
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	public DbQuery getLinkQuery(Entity e, String linkName, String queryName, boolean selectAll, Context ctx) {
-		EntityModel eModel = EntityManager.getEntityModel(e.$_getName());
+	public DbQuery getLinkQuery(Entity e, String linkName, String queryName, boolean selectAll, RequestContext ctx) {
+		EntityModel eModel = EntityManager.getEntityModel(e.name());
 		if (!eModel.getBackRefNames().contains(linkName)) {
-			throw new TechnicalException("Link " + linkName + " is not a backRef of " + e.$_getName());
+			throw new TechnicalException("Link " + linkName + " is not a backRef of " + e.name());
 		}
 		LinkModel backRefModel = eModel.getBackRefModel(linkName);
 		Key foreignKey = EntityManager.buildForeignKey(backRefModel.getEntityName(), e.getPrimaryKey(), linkName);
@@ -427,22 +402,20 @@ public class DbEntity {
 		}
 		if (foreignKey != null && !foreignKey.isNull()) {
 			if (isAssociative) {
-				dbQuery.addEntity(backRefModel.getEntityName(), "ASSO_NN", Join.STRICT);
+				String associatedLinkName = EntityManager.getEntityModel(backRefModel.getEntityName()).getAssociatedLink(linkName);
+				dbQuery.addEntity(backRefModel.getEntityName(), "ASSO_NN", associatedLinkName, null, Join.STRICT);
 				dbQuery.addCondKey(foreignKey, "ASSO_NN");
 			} else {
 				dbQuery.addCondKey(foreignKey, dbQuery.getAlias(backRefModel.getEntityName()));
 			}
 		}
-		// FIXME bazint layer-sql Appeler la custom-class de l'entité cible ?
-		((DomainLogic<Entity>) DomainUtils.getLogic(backRefModel.getEntityName())).internalUiListPrepare(dbQuery,
-				DomainUtils.newDomain(backRefModel.getEntityName()), null, ctx);
 		return dbQuery;
 	}
 
-	public byte[] getLobContent(Context ctx, Entity entity, String propertyName) {
+	public byte[] getLobContent(RequestContext ctx, Entity entity, String propertyName) {
 		byte[] content = null;
 		String alias = "T01";
-		DbQuery query = new DbFactory().createDbQuery(ctx, entity.$_getName(), alias);
+		DbQuery query = new DbFactory().createDbQuery(ctx, entity.name(), alias);
 		query.addColumn(propertyName, alias);
 		query.addCondKey(entity.getPrimaryKey(), alias);
 		DbManager manager = null;
@@ -454,13 +427,13 @@ public class DbEntity {
 			if (manager.next()) {
 
 				if ("CLOB".equals(lobField.getSqlType())) {
-					String clob = manager.getClob(manager.getColumnIndex(entity.$_getName(), propertyName));
+					String clob = manager.getClob(manager.getColumnIndex(entity.name(), propertyName));
 					if (null != clob) {
 						content = clob.getBytes();
 					}
 
 				} else {
-					content = manager.getBlob(manager.getColumnIndex(entity.$_getName(), propertyName));
+					content = manager.getBlob(manager.getColumnIndex(entity.name(), propertyName));
 				}
 			}
 

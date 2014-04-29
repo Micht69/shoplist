@@ -13,6 +13,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -30,9 +31,8 @@ import fr.logica.business.Key;
 import fr.logica.business.KeyModel;
 import fr.logica.business.LinkModel;
 import fr.logica.business.TechnicalException;
-import fr.logica.db.DbConnection;
+import fr.logica.db.DbQuery;
 import fr.logica.db.DbConnection.Type;
-import fr.logica.db.DbQuery.Var;
 import fr.logica.reflect.DomainUtils;
 
 /**
@@ -69,6 +69,7 @@ public class DbQuery implements Cloneable {
 	public class Var {
 		public String name = null;
 		public String extern = null;
+		public String alias = null;
 		public String tableId = null;
 		public EntityField model = null;
 		public Visibility visibility = Visibility.VISIBLE;
@@ -90,6 +91,9 @@ public class DbQuery implements Cloneable {
 		}
 
 		public String getColumnAlias() {
+			if (alias != null) {
+				return alias;
+			}
 			return tableId + "_" + name;
 		}
 
@@ -160,17 +164,26 @@ public class DbQuery implements Cloneable {
 	private boolean forUpdate = false;
 	private String name;
 	private String whereClause = "";
+	private String havingClause = "";
 	private String whereJoin = "";
 	private String groupByClause = "";
 	private List<Table> tables = new ArrayList<DbQuery.Table>();
+
+	/** Variables for Where clause */
 	private List<Var> inVars = new ArrayList<DbQuery.Var>();
+	/** Variable for Select clause */
 	private List<Var> outVars = new ArrayList<DbQuery.Var>();
+	/** Constants for Select clause */
 	private List<Const> outConsts = new ArrayList<DbQuery.Const>();
+	/** Variables for Order By clause */
 	private List<SortVar> sortVars = new ArrayList<DbQuery.SortVar>();
+	/** Binded values for Conditions */
 	private List<Object> bindValues = new ArrayList<Object>();
+
 	private int maxRownum = -1;
 	private int minRownum = 0;
 	private boolean count = false;
+	private boolean isExposedAsWebservice = false;
 
 	private Map<String, Integer> indexes = new HashMap<String, Integer>();
 
@@ -240,7 +253,7 @@ public class DbQuery implements Cloneable {
 		}
 	}
 
-	private class Table {
+	private class Table implements Cloneable {
 		Entity entity = null;
 		String alias = null;
 		String extern = null;
@@ -252,12 +265,52 @@ public class DbQuery implements Cloneable {
 		protected Table(Entity classe, String as) {
 			entity = classe;
 			alias = as;
-			extern = classe.getModel().$_getDbName();
+			extern = classe.getModel().dbName();
 		}
 
 		@Override
 		public String toString() {
 			return "Table [entity=" + entity + ", alias=" + alias + "]";
+		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + ((extern == null) ? 0 : extern.hashCode());
+			result = prime * result + ((alias == null) ? 0 : alias.hashCode());
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			Table other = (Table) obj;
+			if (extern == null) {
+				if (other.extern != null)
+					return false;
+			} else if (!extern.equals(other.extern))
+				return false;
+			if (alias == null) {
+				if (other.alias != null)
+					return false;
+			} else if (!alias.equals(other.alias))
+				return false;
+			return true;
+		}
+
+		public Table clone() {
+			try {
+				Table table = (Table) super.clone();
+				return table;
+			} catch (CloneNotSupportedException e) {
+				throw new TechnicalException(e.getMessage(), e);
+			}
 		}
 	}
 
@@ -321,7 +374,11 @@ public class DbQuery implements Cloneable {
 	public static int IDENTIFIER_MAX_LEN = 30;
 
 	public String aliash(Var v) {
+		if (v.alias != null) {
+			return aliash(v.tableId + "_" + v.alias);
+		}
 		return aliash(v.tableId + "_" + v.model.getSqlName());
+
 	}
 
 	/**
@@ -353,13 +410,15 @@ public class DbQuery implements Cloneable {
 	public String toSelect() {
 		indexes.clear();
 		int index = 1;
-		String query = "SELECT ";
+		String query;
 		if (count) {
-			query = query.concat("COUNT(1) FROM (SELECT ");
-		} else if (maxRownum > 0) {
-			if (DbConnection.dbType == Type.ORACLE) {
-				query = query.concat("* FROM (SELECT ");
-			}
+			query = "SELECT COUNT(1) FROM (SELECT ";
+		} else if (maxRownum > 0 && DbConnection.getDbType() == Type.DB2) {
+			query = "SELECT * FROM (SELECT ";
+		} else if (maxRownum > 0 && DbConnection.getDbType() == Type.ORACLE) {
+			query = "SELECT * FROM (SELECT sub.*, rownum as ROWNUM_ROWNUM FROM ( SELECT ";
+		} else {
+			query = "SELECT ";
 		}
 
 		if (distinct) {
@@ -378,6 +437,8 @@ public class DbQuery implements Cloneable {
 				// all variables
 				query = query.concat(table.alias + ".*");
 			}
+		} else if (count && DbConnection.getDbType() != Type.ORACLE) {
+			query = query.concat(tables.get(0).alias).concat(".*");
 		} else {
 			// Sinon, on ne sélectionne que les variables définies dans
 			// outVars.
@@ -404,7 +465,7 @@ public class DbQuery implements Cloneable {
 				selectClause.append(aliash(outVar));
 			}
 			query = query.concat(selectClause.toString());
-			for (int i = 0; i < outConsts.size(); i++) {
+			for (int i = 0; i < outConsts.size() && !count; i++) {
 				Const c = outConsts.get(i);
 
 				if (i > 0 || outVars.size() > 0) {
@@ -413,22 +474,39 @@ public class DbQuery implements Cloneable {
 				query = query.concat("'" + c.value + "' as " + c.name);
 			}
 		}
+		if (DbConnection.getDbType() == Type.DB2) {
+			query = query.concat(", ROW_NUMBER() OVER() AS ROWNUM");
+		}
 
 		// **** from
 		query = query.concat(" FROM ");
-		for (int i = 0; i < tables.size(); i++) {
+		List<Table> tablesToAdd;
+
+		if (count) {
+			tablesToAdd = filterTables();
+		} else {
+			tablesToAdd = tables;
+		}
+		for (int i = 0; i < tablesToAdd.size(); i++) {
 			if (i > 0) {
-				if (DbConnection.dbType == Type.ORACLE) {
+				if (DbConnection.getDbType() == Type.ORACLE) {
 					query = query.concat(",");
 				}
 			}
-			Table table = tables.get(i);
+			Table table = tablesToAdd.get(i);
+
 			query = query.concat(" " + table.join + " ");
-			query = query.concat(table.extern + " " + table.alias);
+			String schemaName = table.entity.getModel().getDbSchemaName();
+			if (!schemaName.isEmpty()) {
+				query = query.concat(schemaName + "." + table.extern + " " + table.alias);
+			} else {
+				query = query.concat(table.extern + " " + table.alias);
+			}
 			if (table.joinCond.length() > 0) {
 				query = query.concat(" ON " + table.joinCond);
 			}
 		}
+
 		// **** where
 
 		String s = "";
@@ -451,27 +529,37 @@ public class DbQuery implements Cloneable {
 		}
 
 		// **** group by
+
 		if (groupByClause.length() == 0) {
 			addGroupByAll();
 		}
 		if (groupByClause.length() > 0) {
 			query = query.concat(" group by " + groupByClause);
+			if (havingClause.length() > 0) {
+				query = query.concat(" having " + havingClause);
+			}
 		}
 
 		// **** order by
-		if (sortVars.size() > 0) {
+
+		if (!count && sortVars.size() > 0) {
 			query = query.concat(" ORDER BY " + getOrderByClause());
 		}
 
+		// **** complement : closing the outer query
+
 		if (count) {
 			query = query.concat(")");
-			if (DbConnection.dbType != Type.ORACLE) {
+			if (DbConnection.getDbType() != Type.ORACLE) {
 				query = query.concat(" AS COUNT_SUBSELECT_ALIAS");
 			}
 		} else if (maxRownum > 0) {
-			if (DbConnection.dbType == Type.ORACLE) {
-				query = query.concat(") WHERE ROWNUM <= " + maxRownum);
-			} else if (DbConnection.dbType == Type.PostgreSQL) {
+			if (DbConnection.getDbType() == Type.ORACLE) {
+				/* the mixing of ROWNUM and ROWNUM_ROWNUM is intentional : the ROWNUM<=X clause is optimized by Oracle for performance */
+				query = query.concat(") sub ) WHERE ROWNUM_ROWNUM > " + minRownum + " AND ROWNUM <= " + maxRownum);
+			} else if (DbConnection.getDbType() == Type.DB2) {
+				query = query.concat(") AS LIM WHERE LIM.ROWNUM > " + minRownum + " AND LIM.ROWNUM <= " + (minRownum + maxRownum));
+			} else if (DbConnection.getDbType() == Type.PostgreSQL) {
 				query = query.concat(" LIMIT " + maxRownum + " OFFSET " + minRownum);
 			} else {
 				query = query.concat(" LIMIT " + minRownum + ", " + maxRownum);
@@ -492,6 +580,50 @@ public class DbQuery implements Cloneable {
 		}
 
 		return query;
+	}
+
+	private List<Table> filterTables() {
+		Set<Table> filteredTables = new LinkedHashSet<Table>(tables.size());
+
+		for (int i = 0; i < tables.size(); i++) {
+			Table table = tables.get(i);
+
+			if (null != table.join && table.join.indexOf("LEFT") > -1) {
+				String alias = table.alias;
+
+				if (whereClause.indexOf(alias) > -1 || whereJoin.indexOf(" " + alias + ".") > -1
+						|| includeTable(i, alias, new ArrayList<String>())) {
+
+					filteredTables.add(table);
+				}
+
+			} else {
+				filteredTables.add(table);
+			}
+		}
+		return new ArrayList<Table>(filteredTables);
+	}
+
+	private boolean includeTable(int i, String alias, List<String> stackTables) {
+		boolean result = false;
+
+		for (int j = 0; j < tables.size() && !result; j++) {
+			if (i == j) {
+				continue;
+			}
+			Table joinTable = tables.get(j);
+			String joinTableAlias = joinTable.alias;
+			if (null != joinTable.joinCond && joinTable.joinCond.indexOf(alias) > -1) {
+
+				if (whereClause.indexOf(joinTableAlias) > -1 || whereJoin.indexOf(" " + joinTableAlias + ".") > -1) {
+					return true;
+				} else if (!stackTables.contains(joinTableAlias)) {
+					stackTables.add(joinTableAlias);
+					result = includeTable(j, joinTableAlias, stackTables);
+				}
+			}
+		}
+		return result;
 	}
 
 	/**
@@ -661,7 +793,7 @@ public class DbQuery implements Cloneable {
 
 		String dstJoin = "";
 
-		if (DbConnection.dbType == Type.ORACLE) {
+		if (DbConnection.getDbType() == Type.ORACLE) {
 			if (bExtJoin) {
 				dstJoin = "(+)";
 			} else if (getPrivateTable(srcEntity) != null && getPrivateTable(srcEntity).isOuterJoined) {
@@ -691,13 +823,13 @@ public class DbQuery implements Cloneable {
 			String srcKeyExt = srcEntity.getModel().getField(srcKeyList.get(i)).getSqlName();
 			String dstKeyExt = e1.getModel().getField(dstKeyList.get(i)).getSqlName();
 
-			table.joinCond = table.joinCond.concat(srcId + "." + srcKeyExt + "=" + table.alias + "." + dstKeyExt + dstJoin);
+			table.joinCond = table.joinCond.concat(srcId + "." + srcKeyExt + " = " + table.alias + "." + dstKeyExt + dstJoin);
 
 			table.joinCondNull = table.joinCondNull.concat(table.alias + "." + dstKeyExt + " IS NULL");
 		}
 
 		// move join conditions to where clause
-		if (DbConnection.dbType == Type.ORACLE) {
+		if (DbConnection.getDbType() == Type.ORACLE) {
 			if (whereJoin.length() > 0) {
 				whereJoin = whereJoin.concat(" and ");
 			}
@@ -743,7 +875,7 @@ public class DbQuery implements Cloneable {
 	 */
 	private Table getTable(String className, String tableAlias) {
 		for (Table t : tables) {
-			if (t.entity.$_getName().equals(className) && (tableAlias == null || tableAlias.equals(t.alias))) {
+			if (t.entity.name().equals(className) && (tableAlias == null || tableAlias.equals(t.alias))) {
 				return t;
 			}
 		}
@@ -878,6 +1010,179 @@ public class DbQuery implements Cloneable {
 	}
 
 	/**
+	 * Ajout d'une condition 'existe dans' subquery
+	 * 
+	 * @param subquery
+	 *            - query de seléction de valeurs
+	 * @param bNot
+	 *            - true=négation (NOT EXISTS)
+	 */
+	public void addCondExists(DbQuery subquery, boolean bNot) {
+		String rel = "EXISTS";
+		if (bNot) {
+			rel = "NOT EXISTS";
+		}
+
+		if (whereClause.length() > 0 && !whereClause.trim().endsWith("(") && !whereClause.trim().endsWith("or")) {
+			whereClause = whereClause.concat(" and ");
+		}
+
+		whereClause = whereClause.concat(rel + " (" + subquery.toSelect() + ")");
+		// add binded values from subquery
+		List<Object> eBindValues = subquery.getBindValues();
+		for (Object obj : eBindValues) {
+			this.bindValues.add(obj);
+		}
+	}
+
+	/**
+	 * Ajout d'une condition sur 'group by' (clause 'having') Pour l'opérateur Between, utilisez addHavingCondBetween
+	 * 
+	 * @param colAlias
+	 *            - alias de la colonne
+	 * @param tableAlias
+	 *            - alias de la table
+	 * @param op
+	 *            - opérateur
+	 * @param valeur
+	 *            - valeur de comparaison
+	 */
+	public void addHavingCond(String colAlias, String tableAlias, SqlOp op, Object valeur) {
+		if (op == SqlOp.OP_BETWEEN) {
+			throw new TechnicalException("addHavingCond: illegal operator " + op.val + "Use addHavingCondBetween");
+		}
+		addHavingCond(colAlias, tableAlias, op, valeur, null);
+	}
+
+	/**
+	 * Ajout d'une condition 'between' sur 'group by' (clause 'having')
+	 * 
+	 * @param colAlias
+	 *            - alias de la colonne
+	 * @param tableAlias
+	 *            - alias de la table
+	 * @param valeur1
+	 *            - première valeur de comparaison
+	 * @param valeur2
+	 *            - seconde valeur de comparaison
+	 */
+	public void addHavingCondBetween(String colAlias, String tableAlias, Object valeur1, Object valeur2) {
+		addHavingCond(colAlias, tableAlias, SqlOp.OP_BETWEEN, valeur1, valeur2);
+	}
+
+	/**
+	 * Ajout d'une condition 'between' sur 'group by' (clause 'having')
+	 * 
+	 * @param colAlias
+	 *            - alias de la colonne
+	 * @param tableAlias
+	 *            - alias de la table
+	 * @param op
+	 *            - opérateur
+	 * @param valeur1
+	 *            - première valeur de comparaison
+	 * @param valeur2
+	 *            - seconde valeur de comparaison
+	 */
+	private void addHavingCond(String colAlias, String tableAlias, SqlOp op, Object valeur1, Object valeur2) {
+		if (colAlias == null) {
+			throw new TechnicalException("addHavingCond: unknown alias 'null' for table " + tableAlias);
+		}
+
+		// si la valeur est null et si on peut remplacer l'opérateur...
+		if (valeur1 == null || op == SqlOp.OP_ISNULL || op == SqlOp.OP_N_ISNULL) {
+			if (op == SqlOp.OP_EQUAL || op == SqlOp.OP_LIKE || op == SqlOp.OP_ISNULL) {
+				addHavingIsNull(colAlias, tableAlias, false);
+				return;
+			}
+			if (op == SqlOp.OP_N_EQUAL || op == SqlOp.OP_N_LIKE || op == SqlOp.OP_N_ISNULL) {
+				addHavingIsNull(colAlias, tableAlias, true);
+				return;
+			}
+		}
+
+		Var inVar = findOutVarByAlias(colAlias, tableAlias);
+		if (inVar == null) {
+			throw new TechnicalException("ToyDbQuery.addHavingCond: unknown column " + tableAlias + "." + colAlias);
+		}
+
+		if (havingClause.length() > 0 && !havingClause.trim().endsWith("(") && !havingClause.trim().endsWith("OR")) {
+			havingClause = havingClause.concat(" and ");
+		}
+
+		boolean noCase = caseInsensitiveSearch && "VARCHAR2".equals(inVar.model.getSqlType());
+		if (noCase) {
+			havingClause = havingClause.concat("UPPER");
+		}
+
+		havingClause = havingClause.concat("(" + aliash(inVar) + ")");
+
+		havingClause = havingClause.concat(" " + op.val + " ");
+		if (noCase) {
+			havingClause = whereClause.concat("UPPER");
+		}
+
+		String function = parseDefaultValue(inVar, valeur1);
+		if (null != function) {
+			havingClause = havingClause.concat(function);
+		} else {
+			havingClause = havingClause.concat("(?)");
+			bindValues.add(parse(inVar, valeur1));
+		}
+
+		if (op.val.equals(SqlOp.OP_BETWEEN.val)) {
+			function = parseDefaultValue(inVar, valeur2);
+			if (null != function) {
+				havingClause = havingClause.concat(" AND " + function);
+			} else {
+				havingClause = havingClause.concat(" AND (?)");
+				bindValues.add(parse(inVar, valeur2));
+			}
+		}
+	}
+
+	/**
+	 * Ajout une condition IS NULL/IS NOT NULL sur 'group by' (clause 'having')
+	 * 
+	 * @param colAlias
+	 *            Alias de la colonne
+	 * @param tableAlias
+	 *            Alias de la table
+	 * @param notNull
+	 *            vrai pour tester IS NOT NULL, faux pour tester IS NULL
+	 */
+	private void addHavingIsNull(String colAlias, String tableAlias, boolean notNull) {
+		String value = SqlOp.OP_ISNULL.val;
+		if (notNull) {
+			value = SqlOp.OP_N_ISNULL.val;
+		}
+
+		Var inVar = findOutVarByAlias(colAlias, tableAlias);
+		if (inVar == null) {
+			throw new TechnicalException("addHavingIsNull: unknown column " + tableAlias + "." + colAlias);
+		}
+		if (havingClause.length() > 0 && !havingClause.trim().endsWith("(") && !havingClause.trim().endsWith("OR")) {
+			havingClause = havingClause.concat(" AND ");
+		}
+
+		havingClause = havingClause.concat(inVar.tableId + "." + inVar.model.getSqlName() + " " + value);
+	}
+
+	/**
+	 * Ajoute une parenthése ouvrante en fin de clause HAVING
+	 */
+	public void startHavingGroupCondition() {
+		havingClause = havingClause.concat("(");
+	}
+
+	/**
+	 * Ajoute une parenthése en fin de clause HAVING
+	 */
+	public void endHavingGroupCondition() {
+		havingClause = havingClause.concat(")");
+	}
+
+	/**
 	 * Ajout d'une condition 'inclus dans' liste de valeurs
 	 * 
 	 * @param colAlias
@@ -887,8 +1192,7 @@ public class DbQuery implements Cloneable {
 	 * @param objs
 	 *            liste de valeurs
 	 */
-
-	public void addCondInList(String colAlias, String tableAlias, List<Object> objs) {
+	public void addCondInList(String colAlias, String tableAlias, List<?> objs) {
 		addCondInList(colAlias, tableAlias, objs, false);
 	}
 
@@ -904,8 +1208,7 @@ public class DbQuery implements Cloneable {
 	 * @param bNot
 	 *            true=négation (NOT IN)
 	 */
-
-	public void addCondInList(String colAlias, String tableAlias, List<Object> objs, boolean bNot) {
+	public void addCondInList(String colAlias, String tableAlias, List<?> objs, boolean bNot) {
 		if (objs == null || objs.size() == 0) {
 			// Liste vide. On ajoute pas de condition.
 			return;
@@ -942,7 +1245,7 @@ public class DbQuery implements Cloneable {
 		whereClause = whereClause.concat(")");
 	}
 
-	public void addCondLikeConcat(List<String> colAliases, List<String> tableAliases, String value, boolean bNot) {
+	public void addCondLikeConcat(List<String> colAliases, List<String> tableAliases, String paramValue, boolean bNot) {
 		String rel = "LIKE";
 		if (bNot) {
 			rel = "NOT LIKE";
@@ -966,20 +1269,21 @@ public class DbQuery implements Cloneable {
 		int nbreConcat = 2 * inVars.size() - 2;
 		for (int k = 0; k < inVars.size(); k++) {
 			Var inVarTmp = inVars.get(k);
+			String columnExpr;
+
+			if (inVarTmp.expr == null) {
+				columnExpr = inVarTmp.tableId + "." + inVarTmp.model.getSqlName();
+			} else {
+				columnExpr = inVarTmp.expr;
+			}
+			if (STRING_SQL_TYPES.contains(inVarTmp.model.getSqlType())) {
+				columnExpr = "UPPER(" + columnExpr + ")";
+			}
 			if (k < inVars.size() - 1) {
-				if (inVarTmp.expr == null) {
-					// Sauf sur entier
-					whereClause = whereClause.concat("CONCAT(" + inVarTmp.tableId + "." + inVarTmp.model.getSqlName() + ",");
-				} else {
-					whereClause = whereClause.concat("CONCAT(" + inVarTmp.expr + ",");
-				}
+				whereClause = whereClause.concat("CONCAT(" + columnExpr + ",");
 				whereClause = whereClause.concat("CONCAT(' ',");
 			} else {
-				if (inVarTmp.expr == null) {
-					whereClause = whereClause.concat("" + inVarTmp.tableId + "." + inVarTmp.model.getSqlName() + "");
-				} else {
-					whereClause = whereClause.concat("" + inVarTmp.expr + "");
-				}
+				whereClause = whereClause.concat(columnExpr);
 			}
 		}
 
@@ -987,8 +1291,8 @@ public class DbQuery implements Cloneable {
 			whereClause = whereClause.concat(")");
 		}
 		whereClause = whereClause.concat(")");
-		
-		value = value.toUpperCase();
+
+		String value = paramValue.toUpperCase();
 
 		if (!value.startsWith("%")) {
 			value = "%" + value;
@@ -1211,6 +1515,8 @@ public class DbQuery implements Cloneable {
 						throw new TechnicalException("La valeur \"" + sValue + "\" n'est pas correcte. ");
 					}
 				}
+			} else if ("CHAR".equals(var.model.getSqlType()) && sValue.length() > var.model.getSqlSize()) {
+				outValue = sValue.substring(0, var.model.getSqlSize());
 			}
 		}
 		return outValue;
@@ -1223,9 +1529,9 @@ public class DbQuery implements Cloneable {
 
 			if ("DATE".equals(var.model.getSqlType())) {
 
-				if (DbConnection.dbType == Type.ORACLE) {
+				if (DbConnection.getDbType() == Type.ORACLE) {
 					outValue = "SYSDATE";
-				} else if (DbConnection.dbType == Type.PostgreSQL) {
+				} else if (DbConnection.getDbType() == Type.PostgreSQL) {
 					outValue = "current_date";
 				} else {
 					outValue = "CURRENT_DATE";
@@ -1233,9 +1539,9 @@ public class DbQuery implements Cloneable {
 
 			} else if ("TIME".equals(var.model.getSqlType())) {
 
-				if (DbConnection.dbType == Type.ORACLE) {
+				if (DbConnection.getDbType() == Type.ORACLE) {
 					outValue = "SYSDATE";
-				} else if (DbConnection.dbType == Type.PostgreSQL) {
+				} else if (DbConnection.getDbType() == Type.PostgreSQL) {
 					outValue = "current_time";
 				} else {
 					outValue = "CURRENT_TIME";
@@ -1243,7 +1549,7 @@ public class DbQuery implements Cloneable {
 
 			} else if ("TIMESTAMP".equals(var.model.getSqlType())) {
 
-				if (DbConnection.dbType == Type.PostgreSQL) {
+				if (DbConnection.getDbType() == Type.PostgreSQL) {
 					outValue = "clock_timestamp()";
 				} else {
 					outValue = "CURRENT_TIMESTAMP";
@@ -1343,8 +1649,6 @@ public class DbQuery implements Cloneable {
 	 *            - nom de la variable
 	 * @param tableAlias
 	 *            - alias de l'entité
-	 * @param mdVar
-	 *            - mdVar ou null
 	 * @return Var instance if found
 	 */
 	private Var getInVar(String colAlias, String tableAlias) {
@@ -1413,7 +1717,7 @@ public class DbQuery implements Cloneable {
 	 *            Visibility
 	 */
 	public void addColumn(String varName, String tableAlias, Visibility v) {
-		addColumn(varName, tableAlias, null, Visibility.VISIBLE);
+		addColumn(varName, tableAlias, null, v);
 	}
 
 	/**
@@ -1447,6 +1751,7 @@ public class DbQuery implements Cloneable {
 		if (!outVars.contains(outVar)) {
 			outVars.add(outVar);
 		}
+		outVar.alias = as;
 		return outVar;
 	}
 
@@ -1546,6 +1851,23 @@ public class DbQuery implements Cloneable {
 	/**
 	 * Retourner une variable en sortie
 	 * 
+	 * @param alias
+	 *            alias de la colonne
+	 * @param tableAlias
+	 *            alias de la table (facultatif)
+	 */
+	private Var findOutVarByAlias(String alias, String tableAlias) {
+		for (Var var : outVars) {
+			if (var.alias != null && aliash(var).equals(aliash(tableAlias + "_" + var.alias))) {
+				return findOutVar(var.name, tableAlias);
+			}
+		}
+		throw new TechnicalException("findOutVar: '" + alias + "' invalid alias for table alias '" + tableAlias + "'");
+	}
+
+	/**
+	 * Retourner une variable en sortie
+	 * 
 	 * @param varName
 	 *            variable de classe
 	 * @param tableAlias
@@ -1610,7 +1932,7 @@ public class DbQuery implements Cloneable {
 		}
 		for (Table t : tables) {
 			if (alias.equals(t.alias)) {
-				return t.entity.$_getName();
+				return t.entity.name();
 			}
 		}
 		return null;
@@ -1635,7 +1957,7 @@ public class DbQuery implements Cloneable {
 			return null;
 		}
 		for (Table t : tables) {
-			if (entityName.equals(t.entity.$_getName())) {
+			if (entityName.equals(t.entity.name())) {
 				return t.alias;
 			}
 		}
@@ -1643,33 +1965,37 @@ public class DbQuery implements Cloneable {
 	}
 
 	@Override
-	public Object clone() throws CloneNotSupportedException {
-		DbQuery query = (DbQuery) super.clone();
-		query.tables = new ArrayList<DbQuery.Table>();
-		for (DbQuery.Table t : tables) {
-			query.tables.add(t);
+	public DbQuery clone() {
+		try {
+			DbQuery query = (DbQuery) super.clone();
+			query.tables = new ArrayList<DbQuery.Table>();
+			for (DbQuery.Table t : tables) {
+				query.tables.add(t.clone());
+			}
+			query.inVars = new ArrayList<DbQuery.Var>();
+			for (DbQuery.Var v : inVars) {
+				query.inVars.add(v);
+			}
+			query.outVars = new ArrayList<DbQuery.Var>();
+			for (DbQuery.Var v : outVars) {
+				query.outVars.add(v);
+			}
+			query.sortVars = new ArrayList<DbQuery.SortVar>();
+			for (DbQuery.SortVar v : sortVars) {
+				query.sortVars.add(v);
+			}
+			query.bindValues = new ArrayList<Object>();
+			for (Object o : bindValues) {
+				query.bindValues.add(o);
+			}
+			query.outConsts = new ArrayList<DbQuery.Const>();
+			for (DbQuery.Const c : outConsts) {
+				query.outConsts.add(c);
+			}
+			return query;
+		} catch (CloneNotSupportedException e) {
+			throw new TechnicalException(e.getMessage(), e);
 		}
-		query.inVars = new ArrayList<DbQuery.Var>();
-		for (DbQuery.Var v : inVars) {
-			query.inVars.add(v);
-		}
-		query.outVars = new ArrayList<DbQuery.Var>();
-		for (DbQuery.Var v : outVars) {
-			query.outVars.add(v);
-		}
-		query.sortVars = new ArrayList<DbQuery.SortVar>();
-		for (DbQuery.SortVar v : sortVars) {
-			query.sortVars.add(v);
-		}
-		query.bindValues = new ArrayList<Object>();
-		for (Object o : bindValues) {
-			query.bindValues.add(o);
-		}
-		query.outConsts = new ArrayList<DbQuery.Const>();
-		for (DbQuery.Const c : outConsts) {
-			query.outConsts.add(c);
-		}
-		return query;
 	}
 
 	/*************************************************************************/
@@ -1884,8 +2210,8 @@ public class DbQuery implements Cloneable {
 	/**
 	 * Ajouter une expression regroupante
 	 */
-	private Var addGroupColumn(String colAlias, String tableAlias, String expr, String asName) {
-		Var outVar = addColumn(colAlias, tableAlias, asName, Visibility.VISIBLE, expr);
+	private Var addGroupColumn(String varName, String tableAlias, String expr, String as) {
+		Var outVar = addColumn(varName, tableAlias, as, Visibility.VISIBLE, expr);
 		outVar.isGrouping = true;
 		return outVar;
 	}
@@ -1953,21 +2279,21 @@ public class DbQuery implements Cloneable {
 	/**
 	 * Ajout d'une colonne de comptage
 	 * 
-	 * @param colAlias
+	 * @param colName
 	 *            nom de variable
 	 * @param tableAlias
 	 *            alias de table, <code>null</code>=facultatif
-	 * @param bDistinct
-	 *            <code>true</code>=count(distinct COLONNE) <code>false</code>=count(COLONNE)
 	 * @param asName
-	 * <br>
+	 *            alias de la colonne
+	 * @param bDistinct
+	 *            <code>true</code>=count(distinct COLONNE) <code>false</code>=count(COLONNE) <br>
 	 */
-	public void addCount(String colAlias, String tableAlias, String asName, boolean bDistinct) {
+	public void addCount(String colName, String tableAlias, String asName, boolean bDistinct) {
 		Var outVar = null;
 		if (bDistinct) {
-			outVar = addGroupColumn(colAlias, tableAlias, "count(distinct {0})", asName);
+			outVar = addGroupColumn(colName, tableAlias, "count(distinct {0})", asName);
 		} else {
-			outVar = addGroupColumn(colAlias, tableAlias, "count({0})", asName);
+			outVar = addGroupColumn(colName, tableAlias, "count({0})", asName);
 		}
 		// override column type
 		outVar.model = new EntityField(outVar.model.getSqlName(), "INTEGER", 10, 0, Memory.NO, true, false);
@@ -2030,14 +2356,22 @@ public class DbQuery implements Cloneable {
 		String function = parseDefaultValue(outVar, valueIfNull);
 		String expr;
 		if (null != function) {
-			if (DbConnection.dbType == Type.ORACLE) {
+			if (DbConnection.getDbType() == Type.ORACLE) {
 				expr = "nvl({0}, " + function + ")";
+
+			} else if (DbConnection.getDbType() == Type.PostgreSQL) {
+				expr = "COALESCE({0}, " + function + ")";
+
 			} else {
 				expr = "ifnull({0}, " + function + ")";
 			}
 		} else {
-			if (DbConnection.dbType == Type.ORACLE) {
+			if (DbConnection.getDbType() == Type.ORACLE) {
 				expr = "nvl({0}, ?)";
+
+			} else if (DbConnection.getDbType() == Type.PostgreSQL) {
+				expr = "COALESCE({0}, ?)";
+
 			} else {
 				expr = "ifnull({0}, ?)";
 			}
@@ -2051,9 +2385,7 @@ public class DbQuery implements Cloneable {
 	 */
 
 	public void and() {
-		if (whereClause.length() > 0 && !whereClause.endsWith("(")) {
-			whereClause = whereClause.concat(" AND ");
-		}
+		whereClause = whereClause.concat(andOperator(whereClause)); 
 	}
 
 	/**
@@ -2061,9 +2393,43 @@ public class DbQuery implements Cloneable {
 	 */
 
 	public void or() {
-		if (whereClause.length() > 0 && !whereClause.endsWith("(")) {
-			whereClause = whereClause.concat(" OR ");
+		whereClause = whereClause.concat(orOperator(whereClause)); 
+	}
+
+	/**
+	 * Ajoute AND à la fin de clause HAVING
+	 */
+
+	public void havingAnd() {
+		havingClause = havingClause.concat(andOperator(havingClause)); 
+	}
+
+	/**
+	 * Ajoute OR à la fin de clause HAVING
+	 */
+
+	public void havingOr() {
+		havingClause = havingClause.concat(orOperator(havingClause)); 
+	}
+
+	/**
+	 * Ajoute AND à la fin de clause
+	 */
+	private String andOperator(String clause) {
+		if (clause.length() > 0 && !clause.endsWith("(")) {
+			return " AND ";
 		}
+		return ""; 
+	}
+
+	/**
+	 * Ajoute OR à la fin de clause
+	 */
+	private String orOperator(String clause) {
+		if (clause.length() > 0 && !clause.endsWith("(")) {
+			return " OR ";
+		}
+		return ""; 
 	}
 
 	/**
@@ -2071,7 +2437,7 @@ public class DbQuery implements Cloneable {
 	 */
 
 	public void startGroupCondition() {
-		whereClause = whereClause.concat("(");
+		whereClause = whereClause.concat("("); 
 	}
 
 	/**
@@ -2079,7 +2445,7 @@ public class DbQuery implements Cloneable {
 	 */
 
 	public void endGroupCondition() {
-		whereClause = whereClause.concat(")");
+		whereClause = whereClause.concat(")"); 
 	}
 
 	public boolean isForUpdate() {
@@ -2119,6 +2485,7 @@ public class DbQuery implements Cloneable {
 
 	/**
 	 * Lists all category break (order is important) for the query
+	 * 
 	 * @return Columns on which we need to break the results for display
 	 */
 	public List<String> getCategoryBreak() {
@@ -2130,12 +2497,20 @@ public class DbQuery implements Cloneable {
 		}
 		return categoryBreak;
 	}
-	
+
 	public int getMinRownum() {
 		return minRownum;
 	}
 
 	public void setMinRownum(int minRownum) {
 		this.minRownum = minRownum;
+	}
+
+	public boolean isExposedAsWebservice() {
+		return isExposedAsWebservice;
+	}
+
+	public void setExposedAsWebservice(boolean isExposedAsWebservice) {
+		this.isExposedAsWebservice = isExposedAsWebservice;
 	}
 }

@@ -2,8 +2,8 @@ package fr.logica.domain.logic;
 
 import java.util.Map;
 
-import fr.logica.business.Context;
 import fr.logica.business.DefaultLogic;
+import fr.logica.business.context.RequestContext;
 import fr.logica.db.DbManager;
 import fr.logica.db.DbQuery;
 import fr.logica.domain.models.ShopListLArticleModel;
@@ -17,7 +17,7 @@ import fr.logica.domain.objects.ShopListLArticle;
  */
 public class ShopListLogic extends DefaultLogic<ShopList> {
 	@Override
-	public Object uiListVarValue(Map<String, Object> vars, String queryName, String domainName, String varName, Context ctx) {
+	public Object uiListVarValue(Map<String, Object> vars, String queryName, String domainName, String varName, RequestContext ctx) {
 		if (ShopList.Var.ARTICLE_COUNT.equals(varName)) {
 			// Get article count
 			DbQuery artCount = new DbQuery(ShopListLArticleModel.ENTITY_NAME, "ART");

@@ -1,0 +1,22 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:f="http://java.sun.com/jsf/core" xmlns:hh="http://cgi.com/jsf/html">
+<h:body>
+<ui:composition>
+
+<li class="ui-menu-item">
+	<a href="#" class="ui-corner-all">
+		<span>
+			<h:panelGroup rendered="#{sessionCtrl.context.user != null}">
+                <h:outputLabel value="#{sessionCtrl.context.user.login}" /> 
+            </h:panelGroup>
+		</span>
+	</a>
+	<ul>
+
+		<li><h:commandLink action="#{sessionCtrl.logout}" onclick="return checkDirtyState(this);"><h:outputText value="#{labels['action.logout']}" /></h:commandLink></li>
+		<li><h:outputLink value="#" onclick="openScrollablePopUp('../#{viewCtrl.getHelp()}', 800, 600);">#{labels['action.help']}</h:outputLink></li>
+	</ul>
+</li>
+</ui:composition>
+</h:body>
+</html>

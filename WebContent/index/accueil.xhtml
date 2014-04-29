@@ -1,21 +1,17 @@
-<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:f="http://java.sun.com/jsf/core"
-				xmlns:h="http://java.sun.com/jsf/html" xmlns:ui="http://java.sun.com/jsf/facelets"
-				xmlns:logica="http://java.sun.com/jsf/composite/logica" xmlns:hh="http://cgi.com/jsf/html"
-				template="/templates/generic.xhtml">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd" >
 
-<ui:define name="title">Application - <h:outputText value="#{sessionCtrl.version}" /></ui:define>
-<ui:define name="body">
-<div class="actions">
-	<table style="width: 100%">
-		<tr>
-			<td style="display: none;">
 
-				<h:commandButton styleClass="btn_medium" value="#{labels['action.valider']}" action="#{sessionCtrl.redirectFromAccueil}" />
-
-				<script type="text/javascript">setTimeout('goToDefaultPage()', 100);</script>
-			</td>
-		</tr>
-	</table>
-</div>
-</ui:define>
-</ui:composition>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html">
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<script type="text/javascript" src="../static/scripts/jquery-1.9.1.min.js" />
+	<title>Application - <h:outputText value="SHOPLIST" /></title>
+</h:head>
+<h:body>
+	<h:form id="mainForm">
+		<h:commandButton styleClass="btn_medium" value="" action="#{sessionCtrl.redirectFromAccueil}" style="display:none;" />
+		<script type="text/javascript">$(document).ready(function() {$(".btn_medium").click();});</script>
+	</h:form>
+</h:body>
+</html>

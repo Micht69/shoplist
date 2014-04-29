@@ -2,53 +2,48 @@ package fr.logica.jsf.controller;
 
 import java.io.Serializable;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 
 import fr.logica.application.ApplicationUtils;
+import fr.logica.application.logic.ApplicationLogic;
+import fr.logica.application.logic.User;
 import fr.logica.business.Constants;
-import fr.logica.business.EntityManager;
 import fr.logica.business.FunctionalException;
 import fr.logica.business.MessageUtils;
-import fr.logica.business.TechnicalException;
-import fr.logica.reflect.DomainUtils;
+import fr.logica.business.context.RequestContext;
+import fr.logica.business.context.SessionContext;
+import fr.logica.business.controller.Request;
+import fr.logica.jsf.utils.JSFBeanUtils;
+import fr.logica.jsf.webflow.View;
 import fr.logica.security.AbstractSecurityManager;
-import fr.logica.security.ApplicationUser;
-import fr.logica.security.SecurityFunction;
 import fr.logica.security.SecurityUtils;
-import fr.logica.ui.ActionPage;
-import fr.logica.ui.ListPage;
-import fr.logica.ui.Page;
 
 public class SessionController implements Serializable {
 
 	/** serialUID */
 	private static final long serialVersionUID = -7648293653392389886L;
 
-	private ApplicationUser user;
-
 	private LoginForm form;
 
 	private static AbstractSecurityManager sm = SecurityUtils.getSecurityManager();
-
-	private Page<?> currentPage;
-
-	/** Access rights on lists **/
-	private Set<String> lists;
-
-	/** Access rights on Actions **/
-	private Map<String, Set<Integer>> actions;
 
 	/** Admin controls **/
 	private Boolean disableJS = Boolean.FALSE;
 	private Boolean disableCustom = Boolean.FALSE;
 	private Boolean disableCSS = Boolean.FALSE;
+
+	/** Session context */
+	private SessionContext context;
+
+	/** Application Controller */ 
+	private ApplicationController applicationCtrl;
 
 	/**
 	 * Gets application version number.
@@ -59,21 +54,13 @@ public class SessionController implements Serializable {
 		return MessageUtils.getServerProperty("version");
 	}
 
-	public Page<?> getPage() {
-		return currentPage;
-	}
-
-	public void setPage(Page<?> page) {
-		currentPage = page;
-	}
-
 	public String redirectFromAccueil() {
 		reset();
 		return getDefaultPage();
 	}
 
 	public String getDefaultPage() {
-		return ApplicationUtils.getApplicationLogic().getDefaultPage(user);
+		return ApplicationUtils.getApplicationLogic().getDefaultPage(context.getUser());
 	}
 
 	public String login() throws FunctionalException {
@@ -91,55 +78,41 @@ public class SessionController implements Serializable {
 			return null;
 		}
 
-		ApplicationUser user;
+		User user;
 		user = sm.getUser(login, password);
 
 		if (user != null) {
-			this.user = user;
-			initializeAccessRights();
+			context.setUser(user);
+			sm.initializeAccessRights(context);
+			if (context.getAttributes().get(Constants.PERMALINK_LOGIN_KEY) != null) {
+				Map<String, String> parameters = (Map<String, String>) context.getAttributes().get(Constants.PERMALINK_LOGIN_KEY);
+				context.getAttributes().remove(Constants.PERMALINK_LOGIN_KEY);
+				RequestContext requestContext = new RequestContext(context);
+				ViewController viewController = (ViewController) JSFBeanUtils.getManagedBean(ctx, "jsfCtrl");
+				viewController.setContext(requestContext);
+				try {
+					Request<?> request = new ApplicationLogic().getPermalinkRequest(parameters, requestContext);
+					return viewController.prepareView(request);
+				} catch (FunctionalException ex) {
+					ctx.addMessage(null, new FacesMessage(javax.faces.application.FacesMessage.SEVERITY_ERROR, ex.getMessage(),
+							null));
+					return getDefaultPage();
+				}
+			}
 			return getDefaultPage();
 		} else {
 			ctx.addMessage(null, new FacesMessage(javax.faces.application.FacesMessage.SEVERITY_ERROR, "Utilisateur / Mot de passe incorrect",
 					null));
 		}
 		// On reste sur la page de login.
-		return null;
+		return "/index/login.jsf?faces-redirect=true";
 	}
 
-	/**
-	 * This method is called to load everything needed in user session. For instance application access to lists and actions.
-	 */
-	public void initializeAccessRights() {
-		lists = new HashSet<String>();
-		actions = new HashMap<String, Set<Integer>>();
-
-		// No user => No access
-		if (user == null) {
-			return;
-		}
-
-		List<SecurityFunction> fonctions = sm.getSecurity(user);
-
-		for (SecurityFunction f : fonctions) {
-			if (f.getAction() != null) {
-				Set<Integer> act = actions.get(f.getEntite());
-				if (act == null) {
-					act = new HashSet<Integer>();
-				}
-				act.add(f.getAction());
-				actions.put(f.getEntite(), act);
-			} else {
-				lists.add(f.getQuery());
-			}
-		}
-	}
+	
 
 	public String logout() throws FunctionalException {
 		reset();
-		lists = new HashSet<String>();
-		actions = new HashMap<String, Set<Integer>>();
-		form = new LoginForm();
-		user = null;
+		context.setUser(null); 
 		return getDefaultPage();
 	}
 
@@ -148,96 +121,19 @@ public class SessionController implements Serializable {
 	 * 
 	 * @return
 	 */
-	public String getHelp() {
+	public String getHelp(String conversationId) {
 		String url = "static/aide.html";
-		if (currentPage instanceof ListPage) {
-			url += "#" + ((ListPage<?>) currentPage).getQueryName();
+		View currentView = getCurrentView(conversationId);
+		if (currentView != null) {
+			return url + currentView.getURLNoParam();
 		}
-		if (currentPage instanceof ActionPage) {
-			url += "#" + currentPage.getDomainName() + "_" + ((ActionPage<?>) currentPage).getAction().code;
-		}
-		return url.toString();
+		return url;
 	}
 
 	public void reset() {
-		currentPage = null;
+	
 	}
 
-	/**
-	 * Current user has rights to see the list queryName ?
-	 * 
-	 * @param queryName
-	 *            Query to display
-	 * @return booléen
-	 */
-	public boolean isListRendered(String queryName) {
-		if (lists != null && lists.contains(queryName)) {
-			return true;
-		}
-		return sm.disableSecurity();
-	}
-
-	/**
-	 * Access right on an action
-	 * 
-	 * @param entityName
-	 *            Action entity
-	 * @param action
-	 *            Action code
-	 * @return booléen true if current user has access and that it's not inside a display action
-	 */
-	public boolean isActionRendered(String entityName, int action) {
-		if (currentPage instanceof ActionPage) {
-			if (((ActionPage<?>) currentPage).getAction().type == Constants.DISPLAY) {
-				try {
-					if (action == Constants.SELECT
-							|| action == Constants.DETACH
-							|| EntityManager.getEntityModel(DomainUtils.createJavaName(entityName, false)).getAction(action).type != Constants.DISPLAY) {
-						return false;
-					}
-				} catch (TechnicalException ex) {
-					if (EntityManager.getEntityModel(entityName).getAction(action).type != Constants.DISPLAY) {
-						return false;
-					}
-				}
-			}
-		}
-		if (action == Constants.SELECT || action == Constants.DETACH) {
-			// If user is allowed to modify the target entity, he is able to modify its links.
-			if (isActionRendered(entityName, Constants.MODIFY)) {
-				return true;
-			}
-		}
-		if (actions != null && actions.get(entityName) != null && actions.get(entityName).contains(action)) {
-			return true;
-		}
-		return sm.disableSecurity();
-	}
-
-	public boolean isDisplayActionRendered(String entityName, int action) {
-		if (!isActionRendered(entityName, action) && isActionRendered(entityName, Constants.DISPLAY)) {
-			// L'action par défaut est désactivée. On a le droit d'afficher l'action de consultation. On remplace.
-			return true;
-		}
-		return false;
-	}
-
-	public boolean isNoDefaultActionRendered(String entityName, int action) {
-		if (!isActionRendered(entityName, action) && !isActionRendered(entityName, Constants.DISPLAY)) {
-			// L'action par défaut est désactivée et on a pas le droit d'afficher l'action de consultation.
-			// On affiche pas de lien d'action dans la liste.
-			return true;
-		}
-		return false;
-	}
-
-	public ApplicationUser getUser() {
-		return user;
-	}
-
-	public void setUser(ApplicationUser user) {
-		this.user = user;
-	}
 
 	public LoginForm getForm() {
 		if (form == null) {
@@ -280,7 +176,7 @@ public class SessionController implements Serializable {
 		return ctx.getAttributes();
 	}	
 
-		private Locale currentUserLocale;
+	private Locale currentUserLocale;
 
 	public Locale getCurrentUserLocale() {
 		if (currentUserLocale == null) {
@@ -349,6 +245,99 @@ public class SessionController implements Serializable {
 	public void setDisableCSS(Boolean disableCSS) {
 		this.disableCSS = disableCSS;
 	}
+	
+	
+	public SessionContext getContext() {
+		return context;
+	}
+
+	public void setContext(SessionContext context) {
+		this.context = context;
+	}
+	
+	
+	public ApplicationController getApplicationCtrl() {
+		return applicationCtrl;
+	}
+
+	public void setApplicationCtrl(ApplicationController applicationCtrl) {
+		this.applicationCtrl = applicationCtrl;
+	}
+
+	@PostConstruct
+	public void initializeContext() {
+		context = new SessionContext(applicationCtrl.getContext());
+	}
+
+	@PreDestroy
+	public void closeContext() {
+		if (context != null) {
+			context.close();
+		}
+	}
+	
+
+	private Map<String, View> conversations;
+	private Map<String, String> viewConversations;
+
+
+	private Map<String, View> getConversations() {
+		if (conversations == null) {
+			conversations = new HashMap<String, View>();
+		}
+		return conversations;
+	}
+
+	public String getNewConversationId() {
+		return String.valueOf(getConversations().size());
+	}
+
+	public Map<String, String> getViewConversations() {
+		if (viewConversations == null) {
+			viewConversations = new HashMap<String, String>();
+		}
+		return viewConversations;
+	}
+
+	public View getCurrentView(String cID) {
+		return getConversations().get(cID);
+	}
+
+	public void setCurrentView(String cID, View v) {
+		getConversations().put(cID, v);
+	}
+	
+	public View getView(String vID) {
+		return conversations.get(viewConversations.get(vID));
+	}
+
+	/** @deprecated use {@link AbstractSecurityManager#isActionRendered(String, int, SessionContext)} */
+	@Deprecated
+	public boolean isActionRendered(String entityName, Integer code) {
+		return sm.isActionRendered(entityName, code, context);
+	}
+
+	/** @deprecated use {@link AbstractSecurityManager#isListRendered(String, SessionContext)} */
+	@Deprecated
+	public boolean isListRendered(String queryName) {
+		return sm.isListRendered(queryName, context);
+	}
+
+	/** @deprecated use {@link AbstractSecurityManager#isDisplayActionRendered(String, int, SessionContext)} */
+	@Deprecated
+	public boolean isDisplayActionRendered(String entityName, int action) {
+		return sm.isDisplayActionRendered(entityName, action, context);
+	}
+
+	/** @deprecated use {@link AbstractSecurityManager#isNoDefaultActionRendered(String, int, SessionContext)} */
+	@Deprecated
+	public boolean isNoDefaultActionRendered(String entityName, int action) {
+		return sm.isNoDefaultActionRendered(entityName, action, context);
+	}
+	
+	/** @deprecated use {@link AbstractSecurityManager#isOptionMenuRendered(String, SessionContext)} */
+	@Deprecated
+	public boolean isOptionMenuRendered(String optMenuName) {
+		return sm.isOptionMenuRendered(optMenuName, context);
+	}
 }
-
-

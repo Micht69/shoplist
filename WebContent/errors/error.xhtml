@@ -9,8 +9,8 @@
 
 	<ui:define name="body">
 		<h2><h:outputText value="#{hh:label('messages', 'error.bug')}" /></h2><br />
-		
-		<h:panelGroup rendered="#{!jsfCtrl.pageIsActionPage()}">
+
+		<h:panelGroup>
 			<div class="form_container" id="contextVars">
 				<div class="form_title">
 					<h:outputText value="#{hh:label('labels', 'errorPage.contextVars')}" />
@@ -18,32 +18,14 @@
 				<table class="group_table">
 					<tr>
 						<td class="group_table_col_1">
-							Query : <h:outputText value="#{jsfCtrl.getListPage().queryName}"/><br />
+							<h:outputText value="#{jsfCtrl.viewInformation}" escape="false"/>
 							<br />
 						</td>
 					</tr>
 				</table>
 			</div>
 		</h:panelGroup>
-		<h:panelGroup rendered="#{jsfCtrl.pageIsActionPage()}">
-			<div class="form_container" id="contextVars">
-				<div class="form_title">
-					<h:outputText value="#{hh:label('labels', 'errorPage.contextVars')}" />
-				</div>
-				<table class="group_table">
-					<tr>
-						<td class="group_table_col_1">
-							Nom du domaine : <h:outputText value="#{jsfCtrl.getActionPage().domainName}"/><br />
-							Action : <h:outputText value="#{jsfCtrl.getActionPage().action}"/><br />
-							<ui:repeat var="key" value="#{jsfCtrl.getActionPage().keyList}">
-							Clé : <h:outputText value="#{key}"/><br />
-							</ui:repeat>
-							<br />
-						</td>
-					</tr>
-				</table>
-			</div>
-		</h:panelGroup>
+
 		
 		<h:panelGroup layout="none">
 			<div class="form_container" id="stackTraceGroup">

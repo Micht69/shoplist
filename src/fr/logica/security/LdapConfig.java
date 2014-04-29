@@ -9,5 +9,5 @@ public class LdapConfig {
 	public String userSubsearch = "true";
 	public String userLoginAttr = "cn";
 	public String userDnAttr = "dn";
-	public String userOtherAttr = null;
+	public String userOtherAttr = "";
 }

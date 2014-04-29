@@ -17,10 +17,12 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.sun.faces.util.Util;
 
-import fr.logica.business.Context;
-import fr.logica.business.FileContainer;
+import fr.logica.business.Entity;
+import fr.logica.business.Key;
+import fr.logica.business.context.RequestContext;
 import fr.logica.db.DB;
-import fr.logica.jsf.controller.JSFController;
+import fr.logica.jsf.controller.SessionController;
+import fr.logica.reflect.DomainUtils;
 
 /**
  * @author zuberl
@@ -46,22 +48,30 @@ public class ImageLinkResource extends Resource {
 	public InputStream getInputStream() throws IOException {
 		ByteArrayInputStream result = null;
 		if (mediaId != null) {
+			String[] mediaParts = mediaId.split("/");
+			if (mediaId.startsWith("ImageLink:")) {
+				mediaParts = mediaId.substring("ImageLink:".length()).split("/");
+			}
+			String entityName = mediaParts[0];
+			String jsfEncodedKey = mediaParts[1];
+			String varName = mediaParts[2];
+
 			byte[] content = null;
 			HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
-			JSFController bean = (JSFController) request.getSession().getAttribute("jsfCtrl");
-			fr.logica.business.FileContainer container = (FileContainer) bean.getEntity().invokeGetter(mediaId + "Container");
 
-			if (!container.isNull()) {
-				Context ctx = null;
-				try {
-					ctx = new Context(bean.getSessionCtrl().getUser());
-					content = DB.createDbEntity().getLobContent(ctx, bean.getEntity(), mediaId);
-					bean.getEntity().invokeSetter(mediaId, content);
-					container.setContent(content);
-				} finally {
-					if (ctx != null) {
-						ctx.close();
-					}
+			Entity e = DomainUtils.newDomain(entityName);
+			Key pk = new Key(entityName);
+			pk.setEncodedValue(jsfEncodedKey.replace("=", ":::"));
+			e.setPrimaryKey(pk);
+			SessionController sessionCtrl = (SessionController) request.getSession().getAttribute("sessionCtrl");
+
+			RequestContext ctx = null;
+			try {
+				ctx = new RequestContext(sessionCtrl.getContext());
+				content = DB.createDbEntity().getLobContent(ctx, e, varName);
+			} finally {
+				if (ctx != null) {
+					ctx.close();
 				}
 			}
 

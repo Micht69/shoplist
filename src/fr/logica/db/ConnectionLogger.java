@@ -1,8 +1,14 @@
 package fr.logica.db;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import fr.logica.db.ConnectionObject;
 
 /**
  * Log all Db Connections.
@@ -72,5 +78,18 @@ public class ConnectionLogger {
 				}
 			}
 		}
+		mapConnections.remove(id);
+	}
+	
+	public List<ConnectionObject> getListConnections() {
+		List<ConnectionObject> list = new ArrayList<ConnectionObject>();
+		list.addAll(getOpenedConnections().values());
+		Collections.sort(list, new Comparator<ConnectionObject>() {
+			@Override
+			public int compare(ConnectionObject o1, ConnectionObject o2) {
+				return o1.getId() - o2.getId();
+			}
+		});
+		return list;
 	}
 }

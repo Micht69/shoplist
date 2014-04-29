@@ -55,6 +55,15 @@ a img {
 	padding: 0px 0 52px 0;
 }
 
+.inner-content {
+	display: table-row-group;
+}
+
+#mainForm {
+	display: table;
+	width: 100%;
+}
+
 /******************************************************************************
 * Buttons
 ******************************************************************************/
@@ -64,7 +73,8 @@ input.dateTime ~ img, /* calendar button */
 a.link-actions,
 .iconAction,
 .uploadFile label.btn_medium span,
-.jw-widget .jw-footer button.ui-button /* buttons in wizard */ {
+.jw-widget .jw-footer button.ui-button, /* buttons in wizard */
+.fc-button {
 	margin: 0px;
 	padding: 4px 12px;
 	font-size: 14px;
@@ -78,6 +88,25 @@ a.link-actions,
 	-webkit-border-radius: 4px;
 	-moz-border-radius: 4px;
 	border-radius: 4px;
+}
+
+.fc-button-prev,
+.fc-button-next {
+	padding: 4px 0;
+}
+
+.fc-button-prev .ui-icon,
+.fc-button-next .ui-icon {
+	background-image: url(../img/jquery-ui/ui-icons_2e83ff_256x240.png);
+}
+
+.fc-button-prev.ui-state-hover .ui-icon,
+.fc-button-next.ui-state-hover .ui-icon {
+	background-image: url(../img/jquery-ui/ui-icons_ffffff_256x240.png);
+}
+
+.fc-header .fc-button {
+	margin-bottom: .25em;
 }
 
 .btn_icon > input {
@@ -99,7 +128,8 @@ a.link-actions:hover,
 .iconAction:hover,
 input.dateTime ~ img:hover,
 .uploadFile label.btn_medium span:hover,
-.jw-widget .jw-footer button.ui-button:hover {
+.jw-widget .jw-footer button.ui-button:hover,
+.fc-button:hover {
 	color: white;
 	background-color: rgb(0, 116, 202);
 }
@@ -113,15 +143,17 @@ button:active,input[type="button"]:active,input[type="submit"]:active,a.link-act
 }
 
 /* Buttons, [disabled] */
-button[disabled],input[type="button"][disabled],input[type="submit"][disabled]
-	{
+button[disabled],input[type="button"][disabled],input[type="submit"][disabled],
+.fc-button.ui-state-disabled {
 	color: #7b7b7b;
 	cursor: default;
 	background-color: white;
 	border-color: #7b7b7b;
 }
 
-
+.fc-button.ui-state-disabled {
+	opacity: 1;
+}
 
 /******************************************************************************
 * Fields
@@ -244,30 +276,42 @@ input.inline {
 }
 
 /* Block title description */
-.ui-accordion .ui-accordion-header td.accordion-title-description > * {
+.ui-accordion .ui-accordion-header td.accordion-title-description .criteria-desc,
+.ui-accordion .ui-accordion-header td.accordion-title-description .result-count,
+.ui-accordion .ui-accordion-header td.accordion-title-description .total-result-count {
 	width: auto;
 	text-align: right;
-	max-width: 725px;
+	max-width: 525px;
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	display: inline-block;
-	float: right;
 	margin: auto;
 	padding-left: 20px;
 }
-.ui-accordion .ui-accordion-header td.accordion-title-description > *:before {
+.ui-accordion .ui-accordion-header td.accordion-title-description .total-result-count {
+	padding-left: 5px;
+}
+.ui-accordion .ui-accordion-header td.accordion-title-description .criteria-desc:before,
+.ui-accordion .ui-accordion-header td.accordion-title-description .result-count:before {
+	color: rgb(0, 116, 202);
 	content:"(";
 }
-.ui-accordion .ui-accordion-header td.accordion-title-description > *:after {
+.ui-accordion .ui-accordion-header td.accordion-title-description .criteria-desc:after,
+.ui-accordion .ui-accordion-header td.accordion-title-description .total-result-count:after {
+	color: rgb(0, 116, 202);
 	content:")";
 }
-.ui-accordion .ui-accordion-header td.accordion-title-description > *:empty {
-	padding: 0px;
+.ui-accordion .ui-accordion-header td.accordion-title-description .criteria-desc:empty,
+.ui-accordion .ui-accordion-header td.accordion-title-description .total-result-count:empty {
+	padding-left: 0px;
 }
-.ui-accordion .ui-accordion-header td.accordion-title-description > *:empty:before,
-.ui-accordion .ui-accordion-header td.accordion-title-description > *:empty:after {
+.ui-accordion .ui-accordion-header td.accordion-title-description .criteria-desc:empty:before,
+.ui-accordion .ui-accordion-header td.accordion-title-description .criteria-desc:empty:after {
 	content:"";
+}
+.ui-accordion .ui-accordion-header td.accordion-title-description .results-nodata {
+	color: #F00;
 }
 
 /* Block content */
@@ -381,12 +425,12 @@ form > .actions {
 }
 
 /* Space between main blocks. Note that no padding is applied to the first block. */
-#mainForm > .group_table > tbody > tr > td {
+#mainForm > .inner-content > .group_table > tbody > tr > td {
 	padding-top: 20px;
 }
 
 /* Whole block (title plus content). The "form_container" can't be defined without a prefix, because a form_container is something different on list pages */
-#mainForm > .form_container, /* single block on a form page, for the simplest form pages  */
+#mainForm > .inner-content > .form_container, /* single block on a form page, for the simplest form pages  */
 .group_table .form_container, /* sequential blocks on form pages */
 .mainTable_container /* block for link lists */ {
 	border: 1px solid rgb(0, 116, 202);
@@ -396,7 +440,7 @@ form > .actions {
 }
 
 /* Whole block when reduced */
-#mainForm > .form_container.reduced,
+#mainForm > .inner-content > .form_container.reduced,
 .group_table .form_container.reduced,
 .mainTable_container.reduced {
 	border: none;
@@ -404,7 +448,7 @@ form > .actions {
 }
 
 /* Block titles */
-#mainForm > .form_container > .form_title, /* block title on single block  */
+#mainForm > .inner-content > .form_container > .form_title, /* block title on single block  */
 .group_table .form_container > .form_title, /* block title on sequential blocks */
 .mainTable_container > .table_title, /* block title on link lists */
 .lineTitle /* titles of group templates */ {
@@ -422,7 +466,7 @@ form > .actions {
 }
 
 /* Block contents */
-#mainForm > .form_container > .group_table, /* block content on single block */
+#mainForm > .inner-content > .form_container > .group_table, /* block content on single block */
 .group_table .form_container > .group_table, /* block content on sequential blocks */
 .mainTable_container>.table_container /* block content on link lists */ {
 	
@@ -545,4 +589,15 @@ div.ui-tabs div.ui-tabs-panel > table > tbody > tr > td > .form_container{
 /* Unused tab */
 .ui-tabs .ui-tabs-hide {
 	display: none !important;
+}
+
+.fc-header .fc-header-left,
+.fc-header tr:hover .fc-header-left,
+.fc-header .fc-header-center,
+.fc-header tr:hover .fc-header-center,
+.fc-header .fc-header-right,
+.fc-header tr:hover .fc-header-right {
+	border: none;
+	color: inherit;
+	background-color: inherit;
 }

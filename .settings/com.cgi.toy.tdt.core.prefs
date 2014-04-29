@@ -1,0 +1,4 @@
+com.cgi.toy.tdt.core.application=SHOPLIST
+com.cgi.toy.tdt.core.server=Local
+com.cgi.toy.tdt.core.target=JWEB_JSF2_SQL
+eclipse.preferences.version=1

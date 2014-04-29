@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import fr.logica.business.TechnicalException;
 import fr.logica.db.AbstractEntityQuery;
 import fr.logica.db.DbQuery;
 import fr.logica.db.DbQuery.Join;
@@ -19,19 +20,26 @@ public class ShopUserQuery extends AbstractEntityQuery {
 	/** Queries for entity ShopUser */
 	public static final Map<String, DbQuery> QUERIES;
 
+	/** Initialize internal query repository */
 	static { 
 		QUERIES = new HashMap<String, DbQuery>();	
 		
-		DbQuery SHOP_USER = new DbQuery("shopUser", "USR");
-		SHOP_USER.setName("SHOP_USER");
-		SHOP_USER.addColumn("login", "USR");
-		SHOP_USER.addColumn("name", "USR");
-		SHOP_USER.addColumn("profile", "USR");
-		SHOP_USER.addSortBy("login", "USR", "ASC");
-		QUERIES.put("SHOP_USER", SHOP_USER);	
+		// Initialization of query SHOP_USER
+		DbQuery shopUser = new DbQuery("shopUser", "USR");
+		shopUser.setName("SHOP_USER");
+		shopUser.addColumn("login", "USR");
+		shopUser.addColumn("name", "USR");
+		shopUser.addColumn("profile", "USR");
+		shopUser.addSortBy("login", "USR", "ASC");
+		QUERIES.put("SHOP_USER", shopUser);	
 
 	}
 	
+	/**
+	 * Gets a query from internal query cache
+	 * @param queryName query name
+	 * @return Cached query
+	 */
 	@Override
 	public DbQuery getQuery(String queryName) {
 		return QUERIES.get(queryName);
@@ -43,7 +51,7 @@ public class ShopUserQuery extends AbstractEntityQuery {
 		String QUERY_SHOP_USER = "SHOP_USER";
 	}
 	
-	/** Holder for the query entityes aliases */
+	/** Holder for the query entities aliases */
 	public interface Alias {
 		/** Aliases for query SHOP_USER */
 		public interface QUERY_SHOP_USER {
@@ -57,5 +65,16 @@ public class ShopUserQuery extends AbstractEntityQuery {
 	public Set<String> getQueryNames() {
 		return QUERIES.keySet();
 	}
+
+	/**
+	 * Returns a clone of DbQuery named SHOP_USER
+	 * 
+	 * @return clone of DbQuery named SHOP_USER
+	 */
+	public static DbQuery getShopUserQuery() {
+		return QUERIES.get(Query.QUERY_SHOP_USER).clone();
+	}
+
+
 }
 

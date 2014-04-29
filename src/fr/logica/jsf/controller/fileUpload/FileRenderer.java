@@ -24,7 +24,6 @@ import fr.logica.business.FileContainer;
 @FacesRenderer(componentFamily = "javax.faces.Input", rendererType = "javax.faces.File")
 public class FileRenderer extends TextRenderer {
 
-	private static final String EMPTY_STRING = "";
 	private static final Attribute[] INPUT_ATTRIBUTES = AttributeManager.getAttributes(AttributeManager.Key.INPUTTEXT);
 
 	@Override
@@ -87,7 +86,11 @@ public class FileRenderer extends TextRenderer {
 			throws ConverterException {
 
 		/* This component always returns a FileContainer object. */
-		return (submittedValue != EMPTY_STRING) ? submittedValue : null;
+		if (submittedValue instanceof String && ((String)submittedValue).isEmpty()) {
+			return null;
+		} else {
+			return submittedValue;
+		}
 	}
 
 }

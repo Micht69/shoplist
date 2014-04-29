@@ -18,6 +18,7 @@ import javax.faces.context.ResponseWriter;
 import javax.faces.render.FacesRenderer;
 import javax.faces.render.Renderer;
 
+import fr.logica.business.data.ScheduleEvent;
 import fr.logica.jsf.components.schedule.HtmlSchedule.PropertyKeys;
 
 @FacesRenderer(componentFamily = HtmlSchedule.COMPONENT_FAMILY, rendererType = ScheduleRenderer.RENDERER_TYPE)
@@ -57,7 +58,6 @@ public class ScheduleRenderer extends Renderer {
 			if (null != submittedEvent) {
 				event.setStart(submittedEvent.getStart());
 				event.setEnd(submittedEvent.getEnd());
-				event.setUpdated(true);
 			}
 			events.add(event);
 		}
@@ -68,7 +68,6 @@ public class ScheduleRenderer extends Renderer {
 		Map<String, Object> params = new HashMap<String, Object>();
 		Map<String, ScheduleEvent> events = new HashMap<String, ScheduleEvent>();
 		int idLength = clientId.length() + 1;
-		int eventLength = EVENT_KEY.length();
 
 		for (Entry<String, String> entry : requestParams.entrySet()) {
 
@@ -77,7 +76,6 @@ public class ScheduleRenderer extends Renderer {
 
 				if (key.startsWith(EVENT_KEY)) {
 					ScheduleEvent event = new ScheduleEvent();
-					event.setId(key.substring(eventLength));
 					int dashIndex = entry.getValue().indexOf('-');
 					event.setStart(new Date(Long.valueOf(entry.getValue().substring(0, dashIndex))));
 					event.setEnd(new Date(Long.valueOf(entry.getValue().substring(dashIndex + 1))));

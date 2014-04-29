@@ -13,25 +13,25 @@ import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
 import javax.faces.event.ActionEvent;
 
-import fr.logica.ui.Page;
+import fr.logica.jsf.webflow.View;
 
 @FacesComponent(UIBreadcrumbs.COMPONENT_ID)
 public class UIBreadcrumbs extends UICommand {
 
 	public static final String COMPONENT_ID = "cgi.faces.breadcrumbs";
 
-	private Page<?> page;
+	private View view;
 
 	private MethodExpression method;
 
 	private String onclick;
 
-	public Page<?> getPage() {
-		return page;
+	public View getView() {
+		return view;
 	}
 
-	public void setPage(Page<?> page) {
-		this.page = page;
+	public void setView(View view) {
+		this.view = view;
 	}
 
 	public MethodExpression getMethod() {
@@ -52,7 +52,7 @@ public class UIBreadcrumbs extends UICommand {
 
 	@Override
 	public void encodeBegin(FacesContext ctx) throws IOException {
-		page = (Page<?>) getAttributes().get("page");
+		view = (View) getAttributes().get("view");
 		method = (MethodExpression) getAttributes().get("method");
 		onclick = (String) getAttributes().get("onclick");
 
@@ -63,12 +63,12 @@ public class UIBreadcrumbs extends UICommand {
 		writer.writeAttribute("id", "breadCrumb", null);
 		writer.writeAttribute("class", "ariane", null);
 
-		if (page != null) {
+		if (view != null) {
 			writer.write("\n\t\t");
 			writeHiddenIndex(writer);
 
 			/* most of the fun is happening here */
-			writeBreadcrumbs(writer, page, 0);
+			writeBreadcrumbs(writer, view, 0);
 			writer.write("\n");
 		}
 		writer.endElement("div");
@@ -82,20 +82,20 @@ public class UIBreadcrumbs extends UICommand {
 		writer.endElement("input");
 	}
 
-	private void writeBreadcrumbs(ResponseWriter writer, Page<?> currentPage, int backIndex) throws IOException {
+	private void writeBreadcrumbs(ResponseWriter writer, View currentView, int backIndex) throws IOException {
 
 		/* Recursion on upper pages */
-		Page<?> nextPage = currentPage.getNextPage();
-		if (nextPage != null) {
-			writeBreadcrumbs(writer, nextPage, backIndex + 1);
+		View nextView = currentView.getNextView();
+		if (nextView != null) {
+			writeBreadcrumbs(writer, nextView, backIndex + 1);
 			writeSeparator(writer);
 		}
 
 		/* Working on current page */
-		writeCrumb(writer, currentPage, backIndex);
+		writeCrumb(writer, currentView, backIndex);
 	}
 
-	private void writeCrumb(ResponseWriter writer, Page<?> currentPage, int backIndex) throws IOException {
+	private void writeCrumb(ResponseWriter writer, View currentView, int backIndex) throws IOException {
 		writer.write("\n\t\t");
 		writer.startElement("span", null);
 		if (backIndex != 0) {
@@ -103,7 +103,7 @@ public class UIBreadcrumbs extends UICommand {
 			writer.writeAttribute("href", "#", null);
 			writer.writeAttribute("onclick", getJavascript(backIndex), null);
 		}
-		writer.write(currentPage.getTitle());
+		writer.write(currentView.getTitle());
 		if (backIndex != 0) {
 			writer.endElement("a");
 		}
@@ -145,7 +145,7 @@ public class UIBreadcrumbs extends UICommand {
 			String text = matcher.group(1);
 			String newExpression = "#{" + text + "(" + strClicked + ")}";
 			MethodExpression action = ExpressionFactory.newInstance().createMethodExpression(context.getELContext(), newExpression,
-					String.class, null);
+					String.class, new Class<?>[0]);
 
 			setActionExpression(action);
 			queueEvent(new ActionEvent(this));

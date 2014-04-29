@@ -6,7 +6,7 @@
         xmlns:f="http://java.sun.com/jsf/core">
 <f:view contentType="text/html" locale="#{sessionCtrl.currentUserLocale}">
 <f:metadata>
-    <f:event type="preRenderView" listener="#{jsfCtrl.executeMenuQueries()}" />
+    <f:event type="preRenderView" listener="#{menuCtrl.executeMenuQueries()}" />
     <ui:insert name="metadata"/>
 </f:metadata>
 <h:head>
@@ -15,34 +15,36 @@
 	<meta name="author" content="CGI" />
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<ui:insert name="meta"></ui:insert>
-	
+
 	<title><ui:insert name="title">Titre de la page</ui:insert></title>
 	<ui:insert name="head" />
-	
+
 	<!-- Stylesheets for jQuery elements -->
 	<link rel="stylesheet" type="text/css" href="../static/css/jquery-ui-1.8.8.custom.css" />
 	<link rel="stylesheet" type="text/css" href="../static/css/jquery-magnific-popup.css" /> 
-	
+
 	<!-- Stylesheets for other specific widgets -->
 	<link rel="stylesheet" type="text/css" href="../static/css/tabedit.css" />
-	
+	<link rel="stylesheet" type="text/css" href="../static/css/treeRightAccess.css" />
+
 	<!-- Layout stylesheets -->
 	<link rel="stylesheet" type="text/css" href="../static/css/global.css" />
 	<link rel="stylesheet" type="text/css" href="../static/css/menu.css" />
 	<link rel="stylesheet" type="text/css" href="../static/css/form.css" />
 	<link rel="stylesheet" type="text/css" href="../static/css/lists.css" />
-		
+
 	<link rel="stylesheet" type="text/css" media="print" href="../static/css/print.css" />
 	<link rel="stylesheet" type="text/css" href="../static/css/skin-base.css" />
 	<link rel="stylesheet" type="text/css" href="../static/css/skin-header-footer.css" />
 	<link rel="stylesheet" type="text/css" href="../static/css/skin-specifics.css" />
 	<link rel="stylesheet" type="text/css" media="print" href="../static/css/skin-print.css" />
+	<link rel="stylesheet" type="text/css" href="../static/css/responsive.css" />
 	<!-- Kept for compatibility, deprecated -->
 	<h:panelGroup rendered="#{!sessionCtrl.disableCSS}"><link rel="stylesheet" type="text/css" href="../static/css/custom.css" /></h:panelGroup>
-		
+
 	<link rel="icon" href="../static/img/favicon.ico" type="image/x-icon" />
 	<link rel="shortcut icon" href="../static/img/favicon.ico" type="image/x-icon" />
-	
+
 	<script type="text/javascript" src="../static/scripts/jquery-1.9.1.min.js" />
 	<script type="text/javascript" src="../static/scripts/jquery-migrate-1.1.0.js" />
 	<script type="text/javascript" src="../static/scripts/jquery-ui-1.10.0.custom.min.js" />
@@ -57,7 +59,7 @@
 	<h:panelGroup rendered="#{!sessionCtrl.disableJS}"><script type="text/javascript" src="../static/scripts/custom.js" /></h:panelGroup>
 	<script type="text/javascript" src="../static/scripts/tabedit.js" />
 	<script type="text/javascript" src="../static/scripts/k.min.js" />
-	
+
 	<h:outputScript library="javax.faces" name="jsf.js" />
 
 </h:head>
@@ -69,30 +71,54 @@
 	    <!-- Début du contenaire central -->
 	    <div class="content">
 		    <h:form id="mainForm" class="clear_fix">
-		
-		        <!-- Champ pour sauvegarder l'état sale. Immediate car doit être passé au serveur même si une erreur de validation survient. -->
-		        <h:inputHidden id="dirty" value="#{jsfCtrl.dirty}" immediate="true" />
-		        <!-- messages définis en bas sur certains écrans, à redéfinir si on en a besoin en haut  -->
-		        <h:messages layout="list" errorClass="message_error" styleClass="message" id="messages" />
-		
-		        <ui:insert name="body">Corps de la page</ui:insert>
+				<h:panelGroup layout="block" styleClass="inner-content">
+			        <!-- Champ pour sauvegarder l'état sale. Immediate car doit être passé au serveur même si une erreur de validation survient. -->
+			        <h:inputHidden id="dirty" value="#{jsfCtrl.dirty}" immediate="true" />
 
-				<div style="display: none;">
-					<h:outputText escape="false" value="#{jsfCtrl.customData}"></h:outputText>
-				</div>
-		
-				<h:panelGroup rendered="#{jsfCtrl.download != null}">
+			        <ui:insert name="body">Corps de la page</ui:insert>
+
 					<div style="display: none;">
-						<h:commandButton styleClass="btn_download" value="#{labels['action.valider']}" action="#{jsfCtrl.executeDownload}" />
-						<script type="text/javascript">setTimeout('downloadFile()', 100);</script>
-					</div>		
+						<h:outputText escape="false" value="#{jsfCtrl.customData}"></h:outputText>
+					</div>
+
+					<h:panelGroup rendered="#{jsfCtrl.getDownload() != null}">
+						<div style="display: none;">
+							<h:commandButton styleClass="btn_download" value="#{labels['action.valider']}" action="#{jsfCtrl.executeDownload}" />
+							<script type="text/javascript">setTimeout('downloadFile()', 100);</script>
+						</div>		
+					</h:panelGroup>
 				</h:panelGroup>
+
+				<!-- Messages are rendered AFTER mainForm has loaded all its components  -->
+		       	<h:panelGroup id="messageGroup" layout="block" styleClass="messages">
+		       		<h:messages layout="list" errorClass="message_error" styleClass="message" id="messages" />
+	       		</h:panelGroup>
 		    </h:form>
 	    </div>
 		<script type="text/javascript">$('input:radio').closest('td').addClass('td_radio');</script>
     	<!-- Fin du contenaire central -->
-    	
+
+    	<ui:include src="../includes/footer.xhtml" />
     </div>
+    <h:form id="conversationForm">
+    	<h:inputHidden id="conversation" value="#{jsfCtrl.conversation}" immediate="true" />
+    	<h:panelGroup id="newConversationWrapper">
+	    	<h:panelGroup id="newConversation" rendered="#{jsfCtrl.newConversation}">
+			    <script type="text/javascript">
+			    	window.name=<h:outputText value="#{jsfCtrl.conversation}" />
+			    </script>
+	    	</h:panelGroup>
+    	</h:panelGroup>
+	    <h:commandButton id="conversationButton" value="sendConversationId" style="display: none">
+	        <f:ajax listener="#{jsfCtrl.attachToConversation}" execute="conversation" render="newConversationWrapper"/>
+	    </h:commandButton>
+	    <script type="text/javascript">
+	    	$(document).ready(function() { 
+	    		$('input[id="conversationForm\\:conversation"]').val(window.name); 
+	    		$('input[id="conversationForm\\:conversationButton"]').click();
+	    	});</script>
+    </h:form>
+
 </h:body>
 </f:view>
 </html>

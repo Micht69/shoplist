@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Toy version="3.1.0">
+<Produits>
+<Produit TOY_PROD_CD="SSCH" TOY_PROD_LB="Sébastien" TOY_PROD_ORDRE="0"/>
+</Produits>
+<Apps>
+<App SAVE_CRITERIA="false" TOY_APPLI_COD="SHOPLIST" TOY_APPLI_DATABASEID="shoplist" TOY_APPLI_LIB="Shopping List" TOY_APPLI_LISTPAGESIZE="0" TOY_APPLI_ORDRE="0" TOY_APPLI_PROD="SSCH" TOY_APPLI_TREE="SHOPLIST" TOY_APPLI_VERSION_MAJ="1" TOY_APPLI_VERSION_MIN="0"/>
+</Apps>
+<Fonctions>
+<Application NAME="SHOPLIST"/>
+</Fonctions>
+<Entities>
+<MDEntity appName="SHOPLIST" datestamp="false" description="Article" devDescr="" extern="article" external="false" name="SHOP_ARTICLE" rKey="SHOP_ARTICLE_PK" readOnly="false" state="2" virtual="false">
+<MDVar caption="ID" declen="0" descr="ID" displayed="1" mdlClass="kellia.ref.ui.templates.ToyCompteur" memory="0" name="ID" nnull="true" searchVar="0" vType="K" varlen="10"/>
+<MDVar caption="Nom" declen="0" descr="NAME" displayed="1" mdlClass="kellia.ref.ui.templates.ToyString" memory="0" name="NAME" nnull="true" searchVar="1" vType="S" varlen="128"/>
+<MDVar caption="Description" declen="0" descr="DESCR" displayed="1" mdlClass="kellia.ref.ui.templates.ToyStringLong" memory="0" name="DESCR" nnull="false" searchVar="0" vType="S" varlen="500"/>
+<MDVar caption="Rayon" declen="0" descr="SHELF" displayed="1" mdlClass="kellia.ref.ui.templates.ToyString" memory="0" name="SHELF" nnull="true" searchVar="0" vType="S" varlen="10"/>
+<MDVar caption="Ean13" declen="0" descr="EAN13" displayed="1" mdlClass="kellia.ref.ui.templates.ToyString" memory="0" name="EAN13" nnull="false" searchVar="0" vType="S" varlen="13"/>
+<MDVar caption="Description" declen="0" descr="W$_DESC" displayed="1" mdlClass="kellia.ref.ui.templates.ToyStringLong" memory="4" name="W$_DESC" nnull="false" searchVar="0" sqlExpr="NAME" vType="S" varlen="128"/>
+<MDKey description="SHOP_ARTICLE_PK" name="SHOP_ARTICLE_PK" unik="true">
+<MDKeyVar name="ID" sortAsc="true"/>
+</MDKey>
+<MDKey description="Shelf" name="SHOP_ARTICLE_R_SHELF" unik="false">
+<MDKeyVar name="SHELF" sortAsc="true"/>
+</MDKey>
+<MDLinkRef descr="Rayon" name="SHOP_ARTICLE_L_SHELF" onDelDst="1" onUpdDst="2" rsClass="SHOP_ARTICLE" rsKey="SHOP_ARTICLE_R_SHELF" rtClass="SHOP_SHELF" rtKey="SHOP_SHELF_PK"/>
+<MDLinkRef descr="Article" name="SHOP_LIST_L_ARTICLE_L_ARTICLE" onDelDst="1" onUpdDst="2" rsClass="SHOP_LIST_L_ARTICLE" rsKey="SHOP_LIST_L_ARTICLE_ARTICLE_FK" rtClass="SHOP_ARTICLE" rtKey="SHOP_ARTICLE_PK"/>
+<Action ACTION="0" ALWAYSDISP="false" ICON="create.png" PRIORITE="0" RENTITY="SHOP_ARTICLE" TEXT="Create" TYPE_INPUT="NONE" TYPE_IOFLUX="INPUT" TYPE_PERSISTENCE="INSERT" TYPE_PROCESS="AUTO"/>
+<Action ACTION="2" ALWAYSDISP="false" ICON="edit.png" PRIORITE="0" RENTITY="SHOP_ARTICLE" TEXT="Modify" TYPE_INPUT="OBJECT_ONE" TYPE_IOFLUX="INPUT" TYPE_PERSISTENCE="UPDATE" TYPE_PROCESS="AUTO"/>
+<Action ACTION="4" ALWAYSDISP="false" ICON="delete.png" PRIORITE="0" RENTITY="SHOP_ARTICLE" TEXT="Delete" TYPE_INPUT="OBJECT_ONE" TYPE_IOFLUX="INPUT" TYPE_PERSISTENCE="DELETE" TYPE_PROCESS="AUTO"/>
+<Action ACTION="5" ALWAYSDISP="false" ICON="display.png" PRIORITE="0" RENTITY="SHOP_ARTICLE" TEXT="Display" TYPE_INPUT="OBJECT_ONE" TYPE_IOFLUX="INPUT" TYPE_PERSISTENCE="NONE" TYPE_PROCESS="AUTO"/>
+<Action ACTION="50" ALWAYSDISP="false" ICON="barcode.png" PRIORITE="0" RENTITY="SHOP_ARTICLE" RPAGE="SHOP_ARTICLE_CREATE" TEXT="Import using EAN13" TYPE_INPUT="NONE" TYPE_IOFLUX="INPUT" TYPE_PERSISTENCE="INSERT" TYPE_PROCESS="AUTO"/>
+</MDEntity>
+<MDEntity appName="SHOPLIST" datestamp="false" description="Liste de courses" devDescr="" extern="list" external="false" name="SHOP_LIST" rKey="SHOP_LIST_PK" readOnly="false" state="2" virtual="false">
+<MDVar caption="ID" declen="0" descr="ID" displayed="1" mdlClass="kellia.ref.ui.templates.ToyCompteur" memory="0" name="ID" nnull="true" searchVar="0" vType="K" varlen="10"/>
+<MDVar caption="Titre" declen="0" descr="NAME" displayed="1" mdlClass="kellia.ref.ui.templates.ToyString" memory="0" name="NAME" nnull="true" searchVar="0" vType="S" varlen="100"/>
+<MDVar caption="Créateur" declen="0" descr="USER" displayed="1" mdlClass="kellia.ref.ui.templates.ToyString" memory="0" name="USER" nnull="true" searchVar="0" vType="S" varlen="10"/>
+<MDVar caption="Date de création" declen="0" descr="CREATE_DATE" displayed="1" initialValue="*NOW" mdlClass="kellia.ref.ui.templates.ToyDate" memory="0" name="CREATE_DATE" nnull="false" searchVar="0" vType="D" varlen="0"/>
+<MDVar caption="Description" declen="0" descr="W$_DESC" displayed="1" mdlClass="kellia.ref.ui.templates.ToyString" memory="4" name="W$_DESC" nnull="false" searchVar="0" sqlExpr="NAME" vType="S" varlen="200"/>
+<MDVar caption="Nbr d'articles" declen="0" descr="ARTICLE_COUNT" displayed="1" mdlClass="kellia.ref.ui.templates.ToyInteger" memory="1" name="ARTICLE_COUNT" nnull="false" searchVar="0" vType="I" varlen="3"/>
+<MDKey description="User" name="SHOP_LIST_USER_FK" unik="false">
+<MDKeyVar name="USER" sortAsc="true"/>
+</MDKey>
+<MDKey description="SHOP_LIST_PK" name="SHOP_LIST_PK" unik="true">
+<MDKeyVar name="ID" sortAsc="true"/>
+</MDKey>
+<MDLinkRef descr="Utilisateur" name="SHOP_ARTICLE_L_USER" onDelDst="1" onUpdDst="2" rsClass="SHOP_LIST" rsKey="SHOP_LIST_USER_FK" rtClass="SHOP_USER" rtKey="SHOP_USER_PK"/>
+<MDLinkRef descr="Liste" name="SHOP_LIST_L_ARTICLE_L_LIST" onDelDst="2" onUpdDst="2" rsClass="SHOP_LIST_L_ARTICLE" rsKey="SHOP_LIST_L_ARTICLE_LIST_FK" rtClass="SHOP_LIST" rtKey="SHOP_LIST_PK"/>
+<Action ACTION="0" ALWAYSDISP="false" ICON="create.png" PRIORITE="0" RENTITY="SHOP_LIST" RPAGE="SHOP_LIST_CREATE" TEXT="Create" TYPE_INPUT="NONE" TYPE_IOFLUX="INPUT" TYPE_PERSISTENCE="INSERT" TYPE_PROCESS="AUTO"/>
+<Action ACTION="2" ALWAYSDISP="false" ICON="edit.png" PRIORITE="0" RENTITY="SHOP_LIST" TEXT="Modify" TYPE_INPUT="OBJECT_ONE" TYPE_IOFLUX="INPUT" TYPE_PERSISTENCE="UPDATE" TYPE_PROCESS="AUTO"/>
+<Action ACTION="4" ALWAYSDISP="false" ICON="delete.png" PRIORITE="0" RENTITY="SHOP_LIST" TEXT="Delete" TYPE_INPUT="OBJECT_ONE" TYPE_IOFLUX="INPUT" TYPE_PERSISTENCE="DELETE" TYPE_PROCESS="AUTO"/>
+<Action ACTION="5" ALWAYSDISP="false" ICON="display.png" PRIORITE="0" RENTITY="SHOP_LIST" TEXT="Display" TYPE_INPUT="OBJECT_ONE" TYPE_IOFLUX="INPUT" TYPE_PERSISTENCE="NONE" TYPE_PROCESS="AUTO"/>
+<Action ACTION="50" ALWAYSDISP="false" ICON="shopping.png" PRIORITE="0" RENTITY="SHOP_LIST" RPAGE="SHOP_LIST_SHOPPING" TEXT="Shopping" TYPE_INPUT="OBJECT_ONE" TYPE_IOFLUX="INPUT" TYPE_PERSISTENCE="UPDATE" TYPE_PROCESS="AUTO"/>
+</MDEntity>
+<MDEntity appName="SHOPLIST" datestamp="false" description="Ligne d'article" devDescr="" external="false" name="SHOP_LIST_L_ARTICLE" rKey="SHOP_LIST_L_ARTICLE_PK" readOnly="false" state="2" virtual="false">
+<MDVar caption="Liste" declen="0" descr="LIST_ID" displayed="1" mdlClass="kellia.ref.ui.templates.ToyInteger" memory="0" name="LIST_ID" nnull="true" searchVar="0" vType="I" varlen="10"/>
+<MDVar caption="Article" declen="0" descr="ARTICLE_ID" displayed="1" mdlClass="kellia.ref.ui.templates.ToyInteger" memory="0" name="ARTICLE_ID" nnull="true" searchVar="0" vType="I" varlen="10"/>
+<MDVar caption="Quantité" declen="0" descr="QUANTITY" displayed="1" initialValue="1" mdlClass="kellia.ref.ui.templates.ToyInteger" memory="0" name="QUANTITY" nnull="true" searchVar="0" vType="I" varlen="3"/>
+<MDVar caption="Statut" declen="0" defaultValue="BUY" descr="STATUS" displayed="1" mdlClass="kellia.ref.ui.templates.ToyCombo" memory="0" name="STATUS" nnull="false" searchVar="0" vType="S" varlen="5">
+<MDVarValue caption="A acheter" code="BUY" value="BUY"/>
+<MDVarValue caption="Acheté" code="DONE" value="DONE"/>
+</MDVar>
+<MDVar caption="Récapitulatif" declen="0" descr="DELETE_INFOS" displayed="1" mdlClass="kellia.ref.ui.templates.ToyStringLong" memory="1" name="DELETE_INFOS" nnull="false" searchVar="0" vType="S" varlen="1000"/>
+<MDKey description="PK" name="SHOP_LIST_L_ARTICLE_PK" unik="true">
+<MDKeyVar name="LIST_ID" sortAsc="true"/>
+<MDKeyVar name="ARTICLE_ID" sortAsc="true"/>
+</MDKey>
+<MDKey description="List FK" name="SHOP_LIST_L_ARTICLE_LIST_FK" unik="false">
+<MDKeyVar name="LIST_ID" sortAsc="true"/>
+</MDKey>
+<MDKey description="Article FK" name="SHOP_LIST_L_ARTICLE_ARTICLE_FK" unik="false">
+<MDKeyVar name="ARTICLE_ID" sortAsc="true"/>
+</MDKey>
+<MDLinkRef descr="Liste" name="SHOP_LIST_L_ARTICLE_L_LIST" onDelDst="2" onUpdDst="2" rsClass="SHOP_LIST_L_ARTICLE" rsKey="SHOP_LIST_L_ARTICLE_LIST_FK" rtClass="SHOP_LIST" rtKey="SHOP_LIST_PK"/>
+<MDLinkRef descr="Article" name="SHOP_LIST_L_ARTICLE_L_ARTICLE" onDelDst="1" onUpdDst="2" rsClass="SHOP_LIST_L_ARTICLE" rsKey="SHOP_LIST_L_ARTICLE_ARTICLE_FK" rtClass="SHOP_ARTICLE" rtKey="SHOP_ARTICLE_PK"/>
+<Action ACTION="0" ALWAYSDISP="false" ICON="create.png" NEXTACTION="51" PRIORITE="0" RENTITY="SHOP_LIST_L_ARTICLE" TEXT="Create" TYPE_INPUT="NONE" TYPE_IOFLUX="INPUT" TYPE_PERSISTENCE="INSERT" TYPE_PROCESS="AUTO">
+<Actionposs ACTION="0" ACT_SOURCE="SHOP_ARTICLES2" RENTITY="SHOP_LIST_L_ARTICLE"/>
+</Action>
+<Action ACTION="2" ALWAYSDISP="false" ICON="edit.png" PRIORITE="0" RENTITY="SHOP_LIST_L_ARTICLE" TEXT="Modify" TYPE_INPUT="OBJECT_ONE" TYPE_IOFLUX="INPUT" TYPE_PERSISTENCE="UPDATE" TYPE_PROCESS="AUTO">
+<Actionposs ACTION="2" ACT_SOURCE="SHOP_ARTICLES2" RENTITY="SHOP_LIST_L_ARTICLE"/>
+</Action>
+<Action ACTION="20" ALWAYSDISP="false" ICON="delete.png" PRIORITE="0" RENTITY="SHOP_LIST_L_ARTICLE" RPAGE="SHOP_LIST_L_ARTICLE_DELETE" TEXT="Delete" TYPE_INPUT="OBJECT_MULTIPLE" TYPE_IOFLUX="INPUT" TYPE_PERSISTENCE="DELETE" TYPE_PROCESS="AUTO">
+<Actionposs ACTION="20" ACT_SOURCE="SHOP_ARTICLES2" RENTITY="SHOP_LIST_L_ARTICLE"/>
+</Action>
+<Action ACTION="51" ALWAYSDISP="false" ICON="create.png" NEXTACTION="0" PRIORITE="0" RENTITY="SHOP_LIST_L_ARTICLE" TEXT="Create" TYPE_INPUT="NONE" TYPE_IOFLUX="INPUT" TYPE_PERSISTENCE="INSERT" TYPE_PROCESS="AUTO"/>
+<Action ACTION="60" ALWAYSDISP="false" ICON="mark.png" PRIORITE="0" RENTITY="SHOP_LIST_L_ARTICLE" TEXT="Mark done" TYPE_INPUT="OBJECT_MULTIPLE" TYPE_IOFLUX="NONE" TYPE_PERSISTENCE="UPDATE" TYPE_PROCESS="CUSTOM">
+<Actionposs ACTION="60" ACT_SOURCE="SHOP_ARTICLES_SHOPPING" RENTITY="SHOP_LIST_L_ARTICLE"/>
+</Action>
+</MDEntity>
+<MDEntity appName="SHOPLIST" datestamp="false" description="Rayon" devDescr="" extern="shelf" external="false" name="SHOP_SHELF" rKey="SHOP_SHELF_PK" readOnly="false" state="2" virtual="false">
+<MDVar caption="Code" declen="0" descr="CODE" displayed="1" mdlClass="kellia.ref.ui.templates.ToyString" memory="0" name="CODE" nnull="true" searchVar="0" vType="S" varlen="10"/>
+<MDVar caption="Nom" declen="0" descr="NAME" displayed="1" mdlClass="kellia.ref.ui.templates.ToyString" memory="0" name="NAME" nnull="true" searchVar="0" vType="S" varlen="100"/>
+<MDVar caption="Position" declen="0" descr="POSITION" displayed="1" mdlClass="kellia.ref.ui.templates.ToyInteger" memory="0" name="POSITION" nnull="true" searchVar="0" vType="I" varlen="3"/>
+<MDVar caption="Description" declen="0" descr="W$_DESC" displayed="1" mdlClass="kellia.ref.ui.templates.ToyString" memory="4" name="W$_DESC" nnull="false" searchVar="0" sqlExpr="NAME" vType="S" varlen="100"/>
+<MDKey description="SHOP_SHELF_PK" name="SHOP_SHELF_PK" unik="true">
+<MDKeyVar name="CODE" sortAsc="true"/>
+</MDKey>
+<MDLinkRef descr="Rayon" name="SHOP_ARTICLE_L_SHELF" onDelDst="1" onUpdDst="2" rsClass="SHOP_ARTICLE" rsKey="SHOP_ARTICLE_R_SHELF" rtClass="SHOP_SHELF" rtKey="SHOP_SHELF_PK"/>
+<Action ACTION="0" ALWAYSDISP="false" ICON="create.png" PRIORITE="0" RENTITY="SHOP_SHELF" TEXT="Create" TYPE_INPUT="NONE" TYPE_IOFLUX="INPUT" TYPE_PERSISTENCE="INSERT" TYPE_PROCESS="AUTO"/>
+<Action ACTION="2" ALWAYSDISP="false" ICON="edit.png" PRIORITE="0" RENTITY="SHOP_SHELF" TEXT="Modify" TYPE_INPUT="OBJECT_ONE" TYPE_IOFLUX="INPUT" TYPE_PERSISTENCE="UPDATE" TYPE_PROCESS="AUTO"/>
+<Action ACTION="4" ALWAYSDISP="false" ICON="delete.png" PRIORITE="0" RENTITY="SHOP_SHELF" TEXT="Delete" TYPE_INPUT="OBJECT_ONE" TYPE_IOFLUX="INPUT" TYPE_PERSISTENCE="DELETE" TYPE_PROCESS="AUTO"/>
+<Action ACTION="5" ALWAYSDISP="false" ICON="display.png" PRIORITE="0" RENTITY="SHOP_SHELF" TEXT="Display" TYPE_INPUT="OBJECT_ONE" TYPE_IOFLUX="INPUT" TYPE_PERSISTENCE="NONE" TYPE_PROCESS="AUTO"/>
+</MDEntity>
+<MDEntity appName="SHOPLIST" datestamp="false" description="Utilisateur" devDescr="" extern="user" external="false" name="SHOP_USER" rKey="SHOP_USER_PK" readOnly="false" state="2" virtual="false">
+<MDVar caption="Login" declen="0" descr="LOGIN" displayed="1" mdlClass="kellia.ref.ui.templates.ToyString" memory="0" name="LOGIN" nnull="true" searchVar="0" vType="S" varlen="10"/>
+<MDVar caption="Nom" declen="0" descr="NAME" displayed="1" mdlClass="kellia.ref.ui.templates.ToyString" memory="0" name="NAME" nnull="true" searchVar="0" vType="S" varlen="100"/>
+<MDVar caption="Mot de passe" declen="0" descr="PASSWORD" displayed="1" mdlClass="kellia.ref.ui.templates.ToyPassword" memory="0" name="PASSWORD" nnull="false" searchVar="0" vType="S" varlen="100"/>
+<MDVar caption="Profil" declen="0" defaultValue="USER" descr="PROFILE" displayed="1" mdlClass="kellia.ref.ui.templates.ToyCombo" memory="0" name="PROFILE" nnull="false" searchVar="0" vType="S" varlen="10">
+<MDVarValue caption="Utilisateur" code="USER" value="USER"/>
+<MDVarValue caption="Administrateur" code="ADMIN" value="ADMIN"/>
+<MDVarValue caption="Acheteur" code="BUYER" value="BUYER"/>
+</MDVar>
+<MDVar caption="Description" declen="0" descr="W$_DESC" displayed="1" mdlClass="kellia.ref.ui.templates.ToyString" memory="4" name="W$_DESC" nnull="false" searchVar="0" sqlExpr="NAME" vType="S" varlen="100"/>
+<MDKey description="SHOP_USER_PK" name="SHOP_USER_PK" unik="true">
+<MDKeyVar name="LOGIN" sortAsc="true"/>
+</MDKey>
+<MDLinkRef descr="Utilisateur" name="SHOP_ARTICLE_L_USER" onDelDst="1" onUpdDst="2" rsClass="SHOP_LIST" rsKey="SHOP_LIST_USER_FK" rtClass="SHOP_USER" rtKey="SHOP_USER_PK"/>
+<Action ACTION="0" ALWAYSDISP="false" ICON="create.png" PRIORITE="0" RENTITY="SHOP_USER" TEXT="Create" TYPE_INPUT="NONE" TYPE_IOFLUX="INPUT" TYPE_PERSISTENCE="INSERT" TYPE_PROCESS="AUTO"/>
+<Action ACTION="2" ALWAYSDISP="false" ICON="edit.png" PRIORITE="0" RENTITY="SHOP_USER" TEXT="Modify" TYPE_INPUT="OBJECT_ONE" TYPE_IOFLUX="INPUT" TYPE_PERSISTENCE="UPDATE" TYPE_PROCESS="AUTO"/>
+<Action ACTION="4" ALWAYSDISP="false" ICON="delete.png" PRIORITE="0" RENTITY="SHOP_USER" TEXT="Delete" TYPE_INPUT="OBJECT_ONE" TYPE_IOFLUX="INPUT" TYPE_PERSISTENCE="DELETE" TYPE_PROCESS="AUTO"/>
+<Action ACTION="5" ALWAYSDISP="false" ICON="display.png" PRIORITE="0" RENTITY="SHOP_USER" TEXT="Display" TYPE_INPUT="OBJECT_ONE" TYPE_IOFLUX="INPUT" TYPE_PERSISTENCE="NONE" TYPE_PROCESS="AUTO"/>
+</MDEntity>
+</Entities>
+<Queries>
+<OthersQueryFrom>
+<Application NAME="SHOPLIST"/>
+</OthersQueryFrom>
+<Application NAME="SHOPLIST">
+<Query APPNAME="SHOPLIST" DATECRE="2013-11-05" DESCR="Articles" EXPOSED_AS_WEBSERVICE="false" EXTERNAL="false" NAME="SHOP_ARTICLE" OUTPUT="D" USR_ACCESS="L" USR_ORD="Y" USR_SEL="Y">
+<QuerySelect ALIAS="ART" CUMULATIVE="false" DISP="N" NUME="0" RQUERY="SHOP_ARTICLE" RVAR="ID" SEL="Y" WRITABLE="true"/>
+<QuerySelect ALIAS="SH" CUMULATIVE="false" DISP="N" NUME="5" RQUERY="SHOP_ARTICLE" RVAR="POSITION" SEL="Y" WRITABLE="true"/>
+<QuerySelect ALIAS="SH" CUMULATIVE="false" DISP="Y" LIBELLE="Rayon" NUME="10" RQUERY="SHOP_ARTICLE" RVAR="NAME" SEL="Y" WRITABLE="true"/>
+<QuerySelect ALIAS="ART" CUMULATIVE="false" DISP="Y" NUME="15" RQUERY="SHOP_ARTICLE" RVAR="NAME" SEL="Y" WRITABLE="true"/>
+<QuerySelect ALIAS="ART" CUMULATIVE="false" DISP="Y" NUME="20" RQUERY="SHOP_ARTICLE" RVAR="EAN13" SEL="Y" WRITABLE="true"/>
+<QueryFrom ALIAS="ART" NUME="5" RENTITY="SHOP_ARTICLE" RQUERY="SHOP_ARTICLE" RTYPE="-1"/>
+<QueryFrom ALIAS="SH" NUME="10" RENTITY="SHOP_SHELF" RLINK="SHOP_ARTICLE_L_SHELF" RQUERY="SHOP_ARTICLE" RTYPE="-1"/>
+<QueryOgb ALIAS="SH" CAT="false" NUME="5" RQUERY="SHOP_ARTICLE" RVAR="NAME" VTYPE="OA"/>
+<QueryOgb ALIAS="ART" CAT="false" NUME="10" RQUERY="SHOP_ARTICLE" RVAR="NAME" VTYPE="OA"/>
+</Query>
+<Query APPNAME="SHOPLIST" DATECRE="2013-08-26" DESCR="Lignes d'article" EXPOSED_AS_WEBSERVICE="false" EXTERNAL="false" NAME="SHOP_ARTICLES2" OUTPUT="D" USR_ACCESS="L" USR_ORD="Y" USR_SEL="Y">
+<QuerySelect ALIAS="T1" CUMULATIVE="false" DISP="N" NUME="0" RQUERY="SHOP_ARTICLES2" RVAR="LIST_ID" SEL="N" WRITABLE="true"/>
+<QuerySelect ALIAS="T1" CUMULATIVE="false" DISP="N" NUME="1" RQUERY="SHOP_ARTICLES2" RVAR="ARTICLE_ID" SEL="Y" WRITABLE="true"/>
+<QuerySelect ALIAS="T3" CUMULATIVE="false" DISP="N" NUME="5" RQUERY="SHOP_ARTICLES2" RVAR="POSITION" SEL="Y" WRITABLE="true"/>
+<QuerySelect ALIAS="T3" CUMULATIVE="false" DISP="Y" LIBELLE="Rayon" NUME="10" RQUERY="SHOP_ARTICLES2" RVAR="NAME" SEL="Y" WRITABLE="true"/>
+<QuerySelect ALIAS="T4" CUMULATIVE="false" DISP="Y" LIBELLE="Article" NUME="15" RQUERY="SHOP_ARTICLES2" RVAR="NAME" SEL="Y" WRITABLE="true"/>
+<QuerySelect ALIAS="T1" CUMULATIVE="false" DISP="Y" NUME="20" RQUERY="SHOP_ARTICLES2" RVAR="QUANTITY" SEL="Y" WRITABLE="true"/>
+<QuerySelect ALIAS="T1" CUMULATIVE="false" DISP="Y" NUME="25" RQUERY="SHOP_ARTICLES2" RVAR="STATUS" SEL="Y" WRITABLE="true"/>
+<QueryFrom ALIAS="T1" NUME="5" RENTITY="SHOP_LIST_L_ARTICLE" RQUERY="SHOP_ARTICLES2" RTYPE="-1"/>
+<QueryFrom ALIAS="T4" NUME="20" RENTITY="SHOP_ARTICLE" RLINK="SHOP_LIST_L_ARTICLE_L_ARTICLE" RQUERY="SHOP_ARTICLES2" RTYPE="-1"/>
+<QueryFrom ALIAS="T3" NUME="25" RENTITY="SHOP_SHELF" RLINK="SHOP_ARTICLE_L_SHELF" RQUERY="SHOP_ARTICLES2" RTYPE="-1"/>
+<QueryOgb ALIAS="T1" CAT="false" NUME="5" RQUERY="SHOP_ARTICLES2" RVAR="STATUS" VTYPE="OA"/>
+<QueryOgb ALIAS="T3" CAT="false" NUME="10" RQUERY="SHOP_ARTICLES2" RVAR="POSITION" VTYPE="OA"/>
+<QueryOgb ALIAS="T4" CAT="false" NUME="15" RQUERY="SHOP_ARTICLES2" RVAR="NAME" VTYPE="OA"/>
+</Query>
+<Query APPNAME="SHOPLIST" DATECRE="2013-08-26" DESCR="Lignes d'article" EXPOSED_AS_WEBSERVICE="false" EXTERNAL="false" NAME="SHOP_ARTICLES_SHOPPING" OUTPUT="D" USR_ACCESS="L" USR_ORD="Y" USR_SEL="Y">
+<QuerySelect ALIAS="T1" CUMULATIVE="false" DISP="N" NUME="0" RQUERY="SHOP_ARTICLES_SHOPPING" RVAR="LIST_ID" SEL="N" WRITABLE="true"/>
+<QuerySelect ALIAS="T1" CUMULATIVE="false" DISP="N" NUME="1" RQUERY="SHOP_ARTICLES_SHOPPING" RVAR="ARTICLE_ID" SEL="Y" WRITABLE="true"/>
+<QuerySelect ALIAS="T3" CUMULATIVE="false" DISP="N" NUME="5" RQUERY="SHOP_ARTICLES_SHOPPING" RVAR="POSITION" SEL="Y" WRITABLE="true"/>
+<QuerySelect ALIAS="T3" CUMULATIVE="false" DISP="Y" LIBELLE="Rayon" NUME="10" RQUERY="SHOP_ARTICLES_SHOPPING" RVAR="NAME" SEL="Y" WRITABLE="true"/>
+<QuerySelect ALIAS="T4" CUMULATIVE="false" DISP="Y" LIBELLE="Article" NUME="15" RQUERY="SHOP_ARTICLES_SHOPPING" RVAR="NAME" SEL="Y" WRITABLE="true"/>
+<QuerySelect ALIAS="T1" CUMULATIVE="false" DISP="Y" NUME="20" RQUERY="SHOP_ARTICLES_SHOPPING" RVAR="QUANTITY" SEL="Y" WRITABLE="true"/>
+<QuerySelect ALIAS="T1" CUMULATIVE="false" DISP="Y" NUME="25" RQUERY="SHOP_ARTICLES_SHOPPING" RVAR="STATUS" SEL="Y" WRITABLE="true"/>
+<QueryFrom ALIAS="T1" NUME="5" RENTITY="SHOP_LIST_L_ARTICLE" RQUERY="SHOP_ARTICLES_SHOPPING" RTYPE="-1"/>
+<QueryFrom ALIAS="T4" NUME="20" RENTITY="SHOP_ARTICLE" RLINK="SHOP_LIST_L_ARTICLE_L_ARTICLE" RQUERY="SHOP_ARTICLES_SHOPPING" RTYPE="-1"/>
+<QueryFrom ALIAS="T3" NUME="25" RENTITY="SHOP_SHELF" RLINK="SHOP_ARTICLE_L_SHELF" RQUERY="SHOP_ARTICLES_SHOPPING" RTYPE="-1"/>
+<QueryWhere ALIAS="T1" OPER="=" RQUERY="SHOP_ARTICLES_SHOPPING" RVAR="STATUS" VALUE1="BUY"/>
+<QueryOgb ALIAS="T3" CAT="false" NUME="5" RQUERY="SHOP_ARTICLES_SHOPPING" RVAR="POSITION" VTYPE="OA"/>
+<QueryOgb ALIAS="T4" CAT="false" NUME="15" RQUERY="SHOP_ARTICLES_SHOPPING" RVAR="NAME" VTYPE="OA"/>
+</Query>
+<Query APPNAME="SHOPLIST" DATECRE="2013-08-30" DESCR="Liste des listes" EXPOSED_AS_WEBSERVICE="false" EXTERNAL="false" NAME="SHOP_LIST" OUTPUT="D" USR_ACCESS="L" USR_ORD="Y" USR_SEL="Y">
+<QuerySelect ALIAS="T1" CUMULATIVE="false" DISP="N" LIBELLE="ID" NUME="0" RQUERY="SHOP_LIST" RVAR="ID" SEL="N" WRITABLE="true"/>
+<QuerySelect ALIAS="T1" CUMULATIVE="false" DISP="Y" NUME="5" RQUERY="SHOP_LIST" RVAR="NAME" SEL="Y" WRITABLE="true"/>
+<QuerySelect ALIAS="T1" CUMULATIVE="false" DISP="Y" NUME="10" RQUERY="SHOP_LIST" RVAR="CREATE_DATE" SEL="Y" WRITABLE="true"/>
+<QuerySelect ALIAS="T1" CUMULATIVE="false" DISP="Y" NUME="15" RQUERY="SHOP_LIST" RVAR="ARTICLE_COUNT" SEL="Y" WRITABLE="true"/>
+<QueryFrom ALIAS="T1" NUME="5" RENTITY="SHOP_LIST" RQUERY="SHOP_LIST" RTYPE="-1"/>
+</Query>
+<Query APPNAME="SHOPLIST" DATECRE="2013-11-05" DESCR="Rayons" EXPOSED_AS_WEBSERVICE="false" EXTERNAL="false" NAME="SHOP_SHELF" OUTPUT="D" USR_ACCESS="L" USR_ORD="Y" USR_SEL="Y">
+<QuerySelect ALIAS="SH" CUMULATIVE="false" DISP="Y" NUME="0" RQUERY="SHOP_SHELF" RVAR="CODE" SEL="Y" WRITABLE="true"/>
+<QuerySelect ALIAS="SH" CUMULATIVE="false" DISP="Y" NUME="5" RQUERY="SHOP_SHELF" RVAR="NAME" SEL="Y" WRITABLE="true"/>
+<QuerySelect ALIAS="SH" CUMULATIVE="false" DISP="Y" NUME="10" RQUERY="SHOP_SHELF" RVAR="POSITION" SEL="Y" WRITABLE="true"/>
+<QueryFrom ALIAS="SH" NUME="5" RENTITY="SHOP_SHELF" RQUERY="SHOP_SHELF" RTYPE="-1"/>
+<QueryOgb ALIAS="SH" CAT="false" NUME="5" RQUERY="SHOP_SHELF" RVAR="POSITION" VTYPE="OA"/>
+</Query>
+<Query APPNAME="SHOPLIST" DATECRE="2013-11-26" DESCR="Utilisateurs" EXPOSED_AS_WEBSERVICE="false" EXTERNAL="false" NAME="SHOP_USER" OUTPUT="D" USR_ACCESS="L" USR_ORD="Y" USR_SEL="Y">
+<QuerySelect ALIAS="USR" CUMULATIVE="false" DISP="Y" NUME="0" RQUERY="SHOP_USER" RVAR="LOGIN" SEL="Y" WRITABLE="true"/>
+<QuerySelect ALIAS="USR" CUMULATIVE="false" DISP="Y" NUME="5" RQUERY="SHOP_USER" RVAR="NAME" SEL="Y" WRITABLE="true"/>
+<QuerySelect ALIAS="USR" CUMULATIVE="false" DISP="Y" NUME="15" RQUERY="SHOP_USER" RVAR="PROFILE" SEL="Y" WRITABLE="true"/>
+<QueryFrom ALIAS="USR" NUME="5" RENTITY="SHOP_USER" RQUERY="SHOP_USER" RTYPE="-1"/>
+<QueryOgb ALIAS="USR" CAT="false" NUME="5" RQUERY="SHOP_USER" RVAR="LOGIN" VTYPE="OA"/>
+</Query>
+</Application>
+</Queries>
+<Ui>
+<Trees>
+<Tree APPNAME="SHOPLIST" DESCR="ShopList" TREECODE="SHOPLIST" TREETYPE="M">
+<MenuOption CAPTION="Listes" ICON="fiche.gif" MENUID="SHOP_LISTS" RENTITY="SHOP_LIST" TARGET="ToyPageListe.jsp"/>
+<MenuOption CAPTION="Articles" MENUID="SHOP_ARTICLES" RENTITY="SHOP_ARTICLE" TARGET="ToyPageListe.jsp"/>
+<Menu CAPTION="Admin" MENUID="SHOP_ADMIN">
+<MenuOption CAPTION="Rayons" MENUID="SHOP_SHELFS" RENTITY="SHOP_SHELF" TARGET="ToyPageListe.jsp"/>
+<MenuOption CAPTION="Utilisateurs" MENUID="SHOP_USERS" RENTITY="SHOP_USER" TARGET="ToyPageListe.jsp"/>
+</Menu>
+</Tree>
+</Trees>
+<Tpls>
+<Tpl COLS="1" ISPROTECTED="false" MDLENTITY="kellia.ref.ui.templates.ToyTplGroup" NAME="SHOP_ARTICLE" NOTEXT="false" RENTITY="SHOP_ARTICLE" TEXT="Article" TYPETPL="DEFAULT">
+<TplItem ISPROTECTED="false" MDLENTITY="kellia.ref.ui.templates.ToyRefCombo" RLINK="SHOP_ARTICLE_L_SHELF" RTPL="SHOP_ARTICLE" RVARENTITY="SHOP_ARTICLE" VORDER="0"/>
+<TplItem ISPROTECTED="false" RTPL="SHOP_ARTICLE" RVAR="NAME" RVARENTITY="SHOP_ARTICLE" VORDER="5"/>
+<TplItem ISPROTECTED="false" RTPL="SHOP_ARTICLE" RVAR="DESCR" RVARENTITY="SHOP_ARTICLE" VORDER="10"/>
+<TplItem ISPROTECTED="false" RTPL="SHOP_ARTICLE" RVAR="EAN13" RVARENTITY="SHOP_ARTICLE" VORDER="15"/>
+</Tpl>
+<Tpl COLS="1" ISPROTECTED="false" MDLENTITY="kellia.ref.ui.templates.ToyTplGroup" NAME="SHOP_ARTICLE_CREATE" NOTEXT="false" RENTITY="SHOP_ARTICLE" TEXT="Create article" TYPETPL="DEFAULT">
+<TplItem ISPROTECTED="false" MDLENTITY="kellia.ref.ui.templates.ToyRefCombo" RLINK="SHOP_ARTICLE_L_SHELF" RTPL="SHOP_ARTICLE_CREATE" RVARENTITY="SHOP_ARTICLE" VORDER="0"/>
+<TplItem ISPROTECTED="false" RTPL="SHOP_ARTICLE_CREATE" RVAR="EAN13" RVARENTITY="SHOP_ARTICLE" VORDER="5"/>
+<TplItem CUSTOM_PAGE="ean_scan" ISPROTECTED="false" RTPL="SHOP_ARTICLE_CREATE" RTPLTPL="SHOP_ARTICLE_CREATE_10_EAN_SCAN" RVARENTITY="SHOP_ARTICLE" VORDER="10"/>
+</Tpl>
+<Tpl COLS="1" ISPROTECTED="false" MDLENTITY="kellia.ref.ui.templates.ToyTplGroup" NAME="SHOP_ARTICLE_CREATE_10_EAN_SCAN" NOTEXT="false" RENTITY="SHOP_ARTICLE" TEXT="Auto-created TPL for custom page" TYPETPL="DEFAULT"/>
+<Tpl COLS="1" ISPROTECTED="false" MDLENTITY="kellia.ref.ui.templates.ToyTplGroup" NAME="SHOP_LIST" NOTEXT="false" RENTITY="SHOP_LIST" TEXT="Liste de course" TYPETPL="DEFAULT">
+<TplItem ISPROTECTED="false" RTPL="SHOP_LIST" RTPLTPL="SHOP_LIST_INFOS" RVARENTITY="SHOP_LIST" VORDER="0"/>
+<TplItem ISPROTECTED="false" MDLENTITY="kellia.ref.ui.templates.ToyLnkList" RLINK="SHOP_LIST_L_ARTICLE_L_LIST" RQUERY="SHOP_ARTICLES2" RTPL="SHOP_LIST" RVARENTITY="SHOP_LIST" VORDER="20"/>
+</Tpl>
+<Tpl COLS="1" ISPROTECTED="false" MDLENTITY="kellia.ref.ui.templates.ToyTplGroup" NAME="SHOP_LIST_INFOS" NOTEXT="false" RENTITY="SHOP_LIST" TEXT="Infos générale" TYPETPL="DEFAULT">
+<TplItem ISPROTECTED="false" RTPL="SHOP_LIST_INFOS" RVAR="NAME" RVARENTITY="SHOP_LIST" VORDER="5"/>
+<TplItem ISPROTECTED="false" MDLENTITY="kellia.ref.ui.templates.ToyRefCombo" RLINK="SHOP_ARTICLE_L_USER" RTPL="SHOP_LIST_INFOS" RVARENTITY="SHOP_LIST" VORDER="10"/>
+</Tpl>
+<Tpl COLS="2" ISPROTECTED="false" MDLENTITY="kellia.ref.ui.templates.ToyTplGroup" NAME="SHOP_LIST_INFOS2" NOTEXT="false" RENTITY="SHOP_LIST" TEXT="Date et User" TYPETPL="DEFAULT">
+<TplItem ISPROTECTED="false" RTPL="SHOP_LIST_INFOS2" RVAR="CREATE_DATE" RVARENTITY="SHOP_LIST" VORDER="10"/>
+<TplItem ISPROTECTED="false" MDLENTITY="kellia.ref.ui.templates.ToyLnk" RLINK="SHOP_ARTICLE_L_USER" RTPL="SHOP_LIST_INFOS2" RVARENTITY="SHOP_LIST" VORDER="15"/>
+</Tpl>
+<Tpl COLS="1" ISPROTECTED="false" MDLENTITY="kellia.ref.ui.templates.ToyTplGroup" NAME="SHOP_LIST_SHOPPING" NOTEXT="false" RENTITY="SHOP_LIST" TEXT="Liste pour achats" TYPETPL="DEFAULT">
+<TplItem ISPROTECTED="true" RTPL="SHOP_LIST_SHOPPING" RVAR="NAME" RVARENTITY="SHOP_LIST" VORDER="0"/>
+<TplItem ISPROTECTED="false" MDLENTITY="kellia.ref.ui.templates.ToyLnkList" RLINK="SHOP_LIST_L_ARTICLE_L_LIST" RQUERY="SHOP_ARTICLES_SHOPPING" RTPL="SHOP_LIST_SHOPPING" RVARENTITY="SHOP_LIST" VORDER="20"/>
+</Tpl>
+<Tpl COLS="1" ISPROTECTED="false" MDLENTITY="kellia.ref.ui.templates.ToyTplGroup" NAME="SHOP_LIST_L_ARTICLE" NOTEXT="false" RENTITY="SHOP_LIST_L_ARTICLE" TEXT="Ligne d'article" TYPETPL="DEFAULT">
+<TplItem ISPROTECTED="false" MDLENTITY="kellia.ref.ui.templates.ToyRefCombo" RLINK="SHOP_LIST_L_ARTICLE_L_LIST" RTPL="SHOP_LIST_L_ARTICLE" RVARENTITY="SHOP_LIST_L_ARTICLE" VORDER="0"/>
+<TplItem ISPROTECTED="false" MDLENTITY="kellia.ref.ui.templates.ToyRefQuickSearch" RLINK="SHOP_LIST_L_ARTICLE_L_ARTICLE" RTPL="SHOP_LIST_L_ARTICLE" RVARENTITY="SHOP_LIST_L_ARTICLE" VORDER="5"/>
+<TplItem ISPROTECTED="false" RTPL="SHOP_LIST_L_ARTICLE" RVAR="QUANTITY" RVARENTITY="SHOP_LIST_L_ARTICLE" VORDER="10"/>
+<TplItem ISPROTECTED="false" MDLENTITY="kellia.ref.ui.templates.ToyCombo" RTPL="SHOP_LIST_L_ARTICLE" RVAR="STATUS" RVARENTITY="SHOP_LIST_L_ARTICLE" VORDER="15"/>
+</Tpl>
+<Tpl COLS="1" ISPROTECTED="false" MDLENTITY="kellia.ref.ui.templates.ToyTplGroup" NAME="SHOP_LIST_L_ARTICLE_DELETE" NOTEXT="false" RENTITY="SHOP_LIST_L_ARTICLE" TEXT="Suppression de lignes d'article" TYPETPL="FIELDSET">
+<TplItem ISPROTECTED="true" RTPL="SHOP_LIST_L_ARTICLE_DELETE" RVAR="DELETE_INFOS" RVARENTITY="SHOP_LIST_L_ARTICLE" VORDER="5"/>
+</Tpl>
+<Tpl COLS="1" ISPROTECTED="false" MDLENTITY="kellia.ref.ui.templates.ToyTplGroup" NAME="SHOP_USER" NOTEXT="false" RENTITY="SHOP_USER" TEXT="Utilisateur" TYPETPL="DEFAULT">
+<TplItem ISPROTECTED="false" RTPL="SHOP_USER" RVAR="LOGIN" RVARENTITY="SHOP_USER" VORDER="0"/>
+<TplItem ISPROTECTED="false" RTPL="SHOP_USER" RVAR="NAME" RVARENTITY="SHOP_USER" VORDER="5"/>
+<TplItem ISPROTECTED="false" RTPL="SHOP_USER" RVAR="PASSWORD" RVARENTITY="SHOP_USER" VORDER="10"/>
+<TplItem ISPROTECTED="false" RTPL="SHOP_USER" RVAR="PROFILE" RVARENTITY="SHOP_USER" VORDER="15"/>
+</Tpl>
+</Tpls>
+<Pages>
+<Page NAME="SHOP_ARTICLE" RENTITY="SHOP_ARTICLE" RTPL="SHOP_ARTICLE" TEXT="Article"/>
+<Page NAME="SHOP_ARTICLE_CREATE" RENTITY="SHOP_ARTICLE" RTPL="SHOP_ARTICLE_CREATE" TEXT="Create artcile"/>
+<Page NAME="SHOP_LIST" RENTITY="SHOP_LIST" RTPL="SHOP_LIST" TEXT="Liste de courses"/>
+<Page NAME="SHOP_LIST_CREATE" RENTITY="SHOP_LIST" RTPL="SHOP_LIST_INFOS" TEXT="Liste de courses"/>
+<Page NAME="SHOP_LIST_SHOPPING" RENTITY="SHOP_LIST" RTPL="SHOP_LIST_SHOPPING" TEXT="Liste pour les achats"/>
+<Page NAME="SHOP_LIST_L_ARTICLE" RENTITY="SHOP_LIST_L_ARTICLE" RTPL="SHOP_LIST_L_ARTICLE" TEXT="Ligne d'article"/>
+<Page NAME="SHOP_LIST_L_ARTICLE_DELETE" RENTITY="SHOP_LIST_L_ARTICLE" RTPL="SHOP_LIST_L_ARTICLE_DELETE" TEXT="Suppression de lignes d'article"/>
+<Page NAME="SHOP_USER" RENTITY="SHOP_USER" RTPL="SHOP_USER" TEXT="Utilisateur"/>
+</Pages>
+<OthersTplItems>
+<Application NAME="SHOPLIST"/>
+</OthersTplItems>
+<Wfs/>
+<RolesAndAccessRights>
+<Application NAME="SHOPLIST"/>
+</RolesAndAccessRights>
+</Ui>
+<Others>
+<Class name="TOY_MESSAGE">
+<Application NAME="SHOPLIST"/>
+</Class>
+<Class name="TOY_MDL_TPL"/>
+<Class name="TOY_USER"/>
+<Class name="TOY_ROLE"/>
+<Class name="TOY_PROFIL"/>
+<Class name="TOY_PROFIL_ROLE"/>
+<Class name="TOY_TREE_L_ENTITY">
+<Application NAME="SHOPLIST"/>
+</Class>
+</Others>
+</Toy>

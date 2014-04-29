@@ -103,7 +103,7 @@ tabedit.moveNextToWorking = function() {
 /* The tables */
 
 /** All referenced editable tables on this page */
-tabedit.table = {};
+tabedit.tables = [];
 
 tabedit.registerEditableTable = function(myTableId, myFormId) {
 	cgi.debug("Tabedit register :", myTableId, myFormId);
@@ -113,13 +113,22 @@ tabedit.registerEditableTable = function(myTableId, myFormId) {
 		cgi.debug("No editable table present");
 		return;
 	}
+	
+	myTableId = $(toJqId(myDatatableId)).find("div.datatable-div-data").find("table").attr("id");
+	
+	/* the datatableId is "mainForm:stuff:tableQUERY_NAME". We want "QUERY_NAME" */
+	myDatatableIdAsTab = myDatatableId.split(":");
+	myQueryName = myDatatableIdAsTab[myDatatableIdAsTab.length-1].replace(new RegExp("^table"),"");
+	
+	tabedit.table[myDatatableId] = {
 
-	tabedit.table[myTableId] = {
-
+	var table = {
 		tableId : myTableId,
 		formId : myFormId,
 		$tableId : toJqId(myTableId),
 		$formId : toJqId(myFormId),
+		dirty: false,
+		queryName: myQueryName,
 
 		getCurrentAction : function() {
 			return $(this.$formId).find(".tabedit-current-action").val();
@@ -135,6 +144,11 @@ tabedit.registerEditableTable = function(myTableId, myFormId) {
 
 		getLastRow : function() {
 			return $(this.$tableId).children("tbody").children("tr").last();
+		},
+
+		isCreationPossible : function() {
+			creationRownum = $(this.$tableId).find("input.rownum[value=" + tabedit.ROWNUM_FOR_CREATION + "]");
+			return creationRownum.length > 0;
 		},
 
 		/**
@@ -188,17 +202,6 @@ tabedit.registerEditableTable = function(myTableId, myFormId) {
 		validateCurrentRow : function() {
 			var $row = $(tabedit.getWorkingRow());
 
-			/* stop any further edition on the row */
-			tabedit.disableRow($row);
-
-			/* copy each field on the form */
-			var writes = $(this.$formId).find(".tabedit-hidden-form-data").find(".tabedit-editable-write");
-			$row.find(".tabedit-editable-write").each(function(index) {
-				var $rowDiv = $(this);
-				var $hiddenFormDiv = writes.eq(index);
-				$hiddenFormDiv.children().children().val($rowDiv.children().children().val());
-			});
-
 			/* copy the current rownum */
 			$(this.$formId).find(".tabedit-current-rownum").val(tabedit.getRownum($row));
 		},
@@ -212,6 +215,7 @@ tabedit.registerEditableTable = function(myTableId, myFormId) {
 				/* the row that was sent is not editable any more, as it got refreshed from JSF 2 */
 				/* we only need to mark there are no more editable row */
 				tabedit.clearWorking();
+				this.dirty = false;
 				return true;
 			} else {
 				/* restore editable row, table might have been reloaded */
@@ -233,7 +237,7 @@ tabedit.registerEditableTable = function(myTableId, myFormId) {
 		},
 
 		/** Send the form to the server and let it work its magic. */
-		sendFormToServer : function(event) {
+		sendFormToServer : function(callback) {
 			var currentAction = this.getCurrentAction();
 			var nextAction = this.getNextAction();
 
@@ -247,9 +251,12 @@ tabedit.registerEditableTable = function(myTableId, myFormId) {
 			/* Always need to render the hidden form, even if no action (an entity may have been loaded in preparation) */
 			options.render = this.formId + " ";
 
+			var successCallback = callback || $.noop;
+
 			/* Rest of the render (for the current action) : whole table for creation, only the row for edition. */
 			if (currentAction == tabedit.CREATE_ACTION_NAME) {
 				options.render += this.tableId;
+
 			} else if (currentAction == tabedit.MODIFY_ACTION_NAME) {
 				options.render += tabedit.getRenderingForRow($(tabedit.getWorkingRow()));
 			}
@@ -259,6 +266,16 @@ tabedit.registerEditableTable = function(myTableId, myFormId) {
 
 			/* prepare the success */
 			options.onSuccess = function() {
+				
+				if (currentAction == tabedit.CREATE_ACTION_NAME) {
+					/* to render correctly the datatables. FIXME : should be in the onload of datatable */
+					if ($('.list_results_container').length>0) {
+						initList(that.queryName);
+					} else {
+						datatableAlignColumns(that.queryName);					
+					}
+				}
+				
 				if (that.onSaveSuccess() && nextAction != "") {
 					that.onPrepareSuccess();
 				}
@@ -278,12 +295,12 @@ tabedit.registerEditableTable = function(myTableId, myFormId) {
 			var $row = $(tabedit.getWorkingRow());
 			var $write = $row.find(".tabedit-editable-write");
 			var $read = $row.find(".tabedit-editable-read");
-			
+
 			$write.remove();
 			$read.show();
 
 			/* set the proper style on each cell */
-			$read.closest("td").removeClass("tabedit-active");
+			$row.find("td").removeClass("tabedit-active");
 
 			tabedit.clearWorking();
 
@@ -294,7 +311,7 @@ tabedit.registerEditableTable = function(myTableId, myFormId) {
 			$(this.$formId).find(".tabedit-hidden-form-data").children().remove();
 
 			/* Clean dirty state */
-			cleanDirty();
+			this.dirty = false;
 			cgi.debug("Row discarded");
 		},
 
@@ -307,7 +324,7 @@ tabedit.registerEditableTable = function(myTableId, myFormId) {
 			cgi.debug("Setting editable :", $row.get(0));
 
 			/* preparing input div and fields for the current line */
-			var $writeDivs = $(this.$formId).find(".tabedit-hidden-form-data").find(".tabedit-editable-write").clone();
+			var $writeDivs = $(this.$formId).find(".tabedit-hidden-form-data").find(".tabedit-editable-write");
 			cgi.debug("New fields :", $writeDivs);
 
 			if ($writeDivs.length == 0) {
@@ -322,79 +339,52 @@ tabedit.registerEditableTable = function(myTableId, myFormId) {
 
 				cgi.debug("Setting editable field :", $write.get(0));
 
-				/* change the id to differentiate it from the prototype */
-				var oldId = $write.children().children("input").first().attr("id");
-				$write.children().children("input").first().attr("id", oldId + "_current");
-				
 				/* insert it to the right place */
 				$write.insertAfter($read);
-				
+
 				/* we need to show it now, or we have weird mistakes on calculating sizes */
 				$read.hide();
 				$write.show();
-				
-				var $td = $write.closest("td");
-				
+
 				/* set the proper style on each cell */
-				$td.addClass("tabedit-active");
-				var availableWidth  = $td.innerWidth()  - parseInt($td.css('padding-left')) - parseInt($td.css('padding-right'));
-				
-				var $input;
-				
-				/* Special treatment for jQuery UI DatePicker */
-				if ($write.has("input.date-picker").length || $write.has("input.time-picker").length) {
-					cgi.debug("Special case for datepicker");
-					
-					$input = $write.find("input");
-					var $img = $write.find("img.ui-datepicker-trigger");
+				$row.find("td").addClass("tabedit-active");
+				var availableWidth  = $td.innerWidth() - parseInt($td.css('padding-left')) - parseInt($td.css('padding-right'));
 
-					/*
-					 * Looks like : <input type="text" id="..." class="datePicker hasDatepicker" * "
-					 * onchange="completeDate(this);markAsDirty()" /> <img class="ui-datepicker-trigger" src="..." />
-					 */
+				var $input = $write.children().children();
 
-					/* we're going to create a new one */
-					$input.removeClass("hasDatepicker");
-					$img.remove();
-
-					var options = {
-						altFormat : "dd/mm/yy",
-						buttonImage : $img.attr("src"),
-						buttonImageOnly : true,
-						dateFormat : "dd/mm/yy",
-						showOn : "button",
-						showButtonPanel : true,
-						showWeek : true
-					};
-
-					if ($input.is(".time-picker")) {
-						options.controlType = 'select';
-						options.timeFormat = "HH:mm";
-						options.showTime = false;
-						options.useLocalTimezone = true;
-						$input.datetimepicker(options);
-					} else {
-						$input.datepicker(options);
-					}
-
-					availableWidth = availableWidth - $write.find("img.ui-datepicker-trigger").outerWidth(true);
-
-				} else {
-					$input = $write.children().children();
-				}				
-				
 				/* Correct dimensions  */
 				$input.width(   availableWidth  - parseInt($input.css('padding-left')) - parseInt($input.css('padding-right'))  - parseInt($input.css('border-left-width')) - parseInt($input.css('border-right-width'))  );
-								
+
 				/* apply the table alignement to the input field */
 				$input.css("text-align", $read.css("text-align"));
+			});
+			
+			/* iterate on write divs for combobox */
+			var $writeSelectDivs = $row.find(".tabedit-editable-write");
+			$writeSelectDivs.each(function(index) {
+				var $writeSelect = $writeSelectDivs.eq(index);
+				if ($writeSelect.has("select").length) {
+					selectValue = "";
+					$inputs = $writeSelect.find("input");
+					$inputs.each(function(jindex) {
+						$input = $inputs.eq(jindex);
+						if (selectValue != "") {
+							selectValue += ";;;";
+						}
+						idInput = $input.attr("id");
+						splitIdInput = idInput.split("_")
+						keySelect = splitIdInput[splitIdInput.length-1];
+						selectValue += keySelect + ":::" + $input.val();
+					});
+					$writeSelect.find("select").val(selectValue);
+				}
 			});
 
 			/* be ready to use shortkeys on the newly set input fields */
 			this.registerShortkeys($writeDivs);
 
 			/* select the target field */
-			$writeDivs.eq(focusIndex).children().children().focus().select();
+			tabedit.focusElement($writeDivs.eq(focusIndex));
 		},
 
 		/**
@@ -414,7 +404,6 @@ tabedit.registerEditableTable = function(myTableId, myFormId) {
 		 * clicking on the currently editable line.
 		 */
 		onClick : function(event) {
-
 			/*
 			 * if there is a row being edited, and we are clicking on it : do nothing special and go on (maybe we
 			 * clicked on a calendar...)
@@ -438,7 +427,7 @@ tabedit.registerEditableTable = function(myTableId, myFormId) {
 			var goOn = function() {
 				tabedit.busy = true;
 
-				if (tabedit.isWorking() != null) {
+				if (tabedit.isWorking()) {
 					that.discardCurrentRow();
 				}
 
@@ -451,7 +440,7 @@ tabedit.registerEditableTable = function(myTableId, myFormId) {
 					that.prepareNewRow($clickedRow, clickedDivIndex);
 
 					cgi.debug(that.tableId + '#onclick : sending form to server');
-					that.sendFormToServer(event);
+					that.sendFormToServer();
 
 				} else {
 					cgi.debug(this.tableId + '#onclick : no click event for', event.target);
@@ -462,11 +451,15 @@ tabedit.registerEditableTable = function(myTableId, myFormId) {
 			/* stop being busy and give focus, for the case where we are not leaving after all */
 			var stopBeingBusy = function() {
 				tabedit.busy = false;
-				$(tabedit.getWorkingRow()).find(".tabedit-editable-write").find("input").first().focus();
+				tabedit.focusElement($(tabedit.getWorkingRow()).find(".tabedit-editable-write"));
+			};
+
+			var evaluation = function() {
+				return that.dirty;
 			};
 
 			/* there is potentially an editable row opened, with modifications */
-			cgi.withCheckDirty(goOn, stopBeingBusy);
+			cgi.withCheckDirty(goOn, stopBeingBusy, evaluation);
 		},
 
 		/** Capture key event to set up shortkeys on the table */
@@ -513,19 +506,20 @@ tabedit.registerEditableTable = function(myTableId, myFormId) {
 		handleShortkeyTab : function(target, shift) {
 			cgi.debug("Pressed tab !");
 
-			var $cell = $(target).closest("td");
+			var $currentCell = $(target).closest("td");
+			var currentCell = $currentCell.get(0);
+			var cells = $currentCell.parent().children().toArray();
+			var currentCellIndex = cells.indexOf(currentCell);
 
-			var $cellsToLook = shift ? $cell.prevAll() : $cell.nextAll();
-			var $nextCell = $cellsToLook.has(".tabedit-editable-write").first();
+			if (shift && currentCellIndex == 1) {
+				tabedit.focusElement($(cells[cells.length - 1]));
 
-			if ($nextCell.length == 0) {
-				var $siblings = $cell.siblings().has(".tabedit-editable-write");
-				$nextCell = shift ? $siblings.last() : $siblings.first();
+			} else if (!shift && currentCellIndex == cells.length - 1) {
+				tabedit.focusElement($(cells[1]));
+
+			} else {
+				tabedit.focusElement($(cells[currentCellIndex + (shift ? - 1 : 1)]));
 			}
-
-			var $nextInput = $nextCell.find(".tabedit-editable-write").children().children();
-			$nextInput.focus().select();
-
 			return false;
 		},
 
@@ -537,16 +531,32 @@ tabedit.registerEditableTable = function(myTableId, myFormId) {
 
 			this.validateCurrentRow();
 
-			var $row = $(target).closest("tr");
+			var $row = $(tabedit.getWorkingRow());
 			var $nextRow = $row.nextAll().has(".tabedit-editable-read").first();
+
 			if ($nextRow.length > 0) {
 				this.prepareNewRow($nextRow, 0);
-			} else {
+			} else if(this.isCreationPossible()) {
 				/* creation mode */
 				this.prepareNewCreationRow();
 			}
 
-			this.sendFormToServer();
+			var currentAction = this.getCurrentAction();
+			var callback = $.noop;
+
+			if (currentAction == tabedit.CREATE_ACTION_NAME) {
+				callback = function() {
+					$(this.$tableId).find('td.first').click(function(event) {
+						event.stopPropagation();
+					});
+				};
+
+			} else if (currentAction == tabedit.MODIFY_ACTION_NAME) {
+				callback = function() {
+					$row.find("td").removeClass("tabedit-active");
+				};
+			}
+			this.sendFormToServer(callback);
 
 			return false;
 		},
@@ -554,7 +564,24 @@ tabedit.registerEditableTable = function(myTableId, myFormId) {
 		/** React to the escape key being pressed. */
 		handleShortkeyEscape : function() {
 			cgi.debug("Pressed escape !");
-			this.discardCurrentRow();
+			var that = this;
+
+			var onAnyCase = function() {
+				var workingRow = tabedit.getWorkingRow();
+				if (workingRow) {
+					tabedit.focusElement($(tabedit.getWorkingRow()).find(".tabedit-editable-write"));
+				}
+			};
+
+			var onContinue = function(){
+				that.discardCurrentRow();
+			};
+
+			var evaluation = function() {
+				return that.dirty;
+			};
+
+			cgi.withCheckDirty(onContinue, onAnyCase, evaluation);
 			return false;
 		},
 
@@ -568,7 +595,14 @@ tabedit.registerEditableTable = function(myTableId, myFormId) {
 			}
 
 			var $row = $source.closest("tr");
-			var $possibleTargetRow = up ? $row.prev() : $row.next();
+			var $possibleTargetRow = null;
+			while ($possibleTargetRow == null) {
+				$possibleTargetRow = up ? $row.prev() : $row.next();
+				if ($possibleTargetRow.css("display") == "none") {
+					$row = $possibleTargetRow;
+					$possibleTargetRow = null;
+				}
+			}
 
 			var $targetRow = $possibleTargetRow.has(".tabedit-content");
 			if ($targetRow.length == 0) {
@@ -578,23 +612,7 @@ tabedit.registerEditableTable = function(myTableId, myFormId) {
 
 			var position = tabedit.getFieldIndexInRow($source);
 			var $targetCell = $targetRow.children().has(".tabedit-content").eq(position);
-
-			var that = this;
-
-			/* Preparing the ondirty check... */
-			var abandonChanges = function() {
-				cgi.debug("Dirty and abandoning changes");
-				that.discardCurrentRow();
-				$targetCell.click();
-			};
-
-			var stopBeingBusy = function() {
-				tabedit.busy = false;
-				$(tabedit.getWorkingRow()).find(".tabedit-editable-write").find("input").first().focus();
-			};
-
-			tabedit.busy = true;
-			cgi.withCheckDirty(abandonChanges, stopBeingBusy);
+			$targetCell.click();
 
 			return false;
 		},
@@ -650,12 +668,10 @@ tabedit.registerEditableTable = function(myTableId, myFormId) {
 
 			var tabeditActionsSpan = $(this.$formId).find(".tabedit-action-buttons").clone();
 			tabeditActionsSpan.find(".tabedit-action-validate-button").click(function() {
-				tabedit.busy = true;
-				that.validateCurrentRow();
-				that.sendFormToServer();
+				that.handleShortkeyEnter();
 			});
 			tabeditActionsSpan.find(".tabedit-action-cancel-button").click(function() {
-				that.discardCurrentRow();
+				that.handleShortkeyEscape();
 			});
 
 			var actionsSpan = $(this.$tableId).closest(".table_container").find(".allActionButtons");
@@ -681,9 +697,9 @@ tabedit.registerEditableTable = function(myTableId, myFormId) {
 				var actionsSpan = $(that.$tableId).closest(".table_container").find(".allActionButtons");
 				actionsSpan.show();
 			}, 100);
-
 		}
 	};
+	tabedit.tables.push(table);
 
 	/*
 	 * Register a click event listener to manage the editable table. Listener is called during the bubble phase on the
@@ -694,7 +710,7 @@ tabedit.registerEditableTable = function(myTableId, myFormId) {
 	var $clickTarget = $(toJqId(myTableId)).closest("div");
 	$clickTarget.click(function(event) {
 		// $(document).click(function(event) {
-		tabedit.table[myTableId].onClick(event);
+		table.onClick(event);
 		return true;
 	});
 
@@ -712,7 +728,7 @@ tabedit.disableRow = function($row) {
  * <ul>
  * <li><b>options.execute</b> is the space-separated list of ids that we need to execute in addition to the form
  * actions</li>
- * <li><b>options.render</b> is what to render in addition to the usual : hidden form, messages and dirty state</li>
+ * <li><b>options.render</b> is what to render in addition to the usual : hidden form and messages</li>
  * <li><b>options.onSuccess</b> is the function to call when the ajax calls end with success</li>
  * <li><b>options.immediate</b> is <code>true</code> if the call must bypasse the normal JSF lifecycle (see the
  * definition of immediate on h:commandButton)</li>
@@ -730,16 +746,37 @@ tabedit.ajaxCall = function(options, event) {
 		options.$button.click();
 		return;
 	}
-
-	var executing = "mainForm:dirty ";
-	if (options.execute !== undefined)
-		executing += options.execute;
-	cgi.debug("Executing :", executing);
-
-	var rendering = "mainForm:dirty mainForm:messages ";
-	if (options.render !== undefined)
-		rendering += options.render;
-	cgi.debug("Rendering :", rendering);
+	
+	/* iterate on write divs for combobox */
+	var $writeSelectDivs = $(".tabedit-editable-table").find(".tabedit-editable-write");
+	$writeSelectDivs.each(function(index) {
+		var $writeSelect = $writeSelectDivs.eq(index);
+		if ($writeSelect.has("select").length) {
+			selectValue = $writeSelect.find("select").val();
+			keyValues = selectValue.split(";;;");
+			for (var i = 0; i < keyValues.length; i++) {
+				keyValues[i] = keyValues[i].split(":::");
+			}
+			
+			$inputs = $writeSelect.find("input");
+			$inputs.each(function(jindex) {
+				$input = $inputs.eq(jindex);
+				
+				idInput = $input.attr("id");
+				splitIdInput = idInput.split("_")
+				keySelect = splitIdInput[splitIdInput.length-1];
+				
+				for (var i = 0; i < keyValues.length; i++) {
+					if (keySelect == keyValues[i][0]) {
+						$input.val(keyValues[i][1]);
+					}
+				}
+				
+				idInputGeneric = idInput.substring(0, idInput.length - 8).replace(":", "\\:");
+				$("#" + idInputGeneric).val($input.val());
+			});
+		}
+	});
 
 	/* prepare the success */
 	var indicator = prepareProgressIndicator();
@@ -753,8 +790,8 @@ tabedit.ajaxCall = function(options, event) {
 	};
 
 	var ajaxOptions = {
-		execute : executing,
-		render : rendering,
+		execute : options.execute,
+		render : "mainForm:messages " + options.render,
 		onevent : handleAjaxEvent,
 		onerror : logAjaxError
 	};
@@ -789,4 +826,60 @@ tabedit.getRenderingForRow = function($row) {
 /** Returns the rownum for a row */
 tabedit.getRownum = function($row) {
 	return $row.find("input.rownum").val().trim();
+};
+
+tabedit.focusElement = function($parent) {
+	var $input = $parent.find(':input').not('[type="hidden"]').first();
+	$input.focus();
+
+	if ($input.is('input')) {
+		$input.select();
+	}
+};
+
+tabedit.getTable = function(tableId) {
+	for (var i = 0, len = tabedit.tables.length; i < len; i++) {
+		var table = tabedit.tables[i];
+		if (table.tableId == tableId) {
+			return table;
+		}
+	}
+	return undefined;
+};
+
+var superIsPageDirty = isPageDirty;
+
+isPageDirty = function() {
+	var dirty = superIsPageDirty();
+
+	for (var i = 0, len = tabedit.tables.length; i < len && !dirty; i++) {
+		dirty = tabedit.tables[i].dirty;
+	}
+	return dirty;
+};
+
+var superCleanDirty = cleanDirty;
+
+cleanDirty = function() {
+	superCleanDirty();
+
+	for (var i = 0, len = tabedit.tables.length; i < len; i++) {
+		tabedit.tables[i].dirty = false;
+	}
+};
+
+var superMarkAsDirty = markAsDirty;
+
+markAsDirty = function(element) {
+	var $element = $(element);
+
+	if ($element.parentsUntil('td', '.tabedit-editable-write').length > 0) {
+		var tableId = $element.parentsUntil('.datatable-div-data', 'table').attr('id');
+		var table = tabedit.getTable(tableId);
+		if (table) {
+			table.dirty = true;
+		}
+	} else {
+		superMarkAsDirty(element);
+	}
 };

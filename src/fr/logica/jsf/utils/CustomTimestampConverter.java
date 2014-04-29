@@ -5,43 +5,21 @@ import java.util.Date;
 
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
-import javax.faces.convert.ConverterException;
-import javax.faces.convert.DateTimeConverter;
 
-import com.sun.faces.util.MessageFactory;
+public class CustomTimestampConverter extends CustomDateTimeConverter {
 
-import fr.logica.business.Constants;
-
-public class CustomTimestampConverter extends DateTimeConverter {
-
-	/**
-	 * Constructeur de DateTimeConverter personnalisé.
-	 */
 	public CustomTimestampConverter() {
 		super();
-		this.setPattern(Constants.FORMAT_DATE + " " + Constants.FORMAT_HOUR);
 	}
 
 	@Override
-	public Object getAsObject(FacesContext facesContext, UIComponent component, String value) {
-		Object obj = null;
-		try {
-			obj = super.getAsObject(facesContext, component, value);
-		} catch (ConverterException e) {
-			Object label = getAttribute(facesContext, component, "label");
-			throw new ConverterException(MessageFactory.getMessage("javax.faces.converter.DateTimestampConverter.DATE", label), e);
-		}
-		if (obj != null && obj instanceof Date) {
-			obj = new Timestamp(((Date) obj).getTime());
-		}
-		return obj;
-	}
+	public Object getAsObject(FacesContext context, UIComponent component, String value) {
+		Date result = (Date) super.getAsObject(context, component, value);
 
-	Object getAttribute(FacesContext c, UIComponent component, String name) {
-		Object result = component.getAttributes().get(name);
-		if (result == null && component.getParent() != null) {
-			result = getAttribute(c, component.getParent(), name);
+		if (null != result) {
+			return new Timestamp(result.getTime());
 		}
 		return result;
 	}
+
 }

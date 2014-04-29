@@ -1,6 +1,6 @@
 
 /* The mainForm immediately starts with a table to set elements in one column. No top-padding on the first block, following paddings are set in the skin */
-#mainForm > .group_table > tbody > tr:first-child > td {
+#mainForm > .inner-content > .group_table > tbody > tr:first-child > td {
 	padding-top: 0px;
 }
 
@@ -79,6 +79,10 @@ input.dateTime ~ img {
 
 .colFieldSetRight a:only-child {
 	margin-left: 0;
+}
+
+.colFieldSetRight a.ui-slider-handle {
+	margin-left: -.6em;
 }
 
 input.dateTime {
@@ -166,9 +170,18 @@ button.btn_large {
 .colFieldSetRight > textarea {
 	width: 432px;
 }
+
+.colFieldSetRight .ui-slider {
+	width: 398px;
+}
+
 .group_table_col_2 .colFieldSetRight > input,
 .group_table_col_2 .colFieldSetRight > textarea {
 	width: 216px;
+}
+
+.group_table_col_2 .colFieldSetRight .ui-slider {
+	width: 194px;
 }
 
 .colFieldSetRight > .quickSearch input,

@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.el.ELException;
-import javax.el.MethodExpression;
 import javax.el.MethodNotFoundException;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
@@ -20,6 +19,8 @@ import javax.faces.render.FacesRenderer;
 import com.sun.faces.renderkit.html_basic.TextRenderer;
 
 import fr.logica.business.MessageUtils;
+import fr.logica.jsf.components.autocomplete.AutocompleteSuggestion;
+import fr.logica.jsf.model.link.LinkQuickSearchModel;
 
 @FacesRenderer(componentFamily = UIAutocomplete.COMPONENT_FAMILY, rendererType = HtmlAutocompleteRenderer.RENDERER_TYPE)
 public class HtmlAutocompleteRenderer extends TextRenderer {
@@ -46,7 +47,8 @@ public class HtmlAutocompleteRenderer extends TextRenderer {
 
 		if (requestParameters.get("javax.faces.partial.ajax") != null) {
 			ResponseWriter writer = context.getResponseWriter();
-			List<AutocompleteSuggestion> suggestions = getItems(context, comp, requestParameters.get(clientId));
+			String criteria = new String(requestParameters.get(clientId).getBytes(), "UTF-8");
+			List<AutocompleteSuggestion> suggestions = getItems(context, comp, criteria);
 
 			writer.write("[");
 
@@ -79,7 +81,8 @@ public class HtmlAutocompleteRenderer extends TextRenderer {
 
 		writer.startElement("script", component);
 		writer.writeAttribute("type", "text/javascript", null);
-		writer.writeText("$(\"#" + escapedClientId + "\").autocomplete({"
+		writer.writeText("$(document).ready(function() {"
+				+ "$(\"#" + escapedClientId + "\").autocomplete({"
 				+ "\ndelay: 500,"
 				+ "\nminLength: " + getMinLength(component) + ","
 				+ "\nfocus: function(event, ui) { return false; },"
@@ -113,6 +116,7 @@ public class HtmlAutocompleteRenderer extends TextRenderer {
 				+ "\n}"
 				+ "\n});"
 				+ "\n}"
+				+ "\n});"
 				+ "\n});", null);
 		writer.endElement("script");
 	}
@@ -125,13 +129,12 @@ public class HtmlAutocompleteRenderer extends TextRenderer {
 	@SuppressWarnings("unchecked")
 	private List<AutocompleteSuggestion> getItems(FacesContext facesContext, UIAutocomplete component, String value) {
 		List<AutocompleteSuggestion> result = null;
-		MethodExpression autocompleteMethod = component.getAutocompleteMethod();
+		LinkQuickSearchModel model = component.getModel();
 
-		if (null != autocompleteMethod) {
+		if (null != model) {
 
 			try {
-				result = (List<AutocompleteSuggestion>) autocompleteMethod.invoke(facesContext.getELContext(), new Object[] { value });
-
+				result = model.quickSearch(value);
 			} catch (MethodNotFoundException mnfe) {
 				result = new ArrayList<AutocompleteSuggestion>();
 				result.add(new AutocompleteSuggestion(MessageUtils.getInstance().getMessage("autocomplete.error", null), "-1"));

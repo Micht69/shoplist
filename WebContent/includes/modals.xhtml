@@ -8,12 +8,12 @@
     <span id="modalYesButton" class="modal-prototype" title="#{labels['generic.yes']}" />
     <span id="modalNoButton" class="modal-prototype" title="#{labels['generic.no']}" />
     
-    <!-- For the warning when attempting to leave a page with unsaved modifications -->
+    <!-- For the warning when attempting to leave a page with unsaved modifications. See checkDirtyStateCustom in logica.js. -->
     <div id="modalConfirmDirty" class="modal-prototype" title="#{messages['modal.dirty.title']}">
     	<p><h:outputText value="#{messages['modal.dirty.text']}" escape="false" /></p>
     </div>
     
-    <!-- For the progress window. See prepareProgressIndicator in logica.js -->
+    <!-- For the progress window. See prepareProgressIndicator in logica.js. -->
     <div id="modalWorkInProgress" class="modal-prototype" title="#{messages['modal.workInProgress.title']}">
         <p><h:outputText value="#{messages['modal.workInProgress.text']}"  escape="false" /></p>
     </div>

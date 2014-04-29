@@ -1,47 +1,53 @@
 package fr.logica.jsf.components.autocomplete;
 
-import javax.el.MethodExpression;
 import javax.faces.component.FacesComponent;
 import javax.faces.component.html.HtmlInputText;
+
+import fr.logica.jsf.model.link.LinkQuickSearchModel;
 
 @FacesComponent(UIAutocomplete.COMPONENT_TYPE)
 public class UIAutocomplete extends HtmlInputText {
 
-    public static final String COMPONENT_TYPE = "logica.faces.autocomplete";
+	public static final String COMPONENT_TYPE = "logica.faces.autocomplete";
 
-    protected enum PropertyKeys {
-        autocompleteMethod,
-        minLength;
+	protected enum PropertyKeys {
+		model,
+		minLength;
 
-        String toString;
-        PropertyKeys(String toString) { this.toString = toString; }
-        PropertyKeys() { }
+		String toString;
 
-        public String toString() {
-            return ((toString != null) ? toString : super.toString());
-        }
+		PropertyKeys(String toString) {
+			this.toString = toString;
+		}
 
-    }
+		PropertyKeys() {
+		}
 
-    public UIAutocomplete() {
-        super();
-        setRendererType("logica.faces.AutocompleteRenderer");
-    }
+		public String toString() {
+			return ((toString != null) ? toString : super.toString());
+		}
 
-    public MethodExpression getAutocompleteMethod() {
-        return (MethodExpression) getStateHelper().eval(PropertyKeys.autocompleteMethod);
-    }
+	}
 
-    public void setAutocompleteMethod(MethodExpression autocompleteMethod) {
-        getStateHelper().put(PropertyKeys.autocompleteMethod, autocompleteMethod);
-    }
+	public UIAutocomplete() {
+		super();
+		setRendererType("logica.faces.AutocompleteRenderer");
+	}
 
-    public Integer getMinLength() {
-        return (Integer) getStateHelper().eval(PropertyKeys.minLength);
-    }
+	public LinkQuickSearchModel getModel() {
+		return (LinkQuickSearchModel) getStateHelper().eval(PropertyKeys.model);
+	}
 
-    public void setMinLength(Integer minLength) {
-        getStateHelper().put(PropertyKeys.minLength, minLength);
-    }
+	public void setModel(LinkQuickSearchModel model) {
+		getStateHelper().put(PropertyKeys.model, model);
+	}
+
+	public Integer getMinLength() {
+		return (Integer) getStateHelper().eval(PropertyKeys.minLength);
+	}
+
+	public void setMinLength(Integer minLength) {
+		getStateHelper().put(PropertyKeys.minLength, minLength);
+	}
 
 }

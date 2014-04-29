@@ -22,6 +22,8 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.PrecisionModel;
+import com.vividsolutions.jts.io.ParseException;
+import com.vividsolutions.jts.io.WKTReader;
 
 import fr.logica.business.MessageUtils;
 
@@ -37,6 +39,21 @@ public class MapGeocoding {
 	/** Type de variable : SRID du champ GEOMETRY (projection WGS84_SRID = 4326) */
 	public final static int GEOMETRY_SRID = 4326;
 
+	/**
+	 * Input string must be formatted as "well known" text representation<br>
+	 * (http://portal.opengeospatial.org/files/?artifact_id=25355 p52)
+	 * 
+	 * @param s
+	 * @return null if string cannot be converted
+	 */
+	public static Geometry toGeometry(String s){
+		try{
+			return new WKTReader().read(s);
+		}catch(ParseException e){
+			return null;
+		}
+	}
+	
 	public MapCoords getCoordinates(Object obj) throws ClientProtocolException, IOException, URISyntaxException {
 		MapCoords mc = null;
 
@@ -187,10 +204,4 @@ public class MapGeocoding {
 		}
 		return geomStr;
 	}
-
-	public String toString(String str) throws Exception {
-		System.out.println("MapGeocoding - toString2 : " + str);
-		return str;
-	}
-
 }

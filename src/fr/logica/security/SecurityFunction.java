@@ -14,6 +14,12 @@ public class SecurityFunction implements Serializable {
 
 	/** Query */
 	private String query;
+	
+	/** Menu */
+	private String menu;
+	
+	/** Menu Option */
+	private String menuOption;
 
 	public String getEntite() {
 		return entite;
@@ -39,8 +45,19 @@ public class SecurityFunction implements Serializable {
 		this.query = query;
 	}
 
-	@Override
-	public String toString() {
-		return "SecurityFunction [entite=" + entite + ", action=" + action + ", query=" + query + "]";
+	public String getMenu() {
+		return menu;
+	}
+
+	public void setMenu(String menu) {
+		this.menu = menu;
+	}
+
+	public String getMenuOption() {
+		return menuOption;
+	}
+
+	public void setMenuOption(String menuOption) {
+		this.menuOption = menuOption;
 	}
 }

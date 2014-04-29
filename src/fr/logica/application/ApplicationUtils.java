@@ -2,6 +2,8 @@ package fr.logica.application;
 
 import org.apache.log4j.Logger;
 
+import fr.logica.business.context.ApplicationContext;
+
 /**
  * Utility class used to retrieve {@link ApplicationLogic}.
  */
@@ -18,6 +20,9 @@ public class ApplicationUtils {
 	/** Application logic object. */
 	private static AbstractApplicationLogic appLogic;
 
+	/** Application context. There can be only one */
+	private static ApplicationContext appContext;
+
 	/**
 	 * @return The application logic object.
 	 */
@@ -26,7 +31,7 @@ public class ApplicationUtils {
 		if (appLogic == null) {
 
 			try {
-				appLogic = (AbstractApplicationLogic) Class.forName("fr.logica.application.ApplicationLogic").newInstance();
+				appLogic = (AbstractApplicationLogic) Class.forName("fr.logica.application.logic.ApplicationLogic").newInstance();
 			} catch (InstantiationException e) {
 				LOGGER.error("Error", e);
 			} catch (IllegalAccessException e) {
@@ -42,4 +47,11 @@ public class ApplicationUtils {
 		return appLogic;
 	}
 
+	public static synchronized ApplicationContext getApplicationContext() {
+		if (appContext == null) {
+			appContext = new ApplicationContext();
+			getApplicationLogic().initializeApplication(appContext);
+		}
+		return appContext;
+	}
 }

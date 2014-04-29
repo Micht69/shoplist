@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import fr.logica.business.MessageUtils;
-
 /**
  * Cette classe contient l'ensemble des méta-données d'une Entité. (Nom, champs, types de données, clés, liens, etc.).
  * 
@@ -16,19 +14,25 @@ import fr.logica.business.MessageUtils;
  */
 public abstract class EntityModel {
 
-	public abstract String $_getName();
+	public abstract String name();
 
-	public abstract String $_getDbName();
+	public abstract String dbName();
+
+	/**
+	 * Retrieves the database schema where the table is located.
+	 * @return A schema name or an empty string.
+	 */
+	public abstract String getDbSchemaName();
 
 	public abstract KeyModel getKeyModel();
 
 	protected EntityModel getEntityModel() {
-		return EntityManager.getEntityModel($_getName());
+		return EntityManager.getEntityModel(name());
 	}
 
 	/**
 	 * Get a Foreign Key by it's name
-	 *  
+	 * 
 	 * @param keyName : the name of the FK
 	 * @return the ForeignKeyModel
 	 */
@@ -111,6 +115,7 @@ public abstract class EntityModel {
 
 	/**
 	 * Get fields used by search queries.
+	 * 
 	 * @return A set of field names.
 	 */
 	public abstract Set<String> getLookupFields();
@@ -126,12 +131,14 @@ public abstract class EntityModel {
 		String realEnumName = enumName.substring(0, 1).toLowerCase() + enumName.substring(1);
 		for (int i = 0; i < getField(realEnumName).getValues().size(); i++) {
 			if (getField(realEnumName).getValues().get(i) == null) {
-				map.put(MessageUtils.getInstance().getGenLabel(getField(realEnumName).getLabels().get(i), null), getField(realEnumName).getValues().get(i));
+				map.put(MessageUtils.getInstance().getGenLabel(getField(realEnumName).getLabels().get(i), null), getField(realEnumName)
+						.getValues().get(i));
 			}
 		}
 		for (int i = 0; i < getField(realEnumName).getValues().size(); i++) {
 			if (getField(realEnumName).getValues().get(i) != null) {
-				map.put(MessageUtils.getInstance().getGenLabel(getField(realEnumName).getLabels().get(i), null), getField(realEnumName).getValues().get(i));
+				map.put(MessageUtils.getInstance().getGenLabel(getField(realEnumName).getLabels().get(i), null), getField(realEnumName)
+						.getValues().get(i));
 			}
 		}
 		return map;
@@ -150,7 +157,7 @@ public abstract class EntityModel {
 	 * Get the associative link name by it's name
 	 * 
 	 * @param linkName : the name of the link
-	 * @return null if the entity isn't associative 
+	 * @return null if the entity isn't associative
 	 */
 	public String getAssociatedLink(String linkName) {
 		if (!isAssociative()) {
@@ -174,7 +181,7 @@ public abstract class EntityModel {
 	 */
 	public boolean isStrongKey(String keyName) {
 		if (getForeignKeyModel(keyName) == null) {
-			throw new TechnicalException("Key " + keyName + " is not a key of entity " + $_getName());
+			throw new TechnicalException("Key " + keyName + " is not a key of entity " + name());
 		}
 		for (String field : getForeignKeyModel(keyName).getFields()) {
 			if (!getField(field).isMandatory()) {
@@ -204,4 +211,17 @@ public abstract class EntityModel {
 		}
 		return brName;
 	}
+
+	public boolean isAssociativeLink(String linkName) {
+		LinkModel brModel = getBackRefModel(linkName);
+		if (brModel != null) {
+			return EntityManager.getEntityModel(brModel.getEntityName()).isAssociative();
+		}
+		return false;
+	}
+
+	public boolean isExternal() {
+		return false;
+	}
+
 }

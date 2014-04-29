@@ -1,13 +1,14 @@
 package fr.logica.domain.objects;
 
 import java.io.Serializable;
+
 import java.util.HashSet;
 import java.util.Set;
 
 
-import fr.logica.business.Context;
 import fr.logica.business.Entity;
 import fr.logica.business.Key;
+import fr.logica.business.context.RequestContext;
 import fr.logica.db.DB;
 import fr.logica.domain.models.ShopShelfModel;
 
@@ -31,7 +32,7 @@ public class ShopShelf extends Entity implements Serializable {
 	private Integer position ;
 
 	/** Description */
-	private String w$Desc ;
+	private String internalCaption ;
 
 
 	public ShopShelf() {
@@ -57,16 +58,15 @@ public class ShopShelf extends Entity implements Serializable {
 	 * Load a bean from database based on its primary key
 	 * <b>This method does not call the logic method dbPostLoad().</b>
 	 * @param code Code
-
 	 * @param ctx Current context with open database connection.
 	 * @return	<code>true</code> if the bean has been loaded, <code>false</code> if no entity was found.  
 	 */
-	public boolean find(String code, Context ctx) {
+	public boolean find(String code, RequestContext ctx) {
 		Key primaryKey = ShopShelfModel.buildPrimaryKey(code);
 		if (!primaryKey.isFull()) {
 			return false;
 		}
-		ShopShelf dbInstance = DB.get($NAME, primaryKey, ctx);
+		ShopShelf dbInstance = DB.get(NAME, primaryKey, ctx);
 		if (dbInstance != null) {
 			syncFromBean(dbInstance);
 			return true; 
@@ -80,15 +80,14 @@ public class ShopShelf extends Entity implements Serializable {
 
 	/** Entity name */
 	@Override
-	public String $_getName() {
+	public String name() {
 		return "shopShelf";
 	}
 
-
 	/** Entity description */
 	@Override
-	public String $_getDesc() {
-		return "name";
+	public String description() {
+		return getInternalCaption(); 
 	}
 
 	/**
@@ -108,6 +107,9 @@ public class ShopShelf extends Entity implements Serializable {
 	public void setCode(final String code) {
 		this.code = code;
 	}
+	
+
+
 	/**
 	 * Get the value from field Name.
 	 *
@@ -125,6 +127,9 @@ public class ShopShelf extends Entity implements Serializable {
 	public void setName(final String name) {
 		this.name = name;
 	}
+	
+
+
 	/**
 	 * Get the value from field Position.
 	 *
@@ -142,23 +147,47 @@ public class ShopShelf extends Entity implements Serializable {
 	public void setPosition(final Integer position) {
 		this.position = position;
 	}
+	
+
+
 	/**
-	 * Get the value from field W$Desc.
+	 * Gets the value from field InternalCaption. This getter respects real Java naming convention. 
 	 *
 	 * @return the value
 	 */
-	public String getW$Desc() {
-		return this.w$Desc;
+	public String getw$Desc() {
+		return getInternalCaption();
 	}
  
 	/**
-	 * Set the value from field W$Desc.
+	 * Sets the value from field InternalCaption. This setter respects real Java naming convention
 	 *
-	 * @param w$Desc : the value to set
+	 * @param internalCaption : the value to set
 	 */
-	public void setW$Desc(final String w$Desc) {
-		this.w$Desc = w$Desc;
+	public void setw$Desc(final String internalCaption) {
+		setInternalCaption(internalCaption); 
 	}
+
+	/**
+	 * Get the value from field InternalCaption.
+	 *
+	 * @return the value
+	 */
+	public String getInternalCaption() {
+		return this.internalCaption;
+	}
+ 
+	/**
+	 * Set the value from field InternalCaption.
+	 *
+	 * @param internalCaption : the value to set
+	 */
+	public void setInternalCaption(final String internalCaption) {
+		this.internalCaption = internalCaption;
+	}
+	
+
+
 	/** Holder for the var names */
 	public interface Var {
 		/** Var CODE */
@@ -172,13 +201,18 @@ public class ShopShelf extends Entity implements Serializable {
 
 	/**
 	 * This methods gets all instances of ShopArticle back referenced by the current ShopShelf instance via link ShopArticleLShelf. <br/>
-	 * <b>Warning: this method does not cache its results and will connect to database on every call.</b>
+	 * <b>Warning: this method does not cache its results and will connect to database on every call.</b> <br/>
+	 * <i>Note: if the PK is incomplete, an empty set will be returned.</i>
 	 * 
 	 * @param ctx Current context with open database connection.
 	 * @return Set containing instances for every ShopArticle related to the current ShopShelf via link ShopArticleLShelf.
 	 */
-	public Set<ShopArticle> getList_ShopArticleLShelf(Context ctx) {
+	public Set<ShopArticle> getList_ShopArticleLShelf(RequestContext ctx) {
 		Set<ShopArticle> s = new HashSet<ShopArticle>();
+		if (this.getPrimaryKey() == null || !this.getPrimaryKey().isFull()) {
+			// Do not get linked entities if PK is incomplete
+			return s;
+		}
 		for (Entity e : DB.getLinkedEntities(this, ShopShelfModel.LINK_SHOP_ARTICLE_L_SHELF, ctx)) {
 			s.add((ShopArticle) e);
 		}
@@ -188,16 +222,37 @@ public class ShopShelf extends Entity implements Serializable {
 
 	/** Holder for the action names */
 	public interface Action {
-		/** Create. */
+		/** Créer. */
 		int ACTION_0 = 0;
-		/** Modify. */
+		/** Modifier. */
 		int ACTION_2 = 2;
-		/** Delete. */
+		/** Supprimer. */
 		int ACTION_4 = 4;
-		/** Display. */
+		/** Afficher. */
 		int ACTION_5 = 5;
     }
 
 	/** Nom de l'entité. */
-	public static final String $NAME = "shopShelf";
+	public static final String NAME = "shopShelf";
+	
+	/**
+	 * Clones the current bean.
+	 */
+	@Override
+	public ShopShelf clone() {
+		ShopShelf clone = (ShopShelf) super.clone();
+		clone.removeDefaultValues();
+		for (String f : getModel().getFields()) {
+			clone.invokeSetter(f, invokeGetter(f));
+		}
+		clone.resetLinksAndBackRefs();
+		return clone;
+	}
+
+	/** 
+	 * Removes all initial values from the bean and sets everything to null
+	 */
+	@Override
+	public void removeDefaultValues() {
+	}
 }

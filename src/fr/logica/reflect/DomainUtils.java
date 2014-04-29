@@ -10,15 +10,10 @@ import fr.logica.jsf.controller.SessionController;
 import fr.logica.jsf.utils.JSFBeanUtils;
 
 public class DomainUtils {
-
-	private static SessionController sessionCtrl;
-
+	
+	/** Attention, méthode assez lente : chargement du SessionController depuis le contexte à chaque appel. */
 	private static SessionController getSessionCtrl() {
-		if (sessionCtrl == null)
-		{
-			sessionCtrl = (SessionController) JSFBeanUtils.getManagedBean(FacesContext.getCurrentInstance(), "sessionCtrl");
-		}
-		return sessionCtrl;
+		return (SessionController) JSFBeanUtils.getManagedBean(FacesContext.getCurrentInstance(), "sessionCtrl");
 	}
 
 	/**
@@ -54,7 +49,8 @@ public class DomainUtils {
 		String fullClassName = Constants.DOMAIN_LOGIC_PACKAGE + "." + className + Constants.EXTENSION_LOGIC;
 		try {
 
-			if (getSessionCtrl() != null && getSessionCtrl().getDisableCustom() != null && getSessionCtrl().getDisableCustom())
+			SessionController sessionCtrl = getSessionCtrl();
+			if (sessionCtrl != null && sessionCtrl.getDisableCustom() != null && sessionCtrl.getDisableCustom())
 			{
 				try {
 					return (DomainLogic<?>) Class.forName("fr.logica.business.DefaultLogic").newInstance();

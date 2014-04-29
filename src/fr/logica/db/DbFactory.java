@@ -1,13 +1,12 @@
 package fr.logica.db;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 import fr.logica.business.Constants;
-import fr.logica.business.Context;
 import fr.logica.business.TechnicalException;
+import fr.logica.business.context.RequestContext;
 import fr.logica.reflect.DomainUtils;
 
 public class DbFactory {
@@ -23,7 +22,7 @@ public class DbFactory {
 
 	@SuppressWarnings("unchecked")
 	private static void initialize() {
-		if (DbConnection.dbType == null) {
+		if (DbConnection.getDbType() == null) {
 			// dbType is not set yet, we'll initialize later
 			return;
 		}
@@ -41,32 +40,17 @@ public class DbFactory {
 				}
 			}
 			initialized = true;
-		} catch (ClassNotFoundException e) {
-			throw new TechnicalException("Impossible d'initialiser DbFactory : " + e.getMessage(), e);
-		} catch (IllegalArgumentException e) {
-			throw new TechnicalException("Impossible d'initialiser DbFactory : " + e.getMessage(), e);
-		} catch (SecurityException e) {
-			throw new TechnicalException("Impossible d'initialiser DbFactory : " + e.getMessage(), e);
-		} catch (IllegalAccessException e) {
-			throw new TechnicalException("Impossible d'initialiser DbFactory : " + e.getMessage(), e);
-		} catch (InvocationTargetException e) {
-			throw new TechnicalException("Impossible d'initialiser DbFactory : " + e.getMessage(), e);
-		} catch (NoSuchMethodException e) {
-			throw new TechnicalException("Impossible d'initialiser DbFactory : " + e.getMessage(), e);
-		} catch (InstantiationException e) {
-			throw new TechnicalException("Impossible d'initialiser DbFactory : " + e.getMessage(), e);
+		} catch (Exception e) {
+			throw new TechnicalException("Erreur d'initialisation de la DbFactory : " + e.getMessage(), e);
 		}
 	}
 
 	/**
 	 * Creates a new query.
 	 * 
-	 * @param ctx
-	 *            Current context.
-	 * @param entityName
-	 *            Domain object's name to query.
-	 * @param queryName
-	 *            Name of the query to execute.
+	 * @param ctx Current context.
+	 * @param entityName Domain object's name to query.
+	 * @param queryName Name of the query to execute.
 	 * @return a new DbQuery object.
 	 */
 	public DbEntity createDbEntity() {
@@ -85,60 +69,50 @@ public class DbFactory {
 	/**
 	 * Creates a new object to query database.
 	 * 
-	 * @param ctx
-	 *            Current context.
-	 * @param query
-	 *            Query to execute.
+	 * @param ctx Current context.
+	 * @param query Query to execute.
 	 * @return A new IDbManager object.
 	 */
-	public DbManager createDbManager(Context ctx, DbQuery query) {
+	public DbManager createDbManager(RequestContext ctx, DbQuery query) {
 		return new DbManager(ctx, query);
 	}
 
 	/**
 	 * Creates a new query.
 	 * 
-	 * @param ctx
-	 *            Current context.
-	 * @param entityName
-	 *            Domain object's name to query.
+	 * @param ctx Current context.
+	 * @param entityName Domain object's name to query.
 	 * @return a new DbQuery object.
 	 */
-	public DbQuery createDbQuery(Context ctx, String entityName) {
+	public DbQuery createDbQuery(RequestContext ctx, String entityName) {
 		return new DbQuery(entityName);
 	}
 
 	/**
 	 * Creates a new query.
 	 * 
-	 * @param ctx
-	 *            Current context.
-	 * @param entityName
-	 *            Domain object's name to query.
-	 * @param alias
-	 *            Alias to use in the query.
+	 * @param ctx Current context.
+	 * @param entityName Domain object's name to query.
+	 * @param alias Alias to use in the query.
 	 * @return a new DbQuery object.
 	 */
-	public DbQuery createDbQuery(Context ctx, String entityName, String alias) {
+	public DbQuery createDbQuery(RequestContext ctx, String entityName, String alias) {
 		return new DbQuery(entityName, alias);
 	}
 
 	/**
 	 * Creates a new query.
 	 * 
-	 * @param ctx
-	 *            Current context.
-	 * @param entityName
-	 *            Domain object's name to query.
-	 * @param queryName
-	 *            Name of the query to execute.
+	 * @param ctx Current context.
+	 * @param entityName Domain object's name to query.
+	 * @param queryName Name of the query to execute.
 	 * @return a new DbQuery object.
 	 */
-	public synchronized DbQuery getQuery(Context ctx, String entityName) {
+	public synchronized DbQuery getQuery(RequestContext ctx, String entityName) {
 		return getDbQuery(ctx, entityName, DomainUtils.createDbName(entityName));
 	}
 
-	public synchronized DbQuery getDbQuery(Context ctx, String entityName, String queryName) {
+	public synchronized DbQuery getDbQuery(RequestContext ctx, String entityName, String queryName) {
 		if (entityName == null || "".equals(entityName)) {
 			return null;
 		}
@@ -169,8 +143,6 @@ public class DbFactory {
 				return (DbQuery) getDbQuery(ctx, qMainEntity, queryName);
 			}
 			return (DbQuery) QUERIES.get(entityName).getQuery(queryName).clone();
-		} catch (CloneNotSupportedException e) {
-			throw new TechnicalException("Impossible de cloner la requête demandée : " + entityName + " - " + queryName, e);
 		} catch (NullPointerException e) {
 			throw new TechnicalException("La requête demandée : " + entityName + " - " + queryName + " est introuvable. ");
 		}

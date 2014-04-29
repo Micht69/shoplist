@@ -53,6 +53,12 @@
 	width: 100%;
 }
 
+#menu > li > a span.notificationCounter,
+#menu ul li a span.notificationCounter {
+	display: inline-block;
+	width: auto;
+}
+
 /* Adding the triangle after each menu title */
 #menu > li > a span:last-child:after {
     content: "";
@@ -67,6 +73,11 @@
     border-top-style: solid;
     border-bottom-style: none;
 }
+
+#menu > li > a span.notificationCounter:last-child:after {
+	content: none;
+}
+
 
 /******************************************************************************
  * All menus (not the menu-bar)
@@ -92,6 +103,7 @@
 	clear: none;
 	float: none;
 	width: 100%;
+	text-align: left;
 }
 
 #menu ul li a {
@@ -131,6 +143,9 @@
     width: 0;
 }
 
+#menu ul li a span.notificationCounter:last-child:after {
+	content: none;
+}
 
 
 /******************************************************************************

@@ -19,6 +19,8 @@ import javax.naming.directory.SearchResult;
 
 import org.apache.log4j.Logger;
 
+import fr.logica.application.logic.User;
+
 /**
  * SecurityManager using manual LDAP authentication.
  * 
@@ -75,11 +77,11 @@ public class LdapSecurityManager extends DefaultSecurityManager {
 	}
 
 	@Override
-	public ApplicationUser getUser(String login, String password) {
+	public User getUser(String login, String password) {
 		// Escape login invalid characters
-		LOGGER.debug("Login attempt with login="+login);
+		LOGGER.debug("Login attempt with login=" + login);
 		login = sanitize(login);
-		LOGGER.debug("Login sanitized into login="+login);
+		LOGGER.debug("Login sanitized into login=" + login);
 
 		try {
 			// Search for user
@@ -102,16 +104,16 @@ public class LdapSecurityManager extends DefaultSecurityManager {
 					DirContext dctx = new InitialDirContext(env);
 					dctx.close();
 					// Login success
-					LOGGER.info("User log-in successfull for '"+login+"'");
+					LOGGER.info("User log-in successfull for '" + login + "'");
 
 					// Return an ApplicationUser object
-					ApplicationUser user = new ApplicationUser(login);
+					User user = new User(login);
 					// With other attributes as custom data
-					user.getCustomData().putAll(userData);
+					user.getUserData().putAll(userData);
 					return user;
 				} catch (AuthenticationException ae) {
 					// Login failed
-					LOGGER.warn("User log-in rejected for '"+login+"'");
+					LOGGER.warn("User log-in rejected for '" + login + "'");
 
 					// Return null to reject login
 					return null;
@@ -194,39 +196,39 @@ public class LdapSecurityManager extends DefaultSecurityManager {
 	 * @return escaped String
 	 */
 	private String sanitize(final String input) {
-		String s = "";
+		StringBuilder s = new StringBuilder();
 		for (int i = 0; i < input.length(); i++) {
 			char c = input.charAt(i);
 			if (c == '*') {
 				// escape asterisk
-				s += "\\2a";
+				s.append("\\2a");
 			} else if (c == '(') {
 				// escape left parenthesis
-				s += "\\28";
+				s.append("\\28");
 			} else if (c == ')') {
 				// escape right parenthesis
-				s += "\\29";
+				s.append("\\29");
 			} else if (c == '\\') {
 				// escape backslash
-				s += "\\5c";
+				s.append("\\5c");
 			} else if (c == '\u0000') {
 				// escape NULL char
-				s += "\\00";
+				s.append("\\00");
 			} else if (c <= 0x7f) {
 				// regular 1-byte UTF-8 char
-				s += String.valueOf(c);
+				s.append(String.valueOf(c));
 			} else if (c >= 0x080) {
 				// higher-order 2, 3 and 4-byte UTF-8 chars
 				try {
 					byte[] utf8bytes = String.valueOf(c).getBytes("UTF8");
 					for (byte b : utf8bytes)
-						s += String.format("\\%02x", b);
+						s.append(String.format("\\%02x", b));
 				} catch (UnsupportedEncodingException e) {
-					// ignore
+					// Ignore char
+					LOGGER.debug(e.getMessage(), e);
 				}
 			}
 		}
-
-		return s;
+		return s.toString();
 	}
 }

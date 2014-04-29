@@ -5,6 +5,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -20,13 +21,18 @@ import org.apache.xmlrpc.serializer.DateSerializer;
 import org.apache.xmlrpc.serializer.TypeSerializer;
 import org.xml.sax.SAXException;
 
+import fr.logica.application.logic.User;
 import fr.logica.business.Action;
-import fr.logica.business.Context;
+import fr.logica.business.Constants;
 import fr.logica.business.DefaultLogic;
 import fr.logica.business.Key;
+import fr.logica.business.context.RequestContext;
+import fr.logica.business.controller.Request;
 import fr.logica.domain.models.ShopShelfModel;
 import fr.logica.domain.objects.ShopArticle;
-import fr.logica.security.User;
+import fr.logica.domain.objects.ShopList;
+import fr.logica.domain.objects.ShopListLArticle;
+import fr.logica.queries.ShopArticleQuery;
 import fr.logica.ui.Message;
 
 /**
@@ -38,8 +44,8 @@ public class ShopArticleLogic extends DefaultLogic<ShopArticle> {
 	private final Logger logger = Logger.getLogger(this.getClass());
 
 	@Override
-	public void dbOnSave(ShopArticle bean, Action action, Context ctx) {
-		if (action.code == ShopArticle.Action.ACTION_50) {
+	public void dbOnSave(ShopArticle bean, Action action, RequestContext ctx) {
+		if (action.getCode() == ShopArticle.Action.ACTION_50) {
 			// Import from EAN database
 			logger.debug("EAN import.");
 			searchUPCdatabase(bean, ctx);
@@ -48,9 +54,9 @@ public class ShopArticleLogic extends DefaultLogic<ShopArticle> {
 	}
 
 	@Override
-	public void dbPostLoad(ShopArticle bean, Action action, Context ctx) {
-		if (action.code == ShopArticle.Action.ACTION_50 && ctx.getUser() instanceof User) {
-			User user = (User) ctx.getUser();
+	public void dbPostLoad(ShopArticle bean, Action action, RequestContext ctx) {
+		if (action.getCode() == ShopArticle.Action.ACTION_50) {
+			User user = ctx.getSessionContext().getUser();
 			if (user.eanCode != null) {
 				bean.setEan13(user.eanCode);
 				user.eanCode = null;
@@ -63,7 +69,23 @@ public class ShopArticleLogic extends DefaultLogic<ShopArticle> {
 		super.dbPostLoad(bean, action, ctx);
 	}
 
-	private void searchUPCdatabase(ShopArticle bean, Context ctx) {
+	@Override
+	public List<Key> doCustomAction(Request<ShopArticle> request, ShopArticle entity, List<Key> keys, RequestContext ctx) {
+		if (request.getAction().is(Constants.SELECT) && ShopArticleQuery.Query.QUERY_SHOP_ARTICLE.equals(request.getQueryName())) {
+			ShopList liste = (ShopList) request.getLinkedEntity();
+			for (Key articlePk : keys) {
+				ShopListLArticle lienListeArticle = new ShopListLArticle();
+				lienListeArticle.setListId(liste.getId());
+				lienListeArticle.setArticleId((Integer) articlePk.getValue(ShopArticle.Var.ID));
+				lienListeArticle.setQuantity(1);
+				lienListeArticle.setStatus(ShopListLArticle.ValueList.STATUS.BUY);
+				lienListeArticle.persist(ctx);
+			}
+		}
+		return super.doCustomAction(request, entity, keys, ctx);
+	}
+
+	private void searchUPCdatabase(ShopArticle bean, RequestContext ctx) {
 		String ean = bean.getEan13();
 		if (ean == null) {
 			ctx.getMessages().add(new Message("Veuillez entrer un code EAN.", Message.Severity.ERROR));

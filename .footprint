@@ -1,19 +1,25 @@
 
 ### Generated with layers
-* jsf2-3.0.0-SNAPSHOT
-* jweb-3.0.0-SNAPSHOT
-* sql-3.0.0-SNAPSHOT
+* jsf2-3.1.0-SNAPSHOT
+* jweb-3.1.0-SNAPSHOT
+* rorschach-3.1.0-SNAPSHOT
+* sql-3.1.0-SNAPSHOT
 
 ### Generation options
-databaseType=MYSQL
-dataGenerator=false
-beanValidation=false
-encoding=windows-1252
+exportData=false
+locale=fr
 lock=none
 webServer=tomcat7
+database=MYSQL
+testUnits=false
+dataGenerator=false
+encoding=windows-1252
+beanValidation=false
+mavenProject=false
+execTimesStack=false
+actionTooltips=false
 multiapp=false
-exportXls=false
-css=default
 datasource=auto
+css=default
 
 ### This file can be removed with generation option footprint=false.

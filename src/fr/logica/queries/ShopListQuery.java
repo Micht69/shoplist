@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import fr.logica.business.TechnicalException;
 import fr.logica.db.AbstractEntityQuery;
 import fr.logica.db.DbQuery;
 import fr.logica.db.DbQuery.Join;
@@ -19,19 +20,26 @@ public class ShopListQuery extends AbstractEntityQuery {
 	/** Queries for entity ShopList */
 	public static final Map<String, DbQuery> QUERIES;
 
+	/** Initialize internal query repository */
 	static { 
 		QUERIES = new HashMap<String, DbQuery>();	
 		
-		DbQuery SHOP_LIST = new DbQuery("shopList", "T1");
-		SHOP_LIST.setName("SHOP_LIST");
-		SHOP_LIST.addColumn("id", "T1", Visibility.INVISIBLE);
-		SHOP_LIST.addColumn("name", "T1");
-		SHOP_LIST.addColumn("createDate", "T1");
-		SHOP_LIST.addColumn("articleCount", "T1");
-		QUERIES.put("SHOP_LIST", SHOP_LIST);	
+		// Initialization of query SHOP_LIST
+		DbQuery shopList = new DbQuery("shopList", "T1");
+		shopList.setName("SHOP_LIST");
+		shopList.addColumn("id", "T1", Visibility.INVISIBLE);
+		shopList.addColumn("name", "T1");
+		shopList.addColumn("createDate", "T1");
+		shopList.addColumn("articleCount", "T1");
+		QUERIES.put("SHOP_LIST", shopList);	
 
 	}
 	
+	/**
+	 * Gets a query from internal query cache
+	 * @param queryName query name
+	 * @return Cached query
+	 */
 	@Override
 	public DbQuery getQuery(String queryName) {
 		return QUERIES.get(queryName);
@@ -43,7 +51,7 @@ public class ShopListQuery extends AbstractEntityQuery {
 		String QUERY_SHOP_LIST = "SHOP_LIST";
 	}
 	
-	/** Holder for the query entityes aliases */
+	/** Holder for the query entities aliases */
 	public interface Alias {
 		/** Aliases for query SHOP_LIST */
 		public interface QUERY_SHOP_LIST {
@@ -57,5 +65,16 @@ public class ShopListQuery extends AbstractEntityQuery {
 	public Set<String> getQueryNames() {
 		return QUERIES.keySet();
 	}
+
+	/**
+	 * Returns a clone of DbQuery named SHOP_LIST
+	 * 
+	 * @return clone of DbQuery named SHOP_LIST
+	 */
+	public static DbQuery getShopListQuery() {
+		return QUERIES.get(Query.QUERY_SHOP_LIST).clone();
+	}
+
+
 }
 

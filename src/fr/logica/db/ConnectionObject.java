@@ -1,5 +1,7 @@
 package fr.logica.db;
 
+import java.util.Arrays;
+
 public class ConnectionObject {
 	private int id;
 	private Object connection;
@@ -8,7 +10,9 @@ public class ConnectionObject {
 	public ConnectionObject(int idConn, Object conn, StackTraceElement[] stack) {
 		this.id = idConn;
 		this.connection = conn;
-		this.stackTrace = stack;
+		if (stack != null) {
+			this.stackTrace = Arrays.copyOf(stack, stack.length);
+		}
 	}
 
 	public int getId() {

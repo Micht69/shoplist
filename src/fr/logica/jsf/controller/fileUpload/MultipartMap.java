@@ -23,42 +23,37 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Logger;
 
 import fr.logica.business.FileContainer;
 
 public class MultipartMap extends HashMap<String, Object> {
 
-	// Constants
-	// ----------------------------------------------------------------------------------
-
-	/**
-	 * 
-	 */
+	/** serialUID */
 	private static final long serialVersionUID = 1578326881508948774L;
+
+	private static final Logger LOGGER = Logger.getLogger(MultipartMap.class);
+
+	/** Attribute name */
 	private static final String ATTRIBUTE_NAME = "parts";
+
+	/** Default encoding */
 	private static final String DEFAULT_ENCODING = "UTF-8";
-	private static final int DEFAULT_BUFFER_SIZE = 10240; // 10KB.
 
-	// Vars
-	// ---------------------------------------------------------------------------------------
+	/** Buffer size (10kb) */
+	private static final int DEFAULT_BUFFER_SIZE = 10240;
 
+	/** Current encoding */
 	private String encoding;
-
-	// Constructors
-	// -------------------------------------------------------------------------------
 
 	/**
 	 * Construct multipart map based on the given multipart request and file upload location. When the encoding is not specified in the given
 	 * request, then it will default to <tt>UTF-8</tt>.
 	 * 
-	 * @param multipartRequest
-	 *            The multipart request to construct the multipart map for.
-	 * @param location
-	 *            The location to save uploaded files in.
-	 * @throws ServletException
-	 *             If something fails at Servlet level.
-	 * @throws IOException
-	 *             If something fails at I/O level.
+	 * @param multipartRequest The multipart request to construct the multipart map for.
+	 * @param location The location to save uploaded files in.
+	 * @throws ServletException If something fails at Servlet level.
+	 * @throws IOException If something fails at I/O level.
 	 */
 	@SuppressWarnings("unchecked")
 	// ServletFileUpload#parseRequest() isn't parameterized.
@@ -71,7 +66,7 @@ public class MultipartMap extends HashMap<String, Object> {
 		}
 
 		/* Parse GET parameters in queryString */
-		if(multipartRequest.getQueryString() != null) {
+		if (multipartRequest.getQueryString() != null) {
 			processQueryString(multipartRequest.getQueryString());
 		}
 
@@ -96,7 +91,8 @@ public class MultipartMap extends HashMap<String, Object> {
 	 * @param queryString
 	 */
 	private void processQueryString(String queryString) {
-		if (queryString == null) return;
+		if (queryString == null)
+			return;
 
 		String[] queryParams = queryString.split("&");
 		for (String param : queryParams) {
@@ -140,14 +136,11 @@ public class MultipartMap extends HashMap<String, Object> {
 
 	/**
 	 * @see ServletRequest#getParameterValues(String)
-	 * @throws IllegalArgumentException
-	 *             If this field is actually a File field.
+	 * @throws IllegalArgumentException If this field is actually a File field.
 	 */
 	public String[] getParameterValues(String name) {
 		Object value = super.get(name);
 		if (value instanceof String[]) {
-			// throw new
-			// IllegalArgumentException("This is a File field. Use #getFile() instead.");
 			return (String[]) value;
 		}
 		return null;
@@ -179,11 +172,9 @@ public class MultipartMap extends HashMap<String, Object> {
 	/**
 	 * Returns uploaded file associated with given request parameter name.
 	 * 
-	 * @param name
-	 *            Request parameter name to return the associated uploaded file for.
+	 * @param name Request parameter name to return the associated uploaded file for.
 	 * @return Uploaded file associated with given request parameter name.
-	 * @throws IllegalArgumentException
-	 *             If this field is actually a Text field.
+	 * @throws IllegalArgumentException If this field is actually a Text field.
 	 */
 	public FileContainer getFile(String name) {
 		Object value = super.get(name);
@@ -238,8 +229,7 @@ public class MultipartMap extends HashMap<String, Object> {
 			file.setContent(content);
 
 		} catch (IOException e) {
-			// TODO vérifier la gestion de l'exception
-
+			LOGGER.debug(e.getMessage(), e);
 		} finally {
 			IOUtils.closeQuietly(input);
 		}

@@ -449,7 +449,10 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
 .ui-slider-vertical .ui-slider-handle { left: -.3em; margin-left: 0; margin-bottom: -.6em; }
 .ui-slider-vertical .ui-slider-range { left: 0; width: 100%; }
 .ui-slider-vertical .ui-slider-range-min { bottom: 0; }
-.ui-slider-vertical .ui-slider-range-max { top: 0; }/*
+.ui-slider-vertical .ui-slider-range-max { top: 0; }
+
+.ui-slider-out { display: inline-block; width: 34px; }
+/*
  * jQuery UI Tabs 1.8.7
  *
  * Copyright 2010, AUTHORS.txt (http://jqueryui.com/about)
@@ -628,7 +631,7 @@ background: #dae1eb;
 
 .ui-button-text-only .ui-button-text {
 	display: inline;
-	padding: 0;
+	padding: .4em 1em;
 	line-height: 1em;
 }
 
@@ -886,10 +889,13 @@ background: #dae1eb;
 	margin-bottom: 3px;
 }
 
-img.ui-datepicker-trigger {
-	vertical-align: middle;
-	margin-left: 3px;
+.ui-datepicker-trigger {
 	cursor: pointer;
+	background-image: url('../img/ico_cal.png');
+	background-repeat: no-repeat;
+	background-position: 50%;
+	height: 30px;
+	border-radius: 0 4px 4px 0;
 }
 
 div#ui-datepicker-div {
@@ -898,8 +904,14 @@ div#ui-datepicker-div {
 }
 
 /* ------- DateTimePicker -------  */
+.ui-timepicker-div {
+	margin-bottom: .5em;
+}
+
 .ui-timepicker-div .ui-widget-header {
 	margin-bottom: 8px;
+	background: none;
+	background-color: rgb(243, 248, 253);
 }
 
 .ui-timepicker-div dl {

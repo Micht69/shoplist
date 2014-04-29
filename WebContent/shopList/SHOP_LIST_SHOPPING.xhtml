@@ -3,8 +3,9 @@
 
 <ui:define name="metadata">
 	<f:metadata>
-		<f:event type="preRenderView" listener="#{jsfCtrl.prepareUiAccess('mainForm')}" />
-		<f:attribute name="entity" value="shopList" />
+		<f:attribute name="entityName" value="shopList" />
+		<f:event type="preRenderView" listener="#{requestCtrl.initializeViewContext(jsfCtrl)}" />
+		<f:event type="preRenderView" listener="#{jsfCtrl.initializeView}" />
 	</f:metadata>
 </ui:define>
 
@@ -25,208 +26,169 @@
 					<h:outputText value=" "/>
 					<h:commandButton id="printAction" styleClass="btn_print" image="../static/img/buttons/print.png" title="#{hh:label('labels', 'boutons.print')}" onclick="window.print(); return false;" />
 					<h:outputText value=" "/>
-					<h:panelGroup id="socialActions" rendered="#{jsfCtrl.socialPanelEnabled}">
-<div class="g-plusone" data-size="standard" data-annotation="none"></div>
-
-<script type="text/javascript">
-  (function() {
-    var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
-    po.src = 'https://apis.google.com/js/plusone.js';
-    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
-  })();
-</script>
-					</h:panelGroup>
 				</div>
 			</td>
 			<td width="99%" style="text-align: right; white-space: nowrap;">
-				<h:commandButton id="validateAction" rendered="#{!jsfCtrl.noValidateButton}" styleClass="btn_medium" value="#{hh:label('labels', 'boutons.valider')}" action="#{jsfCtrl.validate}"  onclick="if ($('#mainForm').submitted) { alert('Traitement en cours. Veuillez patienter...');return false;} else { $('#mainForm').submitted = true; return true; }" />
+				<h:commandButton id="validateAction" rendered="#{!jsfCtrl.displaySubActions()}" styleClass="btn_medium" value="#{hh:label('labels', 'boutons.valider')}"
+					action="#{jsfCtrl.validate}" onclick="if (actionClicked) { alert('Traitement en cours. Veuillez patienter...');return false;} else { actionClicked = true; return true; }" />
 				<h:outputText value=" "/>
-				<h:commandButton id="cancelAction" immediate="true" styleClass="btn_medium" value="#{hh:label('labels', 'boutons.annuler')}" action="#{jsfCtrl.cancel}" onclick="return checkDirtyState(this);" />
+				<h:commandButton id="cancelAction" immediate="true" styleClass="btn_medium" value="#{hh:label('labels', 'boutons.annuler')}"
+					action="#{jsfCtrl.cancel}" onclick="return checkDirtyState(this);" />
 			</td>
 		</tr>
 	</table>
 	</div>
-
-<h:panelGroup id="shopListShopping" rendered="#{jsfCtrl.isVisible('shopListShopping')}" layout="none">
-
-<table class="group_table">
-
-	<tr>
-	
-		<td class="group_table_col_1">
-
-
-<ui:fragment rendered="#{jsfCtrl.isVisible('shopList.name')}">
-
-<table class="#{!jsfCtrl.isValid('mainForm:shopListShopping_shopList_name') ? 'error' : ''}">
-
-<tr><td class="colFieldSetLeft">
-
-<h:outputLabel escape="false" value="#{jsfCtrl.getLabel('shopList.name', 'shopListShopping.shopList.name')}" title="#{hh:label('tooltips', 'shopListShopping.shopList.name')}"/>
-
-
-</td>
-<td class="colFieldSetMid">
-<h:outputLabel value=":" />
-</td>
-<td class="colFieldSetRight">
-
-<h:inputText disabled="true" id="shopListShopping_shopList_name" value="#{jsfCtrl.entity.name}" label="#{jsfCtrl.getLabel('shopList.name', 'shopList.name')}"  maxlength="100" >
-</h:inputText>
-
-
-<h:message for="shopListShopping_shopList_name" styleClass="errorLabel" />
-
-</td></tr></table>
-
-</ui:fragment>
-
-
-	
-		</td>
-
-	</tr>
-
-	<tr>
-	
-		<td class="group_table_col_1">
-<ui:fragment rendered="#{jsfCtrl.isVisible('shopListLArticleLList')}"> 
-
-<div class="mainTable_container" id="list_shopListLArticleLList_shopArticlesShopping">
-
-	<div class="table_title"><h:graphicImage library='img' name='close_content.gif' styleClass='actionContent' alt="close" /><h:outputText value="#{jsfCtrl.getLabel('shopListLArticleLList_SHOP_ARTICLES_SHOPPING', 'SHOP_ARTICLES_SHOPPING_LIST')}" /></div>
-	
-	<div class="table_container">
-		
-<div class="actions">
-	<table style="width: 100%">
-		<tr>
-			<td style="text-align: left;" class="filter">
-				<span class="filter-line">
-					<span><h:outputText value="#{hh:label('labels', 'filtrer')}" /></span>
-					<h:outputText value=" " />
-					
-					<h:inputText id="globalFilter_shopListLArticleLList_shopArticlesShopping" value="#{jsfCtrl.jsFilterMap.SHOP_ARTICLES_SHOPPING}" onkeyup="showLines(null, this.value, 'shopListLArticleLList_shopArticlesShopping')" class="filter" />
-					
-					<span id="filterCount_SHOP_ARTICLES_SHOPPING"> </span>
-				</span>
-			</td>
-			<td style="text-align: right;"><span class="allActionButtons">
-				<h:panelGroup rendered="#{!jsfCtrl.listIsReadOnly('shopListLArticleLList_SHOP_ARTICLES_SHOPPING')}">
-					<span class="listButtons" id="buttonshopListLArticleLList_shopArticlesShopping">
-						<h:commandButton id="shopListLArticleLList_shopArticlesShopping_button60" alt='commandButton60' styleClass="btn_icon btn_medium"
-						rendered="#{sessionCtrl.isActionRendered('SHOP_LIST_L_ARTICLE', 60) and !jsfCtrl.listIsProtected('shopListLArticleLList_SHOP_ARTICLES_SHOPPING')}"
-						value="#{hh:label('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_60')}" action="#{jsfCtrl.prepareMultiAction('shopListLArticle', 60, 10, jsfCtrl.entity.links.shopListLArticleLList.results('SHOP_ARTICLES_SHOPPING').selectedPk, 'shopListLArticleLList')}" style="background-image: url('#{application.contextPath}/static/img/icons/mark.png');" />
-						<h:outputText value=" " />
-					</span>
-				</h:panelGroup>
-
-			</span></td>
-		</tr>
-	</table>
-	<h:commandButton id="shopListLArticleLList_shopArticlesShopping_launchAction" action="#{jsfCtrl.prepareLinkAction()}" style="display:none;"/> 
-	<h:inputText id="shopListLArticleLList_shopArticlesShopping_launchActionSelected" value="#{jsfCtrl.selectedRowEncodedKey}" style="display:none" />
-	<h:inputText id="shopListLArticleLList_shopArticlesShopping_launchActionEntity" value="#{jsfCtrl.launchActionEntity}" style="display:none" />
-	<h:inputText id="shopListLArticleLList_shopArticlesShopping_launchActionCode" value="#{jsfCtrl.launchActionCode}" style="display:none" />
-	<h:inputText id="shopListLArticleLList_shopArticlesShopping_launchActionType" value="#{jsfCtrl.launchActionType}" style="display:none" />
-	<h:inputText id="shopListLArticleLList_shopArticlesShopping_launchActionLink" value="#{jsfCtrl.launchActionLink}" style="display:none" />
-	<h:inputHidden id="shopListLArticleLList_shopArticlesShopping_launchActionList" value="#{jsfCtrl.launchActionList}" /> 
-</div>
-
-	
-		<div class="results_container">
-			<font color="red" style="font-style: italic;"><h:outputText value="#{hh:label('labels', 'results.nodata')}" rendered="#{empty jsfCtrl.entity.links.shopListLArticleLList.results('SHOP_ARTICLES_SHOPPING').list}" /></font>
-
-			<h:dataTable id="tableshopListLArticleLList_shopArticlesShopping" columnClasses="first, default, default, numeric, defValue" rowClasses="odd,even"
-				value="#{jsfCtrl.entity.links.shopListLArticleLList.results('SHOP_ARTICLES_SHOPPING').list}" var="tempVar"
-				rendered="#{not empty jsfCtrl.entity.links.shopListLArticleLList.results('SHOP_ARTICLES_SHOPPING')}"
-
-				onRowClick="launchLinkAction('shopListLArticleLList', 'shopListLArticle', 60, 10, '#{tempVar.primaryKey.encodedValue}', 'shopListLArticleLList_SHOP_ARTICLES_SHOPPING');"
-				readOnly="#{jsfCtrl.listIsReadOnly('shopListLArticleLList_SHOP_ARTICLES_SHOPPING')}">
-
-				<h:column headerClass="first" rendered="#{!jsfCtrl.listIsReadOnly('shopListLArticleLList_SHOP_ARTICLES_SHOPPING')}">
-					<f:facet name="header">
-						<input type="checkbox" onclick="manageChecks(this, 'shopListLArticleLList_shopArticlesShopping');" />
-					</f:facet>
-
-					<h:selectBooleanCheckbox value="#{tempVar.checked}" onclick="clickCheck(this, 'shopListLArticleLList_shopArticlesShopping');"/>
-					<input type="hidden" name="trdatashopListLArticleLList_shopArticlesShopping" value="#{tempVar.filterField}"/>
-				</h:column>
-
-					<h:column>
-						<f:facet name="header">
-							<h:outputText value="#{jsfCtrl.getColumnLabel(jsfCtrl.entity.links.shopListLArticleLList.results('SHOP_ARTICLES_SHOPPING').titles.T3_name, 'SHOP_ARTICLES_SHOPPING.shopShelf.name')}" />
-						</f:facet>
-
-						<h:outputLabel value="#{tempVar.T3_name}" />
-					</h:column>
-
-					<h:column>
-						<f:facet name="header">
-							<h:outputText value="#{jsfCtrl.getColumnLabel(jsfCtrl.entity.links.shopListLArticleLList.results('SHOP_ARTICLES_SHOPPING').titles.T4_name, 'SHOP_ARTICLES_SHOPPING.shopArticle.name')}" />
-						</f:facet>
-
-						<h:outputLabel value="#{tempVar.T4_name}" />
-					</h:column>
-
-					<h:column>
-						<f:facet name="header">
-							<h:outputText value="#{jsfCtrl.getColumnLabel(jsfCtrl.entity.links.shopListLArticleLList.results('SHOP_ARTICLES_SHOPPING').titles.T1_quantity, 'SHOP_ARTICLES_SHOPPING.shopListLArticle.quantity')}" />
-						</f:facet>
-
-						<h:outputLabel value="#{tempVar.T1_quantity}" />
-					</h:column>
-
-					<h:column>
-						<f:facet name="header">
-							<h:outputText value="#{jsfCtrl.getColumnLabel(jsfCtrl.entity.links.shopListLArticleLList.results('SHOP_ARTICLES_SHOPPING').titles.T1_status, 'SHOP_ARTICLES_SHOPPING.shopListLArticle.status')}" />
-						</f:facet>
-
-						<h:outputLabel value="#{tempVar.T1_status}" />
-					</h:column>
-				
-			</h:dataTable>
-		</div>
-	</div>
-	<script type="text/javascript">
-		$(document).ready(function() {
-			datatableAlignColumns('shopListLArticleLList_shopArticlesShopping');
-		});
-	</script>
-</div>
- </ui:fragment>
-	
-		</td>
-
-	</tr>
-
-</table>
-
-</h:panelGroup>
-
-
+	<h:panelGroup id="shopListShopping" rendered="#{jsfCtrl.uiGroupPanel('', 'shopList', 'shopListShopping').visible}" layout="none">
+		<table class="group_table">
+			<tr>
+				<td class="group_table_col_1">
+					<ui:fragment rendered="#{jsfCtrl.isVisible('shopList.name')}">
+						<table class="#{!jsfCtrl.isValid('mainForm:shopListShopping_shopList_name') ? 'error' : ''}">
+							<tr>
+								<td class="colFieldSetLeft">
+									<h:outputLabel id="i1_shopListShopping_shopList_name" escape="false" value="#{jsfCtrl.getLabel('shopList.name', 'shopListShopping.shopList.name')}" title="#{hh:label('tooltips', 'shopListShopping.shopList.name')}"/>
+								</td>
+								<td class="colFieldSetMid">
+									<h:outputLabel value=":" />
+								</td>
+								<td class="colFieldSetRight">
+									<h:inputText disabled="true" id="i0_shopListShopping_shopList_name" value="#{jsfCtrl.entity.name}" label="#{jsfCtrl.getLabel('shopList.name', 'shopList.name')}"  maxlength="100" >
+									</h:inputText>
+									<h:message for="i0_shopListShopping_shopList_name" styleClass="errorLabel" />
+								</td>
+							</tr>
+						</table>
+					</ui:fragment>
+				</td>
+			</tr>
+			<tr>
+				<td class="group_table_col_1">
+					<ui:fragment rendered="#{jsfCtrl.isVisible('shopListLArticleLList')}">
+						<div class="mainTable_container" id="list_i0_shopListLArticleLList_shopArticlesShopping">
+							<div class="table_title"><h:graphicImage library='img' name='close_content.gif' styleClass='actionContent' alt="close" /><h:outputText value="#{jsfCtrl.getLabel('shopListLArticleLList_SHOP_ARTICLES_SHOPPING', 'shopListShopping.0.shopListLArticleLList')}" /></div>
+							<div class="table_container">
+								<div class="actions">
+									<table style="width: 100%">
+										<tr>
+											<td style="text-align: left;" class="filter">
+												<span class="filter-line">
+													<span><h:outputText value="#{hh:label('labels', 'filtrer')}" /></span>
+													<h:outputText value=" " />
+													
+													<h:inputText id="globalFilter_shopListLArticleLList_shopArticlesShopping" value="#{jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES_SHOPPING', 'SHOP_LIST_L_ARTICLE').jsFilter}" onkeyup="showLines(null, this.value, 'i0_shopListLArticleLList_shopArticlesShopping')" styleClass="filter linklist-filter" />
+													
+													<span id="filterCount_SHOP_ARTICLES_SHOPPING"> </span>
+												</span>
+											</td>
+											<td style="text-align: right;"><span class="allActionButtons">
+												<h:panelGroup rendered="#{!jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES_SHOPPING', 'SHOP_LIST_L_ARTICLE').readonly}">
+													<span class="listButtons" id="buttonshopListLArticleLList_shopArticlesShopping">
+														<h:commandButton id="shopListLArticleLList_shopArticlesShopping_button60" alt='commandButton60' styleClass="btn_icon btn_medium"
+														rendered="#{sessionCtrl.isActionRendered('shopListLArticle', 60) and !jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES_SHOPPING', 'SHOP_LIST_L_ARTICLE').protected}"
+														value="#{hh:label('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_60')}" title="#{hh:label('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_60')}" action="#{jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES_SHOPPING', 'SHOP_LIST_L_ARTICLE').prepareActionCode(60)}" style="background-image: url('#{application.contextPath}/static/img/icons/mark.png');" />
+														<h:outputText value=" " />
+													</span>
+												</h:panelGroup>
+												<h:commandButton id="shopListLArticleLList_shopArticlesShopping_buttonXls" alt="commandButtonXlsExport" rendered="#{applicationCtrl.displayXlsExport and jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES_SHOPPING', 'SHOP_LIST_L_ARTICLE').rows.size() > 0}" styleClass="btn_medium"
+													value="#{hh:label('labels', 'boutons.exportExcel')}" action="#{jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES_SHOPPING', 'SHOP_LIST_L_ARTICLE').export('xls')}" />
+											</span></td>
+										</tr>
+									</table>
+									<h:commandButton id="shopListLArticleLList_shopArticlesShopping_launchAction" action="#{jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES_SHOPPING', 'SHOP_LIST_L_ARTICLE').prepareDefaultAction('60')}" disabled="#{not jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES_SHOPPING', 'SHOP_LIST_L_ARTICLE').hasAvailableActionIn('60')}" style="display:none;"/> 
+									<h:inputText id="shopListLArticleLList_shopArticlesShopping_launchActionSelected" value="#{jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES_SHOPPING', 'SHOP_LIST_L_ARTICLE').selectedRowEncodedKey}" style="display:none" />
+								</div>
+								<div class="results_container">
+									<font color="red" style="font-style: italic;">
+										<h:outputText value="#{hh:label('labels', 'results.nodata')}" rendered="#{empty jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES_SHOPPING', 'SHOP_LIST_L_ARTICLE').rows}" />
+									</font>
+									<h:dataTable vanilla="false" id="tablei0_shopListLArticleLList_shopArticlesShopping" columnClasses="first, default, default, numeric, defValue" rowClasses="odd,even"
+										onRowClick="launchLinkAction('#{tempVar.primaryKey.encodedValue}', 'shopListLArticleLList_shopArticlesShopping');"
+										value="#{jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES_SHOPPING', 'SHOP_LIST_L_ARTICLE').rows}" var="tempVar"
+										rendered="#{not empty jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES_SHOPPING', 'SHOP_LIST_L_ARTICLE').rows}">
+										<h:column headerClass="first" rendered="#{!jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES_SHOPPING', 'SHOP_LIST_L_ARTICLE').readonly}">
+											<f:facet name="header">
+												<input type="checkbox" onclick="manageChecks(this, 'shopListLArticleLList_shopArticlesShopping');" />
+											</f:facet>
+											<h:selectBooleanCheckbox value="#{tempVar.checked}" onclick="clickCheck(this, 'shopListLArticleLList_shopArticlesShopping');"/>
+											<input type="hidden" name="trdatashopListLArticleLList_shopArticlesShopping" value="#{tempVar.filterField}"/>
+										</h:column>
+											<h:column rendered="#{jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES_SHOPPING', 'SHOP_LIST_L_ARTICLE').columns.T3_name.visible}">
+												<f:facet name="header">
+													<h:commandLink style="#{jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES_SHOPPING', 'SHOP_LIST_L_ARTICLE').sortedStyle('T3_name')}">
+														<f:ajax render=":mainForm:messages :mainForm:tablei0_shopListLArticleLList_shopArticlesShopping" listener="#{jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES_SHOPPING', 'SHOP_LIST_L_ARTICLE').sortBy('T3_name')}"></f:ajax>
+														<h:outputText value="#{jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES_SHOPPING', 'SHOP_LIST_L_ARTICLE').columns.T3_name.title}" />
+													</h:commandLink>
+													<h:outputText value=" " />
+												</f:facet>
+												<h:outputLabel value="#{tempVar.T3_name}" />
+											</h:column>
+											<h:column rendered="#{jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES_SHOPPING', 'SHOP_LIST_L_ARTICLE').columns.T4_name.visible}">
+												<f:facet name="header">
+													<h:commandLink style="#{jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES_SHOPPING', 'SHOP_LIST_L_ARTICLE').sortedStyle('T4_name')}">
+														<f:ajax render=":mainForm:messages :mainForm:tablei0_shopListLArticleLList_shopArticlesShopping" listener="#{jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES_SHOPPING', 'SHOP_LIST_L_ARTICLE').sortBy('T4_name')}"></f:ajax>
+														<h:outputText value="#{jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES_SHOPPING', 'SHOP_LIST_L_ARTICLE').columns.T4_name.title}" />
+													</h:commandLink>
+													<h:outputText value=" " />
+												</f:facet>
+												<h:outputLabel value="#{tempVar.T4_name}" />
+											</h:column>
+											<h:column rendered="#{jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES_SHOPPING', 'SHOP_LIST_L_ARTICLE').columns.T1_quantity.visible}">
+												<f:facet name="header">
+													<h:commandLink style="#{jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES_SHOPPING', 'SHOP_LIST_L_ARTICLE').sortedStyle('T1_quantity')}">
+														<f:ajax render=":mainForm:messages :mainForm:tablei0_shopListLArticleLList_shopArticlesShopping" listener="#{jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES_SHOPPING', 'SHOP_LIST_L_ARTICLE').sortBy('T1_quantity')}"></f:ajax>
+														<h:outputText value="#{jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES_SHOPPING', 'SHOP_LIST_L_ARTICLE').columns.T1_quantity.title}" />
+													</h:commandLink>
+													<h:outputText value=" " />
+												</f:facet>
+												<h:outputLabel value="#{tempVar.T1_quantity}" />
+											</h:column>
+											<h:column rendered="#{jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES_SHOPPING', 'SHOP_LIST_L_ARTICLE').columns.T1_status.visible}">
+												<f:facet name="header">
+													<h:commandLink style="#{jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES_SHOPPING', 'SHOP_LIST_L_ARTICLE').sortedStyle('T1_status')}">
+														<f:ajax render=":mainForm:messages :mainForm:tablei0_shopListLArticleLList_shopArticlesShopping" listener="#{jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES_SHOPPING', 'SHOP_LIST_L_ARTICLE').sortBy('T1_status')}"></f:ajax>
+														<h:outputText value="#{jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES_SHOPPING', 'SHOP_LIST_L_ARTICLE').columns.T1_status.title}" />
+													</h:commandLink>
+													<h:outputText value=" " />
+												</f:facet>
+												<h:outputLabel value="#{tempVar.T1_status}" />
+											</h:column>
+									</h:dataTable>
+								</div>
+							</div>
+							<script type="text/javascript">
+								$(document).ready(function() {
+									datatableAlignColumns('i0_shopListLArticleLList_shopArticlesShopping');
+								});
+							</script>
+						</div>
+					</ui:fragment>
+				</td>
+			</tr>
+		</table>
+	</h:panelGroup>
 	<div class="actions bottomActions">
 	<table style="width: 100%">
 		<tr>
 			<td style="text-align: right;">
-				<h:commandButton id="validateAction2" rendered="#{!jsfCtrl.noValidateButton}" styleClass="btn_medium" value="#{hh:label('labels', 'boutons.valider')}" action="#{jsfCtrl.validate}"  onclick="if ($('#mainForm').submitted) { alert('Traitement en cours. Veuillez patienter...');return false;} else { $('#mainForm').submitted = true; return true; }" />
+				<h:commandButton id="validateAction2" rendered="#{!jsfCtrl.displaySubActions()}" styleClass="btn_medium" value="#{hh:label('labels', 'boutons.valider')}"
+					action="#{jsfCtrl.validate}"  onclick="if (actionClicked) { alert('Traitement en cours. Veuillez patienter...');return false;} else { actionClicked = true; return true; }" />
 				<h:outputText value=" "/>
-				<h:commandButton id="cancelAction2" immediate="true" styleClass="btn_medium" value="#{hh:label('labels', 'boutons.annuler')}" action="#{jsfCtrl.cancel}" onclick="return checkDirtyState(this);" />
+				<h:commandButton id="cancelAction2" immediate="true" styleClass="btn_medium" value="#{hh:label('labels', 'boutons.annuler')}"
+					action="#{jsfCtrl.cancel}" onclick="return checkDirtyState(this);" />
 			</td>
 		</tr>
 	</table>
 	</div>
-<script type="text/javascript">
-$(document).ready(function() {
-	try { 
-		<h:outputText value="doPageCustomize('SHOP_LIST_SHOPPING');" rendered="#{!sessionCtrl.disableJS}"/>
-		$('td[class="first"]').click(function(event){
-			event.stopPropagation();
-		});
-	} catch (e) {}
-});
+	<script type="text/javascript">
+	$(document).ready(function() {
+		try { 
+			<h:outputText value="doPageCustomize('SHOP_LIST_SHOPPING');" rendered="#{!sessionCtrl.disableJS}"/>
+			$('td[class="first"]').click(function(event){
+				event.stopPropagation();
+			});
+		} catch (e) {}
+	});
 </script>
-
 </ui:define>
 </ui:composition>
 
