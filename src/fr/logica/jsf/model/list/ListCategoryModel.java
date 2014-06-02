@@ -115,12 +115,14 @@ public class ListCategoryModel extends ListModel {
 	@Override
 	public List<Key> getSelected() {
 		List<Key> keys = new ArrayList<Key>();
-		for (TreeNode n : selectedNodes) {
-			if (n instanceof RowNode) {
-				addOnceToList(((Row) n.getData()).getPk(), keys);
-			}
-			if (n instanceof BreakNode) {
-				addChildren((BreakNode) n, keys);
+		if (selectedNodes != null) {
+			for (TreeNode n : selectedNodes) {
+				if (n instanceof RowNode) {
+					addOnceToList(((Row) n.getData()).getPk(), keys);
+				}
+				if (n instanceof BreakNode) {
+					addChildren((BreakNode) n, keys);
+				}
 			}
 		}
 		return keys;
@@ -140,8 +142,10 @@ public class ListCategoryModel extends ListModel {
 	/**
 	 * Adds a primary key to the list if it's not already present. We don't use a Set because elements order matters.
 	 * 
-	 * @param pk Key to add to the list
-	 * @param keys Key list
+	 * @param pk
+	 *            Key to add to the list
+	 * @param keys
+	 *            Key list
 	 */
 	private void addOnceToList(Key pk, List<Key> keys) {
 		if (pk == null || keys == null) {

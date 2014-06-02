@@ -4,14 +4,13 @@
         xmlns:h="http://java.sun.com/jsf/html"
         xmlns:ui="http://java.sun.com/jsf/facelets"
         xmlns:f="http://java.sun.com/jsf/core">
-<f:view contentType="text/html" locale="#{sessionCtrl.currentUserLocale}">
+<f:view contentType="text/html" locale="#{sessionCtrl.context.locale}">
 <f:metadata>
     <f:event type="preRenderView" listener="#{menuCtrl.executeMenuQueries()}" />
     <ui:insert name="metadata"/>
 </f:metadata>
 <h:head>
-	<meta http-equiv="X-Ua-Compatible" content="IE=edge" />
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta name="author" content="CGI" />
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<ui:insert name="meta"></ui:insert>
@@ -24,7 +23,6 @@
 	<link rel="stylesheet" type="text/css" href="../static/css/jquery-magnific-popup.css" /> 
 
 	<!-- Stylesheets for other specific widgets -->
-	<link rel="stylesheet" type="text/css" href="../static/css/tabedit.css" />
 	<link rel="stylesheet" type="text/css" href="../static/css/treeRightAccess.css" />
 
 	<!-- Layout stylesheets -->

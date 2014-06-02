@@ -8,6 +8,7 @@ import java.util.Map;
 import fr.logica.business.Action.Input;
 import fr.logica.business.Action.Persistence;
 import fr.logica.business.Action.UserInterface;
+import fr.logica.business.EntityField.Memory;
 import fr.logica.business.context.RequestContext;
 import fr.logica.business.controller.Request;
 import fr.logica.business.controller.Response;
@@ -125,9 +126,9 @@ public abstract class DomainLogic<E extends Entity> extends AbstractDomainLogic<
 		}
 		Action action = response.getAction();
 		if (action.getInput() == Input.QUERY && action.getUi() == UserInterface.OUTPUT) {
-			return MessageUtils.getInstance().getListTitle(response.getQueryName());
+			return MessageUtils.getInstance(ctx).getListTitle(response.getQueryName());
 		}
-		return MessageUtils.getInstance().getTitle(response.getEntityName(), response.getAction().getCode());
+		return MessageUtils.getInstance(ctx).getTitle(response.getEntityName(), response.getAction().getCode());
 	}
 
 
@@ -144,7 +145,7 @@ public abstract class DomainLogic<E extends Entity> extends AbstractDomainLogic<
 	@Override
 	public String uiListColumnCaption(DbQuery query, LinkModel link, String varName, RequestContext ctx) {
 		Var var = query.getOutVar(varName);
-		return MessageUtils.getInstance().getQryVarTitle(query.getName(), var.tableId, var.name);
+		return MessageUtils.getInstance(ctx).getQryVarTitle(query.getName(), var.tableId, var.name);
 	}
 
 	@Override
@@ -186,6 +187,9 @@ public abstract class DomainLogic<E extends Entity> extends AbstractDomainLogic<
 			if (action.getPersistence() != Persistence.INSERT && action.getPersistence() != Persistence.NONE) {
 				return true;
 			}
+		}
+		if (bean.getModel().getField(varName).getMemory() != Memory.NO) {
+			return true;
 		}
 		return false;
 	}
@@ -260,6 +264,11 @@ public abstract class DomainLogic<E extends Entity> extends AbstractDomainLogic<
 
 	@Override
 	public boolean uiListPrepare(DbQuery query, E criteria, Action action, String linkName, Entity linkedEntity, RequestContext ctx) {
+		return false;
+	}
+
+	@Override
+	public boolean uiListPrepare(DbQuery query, String criteria, Action action, String linkName, Entity linkedEntity, RequestContext ctx) {
 		return false;
 	}
 

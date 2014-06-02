@@ -8,12 +8,12 @@
 	<ui:define name="title">Erreur inattendue</ui:define>
 
 	<ui:define name="body">
-		<h2><h:outputText value="#{hh:label('messages', 'error.bug')}" /></h2><br />
+		<h2><h:outputText value="#{jsfCtrl.getXhtmlLabel('messages', 'error.bug')}" /></h2><br />
 
 		<h:panelGroup>
 			<div class="form_container" id="contextVars">
 				<div class="form_title">
-					<h:outputText value="#{hh:label('labels', 'errorPage.contextVars')}" />
+					<h:outputText value="#{jsfCtrl.getXhtmlLabel('labels', 'errorPage.contextVars')}" />
 				</div>
 				<table class="group_table">
 					<tr>
@@ -30,7 +30,7 @@
 		<h:panelGroup layout="none">
 			<div class="form_container" id="stackTraceGroup">
 				<div class="form_title">
-					<h:outputText value="#{hh:label('labels', 'errorPage.stacktrace')}" />
+					<h:outputText value="#{jsfCtrl.getXhtmlLabel('labels', 'errorPage.stacktrace')}" />
 				</div>
 				<table class="group_table">
 					<tr>
@@ -39,7 +39,7 @@
 								<h:outputText escape="false" value="#{exception}" />
 							</div>
 							<div style="text-align:center; margin-top:15px;">
-								~ ~ ~ ~ ~ ~ <span id="stackTraceButton" onclick="javascript:toggleStackTrace()" style="cursor:pointer;"><h:outputText value="#{hh:label('labels', 'errorPage.plus')}"/></span> ~ ~ ~ ~ ~ ~
+								~ ~ ~ ~ ~ ~ <span id="stackTraceButton" onclick="javascript:toggleStackTrace()" style="cursor:pointer;"><h:outputText value="#{jsfCtrl.getXhtmlLabel('labels', 'errorPage.plus')}"/></span> ~ ~ ~ ~ ~ ~
 							</div>
 						</td>
 					</tr>
@@ -49,11 +49,11 @@
 			
 		<script type="text/javascript" >
 		function toggleStackTrace() {
-			if ($("#stackTraceButton").html() == "#{hh:label('labels', 'errorPage.plus')}") {
-				$("#stackTraceButton").html("#{hh:label('labels', 'errorPage.moins')}");
+			if ($("#stackTraceButton").html() == "#{jsfCtrl.getXhtmlLabel('labels', 'errorPage.plus')}") {
+				$("#stackTraceButton").html("#{jsfCtrl.getXhtmlLabel('labels', 'errorPage.moins')}");
 				$("#stackTrace").css({'height' : '', 'overflow-y' : ''});
 			} else {
-				$("#stackTraceButton").html("#{hh:label('labels', 'errorPage.plus')}");
+				$("#stackTraceButton").html("#{jsfCtrl.getXhtmlLabel('labels', 'errorPage.plus')}");
 				$("#stackTrace").css({'height' : '300px', 'overflow-y' : 'hidden'});
 			}
 		}

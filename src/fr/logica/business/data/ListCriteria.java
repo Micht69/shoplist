@@ -2,6 +2,8 @@ package fr.logica.business.data;
 
 import java.io.Serializable;
 
+import fr.logica.business.Constants;
+
 public class ListCriteria implements Serializable {
 
 	/** serialUID */
@@ -10,7 +12,8 @@ public class ListCriteria implements Serializable {
 	public String orderByField;
 	public String orderByDirection;
 	public int minRow = 0;
-	public int maxRow = 200;
+	public int maxRow = Constants.MAX_ROW;
+	public String searchCriteria;
 
 	public void sortBy(String field) {
 		if (orderByField != null && orderByField.equals(field)) {

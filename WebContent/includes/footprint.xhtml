@@ -6,14 +6,14 @@
     <h:panelGroup id="libraries" layout="none">
 		<div class="form_container" id="libraries">
 			<div class="form_title">
-				<h:outputText value="#{hh:label('labels', 'adminPage.libraries')}" />
+				<h:outputText value="#{jsfCtrl.getXhtmlLabel('labels', 'adminPage.libraries')}" />
 			</div>
 			<table class="group_table">
 				<tr>
 					<td class="group_table_col_1">
 						<h:outputText value="jsf2-3.1.0-SNAPSHOT"/><br />
 						<h:outputText value="jweb-3.1.0-SNAPSHOT"/><br />
-						<h:outputText value="rorschach-3.1.0-SNAPSHOT"/><br />
+						<h:outputText value="rorschach-3.1.2-SNAPSHOT"/><br />
 						<h:outputText value="sql-3.1.0-SNAPSHOT"/><br />
 					</td>
 				</tr>
@@ -24,12 +24,12 @@
 	<h:panelGroup id="options" layout="none">
 		<div class="form_container" id="options">
 			<div class="form_title">
-				<h:outputText value="#{hh:label('labels', 'adminPage.options')}" />
+				<h:outputText value="#{jsfCtrl.getXhtmlLabel('labels', 'adminPage.options')}" />
 			</div>
 			<table class="group_table">
 				<tr>
 					<td class="group_table_col_1">
-						<h:outputText value="exportData = false"/><br />
+						<h:outputText value="exportData = true"/><br />
 						<h:outputText value="locale = fr"/><br />
 						<h:outputText value="lock = none"/><br />
 						<h:outputText value="webServer = tomcat7"/><br />
@@ -42,6 +42,7 @@
 						<h:outputText value="execTimesStack = false"/><br />
 						<h:outputText value="actionTooltips = false"/><br />
 						<h:outputText value="multiapp = false"/><br />
+						<h:outputText value="persistence.schema = none"/><br />
 						<h:outputText value="datasource = auto"/><br />
 						<h:outputText value="css = default"/><br />
 					</td>

@@ -111,7 +111,12 @@ public class DatatableRenderer extends TableRenderer {
 
 			writer.startElement("div", component);
 			writer.writeAttribute("id", "datatable-div-data-" + id, null);
-			writer.writeAttribute("class", "datatable-div-data", null);
+
+			if (data.getRowCount() != 0) {
+				writer.writeAttribute("class", "datatable-div-data", null);
+			} else {
+				writer.writeAttribute("class", "datatable-div-data datatable-empty", null);
+			}
 			writer.writeAttribute("style", "visibility: hidden", null);
 			renderTableStart(context, component, writer, ATTRIBUTES);
 

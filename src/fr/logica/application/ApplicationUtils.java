@@ -50,7 +50,6 @@ public class ApplicationUtils {
 	public static synchronized ApplicationContext getApplicationContext() {
 		if (appContext == null) {
 			appContext = new ApplicationContext();
-			getApplicationLogic().initializeApplication(appContext);
 		}
 		return appContext;
 	}

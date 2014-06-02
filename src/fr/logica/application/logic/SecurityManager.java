@@ -44,28 +44,25 @@ public class SecurityManager extends DefaultSecurityManager {
 	}
 
 	@Override
-	public User getUser(String login, String password) {
+	public User getUser(String login, String password, RequestContext ctx) {
 		// Auth through DB
 		User user = null;
 		DbQuery userQuery = new DbQuery(ShopUserModel.ENTITY_NAME, "USR");
 		userQuery.addCondEq(ShopUser.Var.LOGIN, "USR", login);
 		userQuery.addCondEq(ShopUser.Var.PASSWORD, "USR", password);
 
-		DbConnection con = null;
+		DbManager dbm = null;
 		try {
-			con = DB.createDbConnection();
-			RequestContext ctx = new RequestContext(null);
-			DbManager dbm = new DbManager(ctx, userQuery);
+			dbm = new DbManager(ctx, userQuery);
 			if (dbm.next()) {
 				ShopUser dbUser = new ShopUser();
 				dbm.getEntity("USR", dbUser, ctx);
 
 				user = new User(dbUser);
 			}
-			ctx.close();
 		} finally {
-			if (con != null) {
-				con.close();
+			if (dbm != null) {
+				dbm.close();
 			}
 		}
 
@@ -73,7 +70,7 @@ public class SecurityManager extends DefaultSecurityManager {
 	}
 
 	@Override
-	public List<SecurityFunction> getSecurity(User user) {
+	public List<SecurityFunction> getSecurity(User user, RequestContext ctx) {
 		List<SecurityFunction> ret = new ArrayList<SecurityFunction>();
 		if (ShopUser.ValueList.PROFILE.USER.equals(user.profile)) {
 			getUserSecurity(ret);

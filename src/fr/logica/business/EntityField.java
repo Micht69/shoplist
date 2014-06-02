@@ -2,6 +2,7 @@ package fr.logica.business;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class EntityField {
 	/** SQL field name */
@@ -168,24 +169,24 @@ public class EntityField {
 		return getDefaultCode();
 	}
 
-	public String getDefinedLabel(Object value) {
+	public String getDefinedLabel(Object value, Locale l) {
 		for (int i = 0; i < values.size(); i++) {
 			if (value == null && values.get(i) == null) {
-				return MessageUtils.getInstance().getGenLabel(labels.get(i), null);
+				return MessageUtils.getInstance(l).getGenLabel(labels.get(i), null);
 			} else if (values.get(i) == null) {
 				continue;
 			}
 			if (values.get(i).equals(value)) {
-				return MessageUtils.getInstance().getGenLabel(labels.get(i), null);
+				return MessageUtils.getInstance(l).getGenLabel(labels.get(i), null);
 			}
 		}
 		return null;
 	}
 
-	public String getDefLabel(String code) {
+	public String getDefLabel(String code, Locale l) {
 		for (int i = 0; i < codes.size(); i++) {
 			if (codes.get(i).equals(code)) {
-				return MessageUtils.getInstance().getGenLabel(labels.get(i), null);
+				return MessageUtils.getInstance(l).getGenLabel(labels.get(i), null);
 			}
 		}
 		if (code == null) {
@@ -238,4 +239,9 @@ public class EntityField {
 	public void setSqlExpr(String sqlExpr) {
 		this.sqlExpr = sqlExpr;
 	}
+
+	public boolean isAlpha() {
+		return "VARCHAR2".equals(sqlType) || "CHAR".equals(sqlType) || "CLOB".equals(sqlType);
+	}
+
 }

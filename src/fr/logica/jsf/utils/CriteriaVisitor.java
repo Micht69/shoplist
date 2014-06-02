@@ -90,7 +90,7 @@ public class CriteriaVisitor implements VisitCallback {
 	}
 
 	public String getCriterias() {
-		return criterias.length() > 0 ? criterias.substring(0, criterias.length() - 2) : "";
+		return criterias.length() > 0 ? ("(" + criterias.substring(0, criterias.length() - 2) + ")") : "";
 	}
 
 }

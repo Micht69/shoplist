@@ -20,6 +20,7 @@ import javax.naming.directory.SearchResult;
 import org.apache.log4j.Logger;
 
 import fr.logica.application.logic.User;
+import fr.logica.business.context.RequestContext;
 
 /**
  * SecurityManager using manual LDAP authentication.
@@ -77,7 +78,7 @@ public class LdapSecurityManager extends DefaultSecurityManager {
 	}
 
 	@Override
-	public User getUser(String login, String password) {
+	public User getUser(String login, String password, RequestContext ctx) {
 		// Escape login invalid characters
 		LOGGER.debug("Login attempt with login=" + login);
 		login = sanitize(login);
@@ -192,7 +193,8 @@ public class LdapSecurityManager extends DefaultSecurityManager {
 	/**
 	 * Escape LDAP invalid characters.
 	 * 
-	 * @param input String to escape
+	 * @param input
+	 *            String to escape
 	 * @return escaped String
 	 */
 	private String sanitize(final String input) {

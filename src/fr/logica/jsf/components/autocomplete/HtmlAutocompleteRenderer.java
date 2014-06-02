@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.el.ELException;
@@ -20,7 +21,10 @@ import com.sun.faces.renderkit.html_basic.TextRenderer;
 
 import fr.logica.business.MessageUtils;
 import fr.logica.jsf.components.autocomplete.AutocompleteSuggestion;
+import fr.logica.jsf.components.autocomplete.UIAutocomplete;
+import fr.logica.jsf.controller.SessionController;
 import fr.logica.jsf.model.link.LinkQuickSearchModel;
+import fr.logica.jsf.utils.JSFBeanUtils;
 
 @FacesRenderer(componentFamily = UIAutocomplete.COMPONENT_FAMILY, rendererType = HtmlAutocompleteRenderer.RENDERER_TYPE)
 public class HtmlAutocompleteRenderer extends TextRenderer {
@@ -136,14 +140,18 @@ public class HtmlAutocompleteRenderer extends TextRenderer {
 			try {
 				result = model.quickSearch(value);
 			} catch (MethodNotFoundException mnfe) {
-				result = new ArrayList<AutocompleteSuggestion>();
-				result.add(new AutocompleteSuggestion(MessageUtils.getInstance().getMessage("autocomplete.error", null), "-1"));
-
+				result = getErrorMessage(facesContext);
 			} catch (ELException ele) {
-				result = new ArrayList<AutocompleteSuggestion>();
-				result.add(new AutocompleteSuggestion(MessageUtils.getInstance().getMessage("autocomplete.error", null), "-1"));
+				result = getErrorMessage(facesContext);
 			}
 		}
+		return result;
+	}
+
+	private List<AutocompleteSuggestion> getErrorMessage(FacesContext facesContext) {
+		List<AutocompleteSuggestion> result = new ArrayList<AutocompleteSuggestion>();
+		Locale l = ((SessionController) JSFBeanUtils.getManagedBean(facesContext, "sessionCtrl")).getContext().getLocale();
+		result.add(new AutocompleteSuggestion(MessageUtils.getInstance(l).getMessage("autocomplete.error", null), "-1"));
 		return result;
 	}
 

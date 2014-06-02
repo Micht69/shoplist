@@ -3,6 +3,7 @@ package fr.logica.business;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -20,6 +21,7 @@ public abstract class EntityModel {
 
 	/**
 	 * Retrieves the database schema where the table is located.
+	 * 
 	 * @return A schema name or an empty string.
 	 */
 	public abstract String getDbSchemaName();
@@ -33,7 +35,8 @@ public abstract class EntityModel {
 	/**
 	 * Get a Foreign Key by it's name
 	 * 
-	 * @param keyName : the name of the FK
+	 * @param keyName
+	 *            : the name of the FK
 	 * @return the ForeignKeyModel
 	 */
 	public abstract ForeignKeyModel getForeignKeyModel(String keyName);
@@ -41,7 +44,8 @@ public abstract class EntityModel {
 	/**
 	 * Get a Link by it's name
 	 * 
-	 * @param linkName : the name of the link
+	 * @param linkName
+	 *            : the name of the link
 	 * @return the LinkModel
 	 */
 	public abstract LinkModel getLinkModel(String linkName);
@@ -49,7 +53,8 @@ public abstract class EntityModel {
 	/**
 	 * Get a Back-Link by it's name
 	 * 
-	 * @param linkName : the name of the back-link
+	 * @param linkName
+	 *            : the name of the back-link
 	 * @return the LinkModel
 	 */
 	public abstract LinkModel getBackRefModel(String linkName);
@@ -78,7 +83,8 @@ public abstract class EntityModel {
 	/**
 	 * Get the field definition for the given name
 	 * 
-	 * @param name : the name of the field
+	 * @param name
+	 *            : the name of the field
 	 * @return an EntityField
 	 */
 	public abstract EntityField getField(String name);
@@ -93,7 +99,8 @@ public abstract class EntityModel {
 	/**
 	 * Check if a field is of type AutoIncrement
 	 * 
-	 * @param name : the name of the field
+	 * @param name
+	 *            : the name of the field
 	 * @return true if AutoIncrement, false otherwise
 	 */
 	public abstract boolean isAutoIncrementField(String name);
@@ -108,7 +115,8 @@ public abstract class EntityModel {
 	/**
 	 * Get an action by it's code
 	 * 
-	 * @param code : the code of the action
+	 * @param code
+	 *            : the code of the action
 	 * @return the Action
 	 */
 	public abstract Action getAction(int code);
@@ -120,7 +128,7 @@ public abstract class EntityModel {
 	 */
 	public abstract Set<String> getLookupFields();
 
-	public Map<String, Object> enumValues(String enumName) {
+	public Map<String, Object> enumValues(String enumName, Locale l) {
 		// On utilise une LinkedHashMap uniquement pour le style, parce que personne ne le fait jamais.
 		// Et accessoirement, ça conserve l'ordre d'entrée dans la map.
 
@@ -131,13 +139,13 @@ public abstract class EntityModel {
 		String realEnumName = enumName.substring(0, 1).toLowerCase() + enumName.substring(1);
 		for (int i = 0; i < getField(realEnumName).getValues().size(); i++) {
 			if (getField(realEnumName).getValues().get(i) == null) {
-				map.put(MessageUtils.getInstance().getGenLabel(getField(realEnumName).getLabels().get(i), null), getField(realEnumName)
+				map.put(MessageUtils.getInstance(l).getGenLabel(getField(realEnumName).getLabels().get(i), null), getField(realEnumName)
 						.getValues().get(i));
 			}
 		}
 		for (int i = 0; i < getField(realEnumName).getValues().size(); i++) {
 			if (getField(realEnumName).getValues().get(i) != null) {
-				map.put(MessageUtils.getInstance().getGenLabel(getField(realEnumName).getLabels().get(i), null), getField(realEnumName)
+				map.put(MessageUtils.getInstance(l).getGenLabel(getField(realEnumName).getLabels().get(i), null), getField(realEnumName)
 						.getValues().get(i));
 			}
 		}
@@ -156,7 +164,8 @@ public abstract class EntityModel {
 	/**
 	 * Get the associative link name by it's name
 	 * 
-	 * @param linkName : the name of the link
+	 * @param linkName
+	 *            : the name of the link
 	 * @return null if the entity isn't associative
 	 */
 	public String getAssociatedLink(String linkName) {
@@ -175,9 +184,11 @@ public abstract class EntityModel {
 	 * Check is the given key is a Strong key<br>
 	 * (ie all fields are mandatory)
 	 * 
-	 * @param keyName : the name of the key
+	 * @param keyName
+	 *            : the name of the key
 	 * @return true if all fields are mandatory, false otherwise
-	 * @throws TechnicalException if the keyName doen't belong to this entity
+	 * @throws TechnicalException
+	 *             if the keyName doen't belong to this entity
 	 */
 	public boolean isStrongKey(String keyName) {
 		if (getForeignKeyModel(keyName) == null) {

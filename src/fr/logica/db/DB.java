@@ -1,5 +1,6 @@
 package fr.logica.db;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import fr.logica.business.Action;
@@ -13,9 +14,8 @@ import fr.logica.business.Key;
 import fr.logica.business.LinkModel;
 import fr.logica.business.TechnicalException;
 import fr.logica.business.context.RequestContext;
-import fr.logica.db.DbManager;
-import fr.logica.db.DbQuery;
 import fr.logica.reflect.DomainUtils;
+import fr.logica.ui.Message;
 
 public class DB {
 
@@ -163,7 +163,7 @@ public class DB {
 		DomainLogic<E> logic = ((DomainLogic<E>) DomainUtils.getLogic(domain));
 		logic.internalDbOnSave(domain, action, ctx);
 		if (logic.internalDoCheck(domain, action, ctx)) {
-			throw new FunctionalException();
+			throw new FunctionalException(new ArrayList<Message>(ctx.getMessages()));
 		}
 		boolean insert = dbFactory.createDbEntity().persist(domain, ctx);
 		logic.internalDbPostSave(domain, action, ctx);
@@ -179,7 +179,7 @@ public class DB {
 		DomainLogic<E> logic = ((DomainLogic<E>) DomainUtils.getLogic(domain));
 		logic.internalDbOnSave(domain, action, ctx);
 		if (logic.internalDoCheck(domain, action, ctx)) {
-			throw new FunctionalException();
+			throw new FunctionalException(new ArrayList<Message>(ctx.getMessages()));
 		}
 		dbFactory.createDbEntity().insert(domain, ctx);
 		logic.internalDbPostSave(domain, action, ctx);
@@ -194,7 +194,7 @@ public class DB {
 		DomainLogic<E> logic = ((DomainLogic<E>) DomainUtils.getLogic(domain));
 		logic.internalDbOnSave(domain, action, ctx);
 		if (logic.internalDoCheck(domain, action, ctx)) {
-			throw new FunctionalException();
+			throw new FunctionalException(new ArrayList<Message>(ctx.getMessages()));
 		}
 		dbFactory.createDbEntity().update(domain, ctx);
 		logic.internalDbPostSave(domain, action, ctx);
@@ -251,5 +251,10 @@ public class DB {
 			mgr.close();
 		}
 		return count;
+	}
+
+	/** Gets a LOB content from database */
+	public static byte[] getLobContent(RequestContext ctx, Entity entity, String propertyName) {
+		return dbFactory.createDbEntity().getLobContent(ctx, entity, propertyName);
 	}
 }

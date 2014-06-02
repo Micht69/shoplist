@@ -1569,7 +1569,7 @@ public class DbQuery implements Cloneable {
 	 * @param notNull
 	 *            vrai pour tester IS NOT NULL, faux pour tester IS NULL
 	 */
-	private void addCondIsNull(String colAlias, String tableAlias, boolean notNull) {
+	public void addCondIsNull(String colAlias, String tableAlias, boolean notNull) {
 		String value = SqlOp.OP_ISNULL.val;
 		if (notNull) {
 			value = SqlOp.OP_N_ISNULL.val;

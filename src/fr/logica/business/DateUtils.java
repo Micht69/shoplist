@@ -2,6 +2,7 @@ package fr.logica.business;
 
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -57,8 +58,14 @@ public final class DateUtils {
 	 * @throws Exception
 	 */
 	public static Date stringToDate(String sDate) throws Exception {
-		SimpleDateFormat stringToDate = new SimpleDateFormat("dd/MM/yyyy");
-		return stringToDate.parse(sDate);
+		SimpleDateFormat stringToDate;
+		try {
+			stringToDate = new SimpleDateFormat("dd/MM/yyyy");
+			return stringToDate.parse(sDate);
+		} catch (ParseException e) {
+			stringToDate = new SimpleDateFormat("yyyy-MM-dd");
+			return stringToDate.parse(sDate);
+		}
 	}
 
 	/**
@@ -85,10 +92,16 @@ public final class DateUtils {
 	 * @throws Exception
 	 */
 	public static Timestamp stringToTimestamp(String sTimestamp) throws Exception {
-		SimpleDateFormat stringToTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S");
-		Calendar cal = GregorianCalendar.getInstance();
-		cal.setTimeInMillis(stringToTime.parse(sTimestamp).getTime());
-		return new Timestamp(cal.getTimeInMillis());
+		Date d;
+		SimpleDateFormat stringToDate;
+		try {
+			stringToDate = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss.S");
+			d = stringToDate.parse(sTimestamp);
+		} catch (ParseException e) {
+			stringToDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S");
+			d = stringToDate.parse(sTimestamp);
+		}
+		return new Timestamp(d.getTime());
 	}
 
 	public static Date addJours(Date d, int nbJours) {

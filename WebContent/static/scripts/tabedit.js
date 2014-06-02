@@ -113,14 +113,6 @@ tabedit.registerEditableTable = function(myTableId, myFormId) {
 		cgi.debug("No editable table present");
 		return;
 	}
-	
-	myTableId = $(toJqId(myDatatableId)).find("div.datatable-div-data").find("table").attr("id");
-	
-	/* the datatableId is "mainForm:stuff:tableQUERY_NAME". We want "QUERY_NAME" */
-	myDatatableIdAsTab = myDatatableId.split(":");
-	myQueryName = myDatatableIdAsTab[myDatatableIdAsTab.length-1].replace(new RegExp("^table"),"");
-	
-	tabedit.table[myDatatableId] = {
 
 	var table = {
 		tableId : myTableId,
@@ -128,7 +120,6 @@ tabedit.registerEditableTable = function(myTableId, myFormId) {
 		$tableId : toJqId(myTableId),
 		$formId : toJqId(myFormId),
 		dirty: false,
-		queryName: myQueryName,
 
 		getCurrentAction : function() {
 			return $(this.$formId).find(".tabedit-current-action").val();
@@ -266,16 +257,8 @@ tabedit.registerEditableTable = function(myTableId, myFormId) {
 
 			/* prepare the success */
 			options.onSuccess = function() {
-				
-				if (currentAction == tabedit.CREATE_ACTION_NAME) {
-					/* to render correctly the datatables. FIXME : should be in the onload of datatable */
-					if ($('.list_results_container').length>0) {
-						initList(that.queryName);
-					} else {
-						datatableAlignColumns(that.queryName);					
-					}
-				}
-				
+				successCallback();
+
 				if (that.onSaveSuccess() && nextAction != "") {
 					that.onPrepareSuccess();
 				}
@@ -348,35 +331,34 @@ tabedit.registerEditableTable = function(myTableId, myFormId) {
 
 				/* set the proper style on each cell */
 				$row.find("td").addClass("tabedit-active");
-				var availableWidth  = $td.innerWidth() - parseInt($td.css('padding-left')) - parseInt($td.css('padding-right'));
-
-				var $input = $write.children().children();
-
-				/* Correct dimensions  */
-				$input.width(   availableWidth  - parseInt($input.css('padding-left')) - parseInt($input.css('padding-right'))  - parseInt($input.css('border-left-width')) - parseInt($input.css('border-right-width'))  );
-
-				/* apply the table alignement to the input field */
-				$input.css("text-align", $read.css("text-align"));
 			});
-			
+
 			/* iterate on write divs for combobox */
 			var $writeSelectDivs = $row.find(".tabedit-editable-write");
-			$writeSelectDivs.each(function(index) {
-				var $writeSelect = $writeSelectDivs.eq(index);
-				if ($writeSelect.has("select").length) {
-					selectValue = "";
+
+			$writeSelectDivs.each(function() {
+				var $writeSelect = $(this);
+				var $select = $writeSelect.find("select");
+
+				if ($select.length > 0) {
+					var selectValue = "";
 					$inputs = $writeSelect.find("input");
-					$inputs.each(function(jindex) {
-						$input = $inputs.eq(jindex);
-						if (selectValue != "") {
-							selectValue += ";;;";
-						}
-						idInput = $input.attr("id");
-						splitIdInput = idInput.split("_")
-						keySelect = splitIdInput[splitIdInput.length-1];
-						selectValue += keySelect + ":::" + $input.val();
-					});
-					$writeSelect.find("select").val(selectValue);
+
+					if ($inputs.length > 0) {
+
+						$inputs.each(function() {
+							$input = $(this);
+
+							if (selectValue != "") {
+								selectValue += ";;;";
+							}
+							idInput = $input.attr("id");
+							splitIdInput = idInput.split("_");
+							keySelect = splitIdInput[splitIdInput.length - 1];
+							selectValue += keySelect + ":::" + $input.val();
+						});
+						$writeSelect.find("select").val(selectValue);
+					}
 				}
 			});
 
@@ -707,7 +689,7 @@ tabedit.registerEditableTable = function(myTableId, myFormId) {
 	 * function trick is here to ensure the 'this' object within onClick refers to the table object, not the HTML
 	 * element (as is the case if onClick is directly used as the argument of $.click()).
 	 */
-	var $clickTarget = $(toJqId(myTableId)).closest("div");
+	var $clickTarget = $(toJqId(myTableId)).parent().parent().parent();
 	$clickTarget.click(function(event) {
 		// $(document).click(function(event) {
 		table.onClick(event);
@@ -746,33 +728,37 @@ tabedit.ajaxCall = function(options, event) {
 		options.$button.click();
 		return;
 	}
-	
+
 	/* iterate on write divs for combobox */
-	var $writeSelectDivs = $(".tabedit-editable-table").find(".tabedit-editable-write");
-	$writeSelectDivs.each(function(index) {
-		var $writeSelect = $writeSelectDivs.eq(index);
-		if ($writeSelect.has("select").length) {
-			selectValue = $writeSelect.find("select").val();
-			keyValues = selectValue.split(";;;");
+	var $row = $(tabedit.getWorkingRow());
+	var $writeSelectDivs = $row.find(".tabedit-editable-write");
+
+	$writeSelectDivs.each(function() {
+		var $writeSelect = $(this);
+		var $select = $writeSelect.find("select");
+
+		if ($select.length > 0) {
+			var selectValue = $writeSelect.find("select").val();
+			var keyValues = selectValue.split(";;;");
+
 			for (var i = 0; i < keyValues.length; i++) {
 				keyValues[i] = keyValues[i].split(":::");
 			}
-			
-			$inputs = $writeSelect.find("input");
-			$inputs.each(function(jindex) {
-				$input = $inputs.eq(jindex);
-				
-				idInput = $input.attr("id");
-				splitIdInput = idInput.split("_")
-				keySelect = splitIdInput[splitIdInput.length-1];
-				
+			var $inputs = $writeSelect.find("input");
+
+			$inputs.each(function() {
+				var $input = $(this);
+				var idInput = $input.attr("id");
+				var splitIdInput = idInput.split("_");
+				var keySelect = splitIdInput[splitIdInput.length - 1];
+
 				for (var i = 0; i < keyValues.length; i++) {
+
 					if (keySelect == keyValues[i][0]) {
 						$input.val(keyValues[i][1]);
 					}
 				}
-				
-				idInputGeneric = idInput.substring(0, idInput.length - 8).replace(":", "\\:");
+				var idInputGeneric = idInput.substring(0, idInput.length - 8).replace(":", "\\:");
 				$("#" + idInputGeneric).val($input.val());
 			});
 		}

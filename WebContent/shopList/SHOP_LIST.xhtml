@@ -18,31 +18,31 @@
 			<td width="1%" style="text-align: left; white-space: nowrap;">
 				<div id="advanced-actions">
 	    			<h:panelGroup rendered="#{commentCtrl.commentsEnabled}">
-						<h:commandLink id="commentAction" styleClass="btn_comment" value="#{commentCtrl.commentsCount('shopList', jsfCtrl.entity.primaryKey.encodedValue)}" title="#{hh:label('labels', 'boutons.comment')}" onclick="commentPage();">
+						<h:commandLink id="commentAction" styleClass="btn_comment" value="#{commentCtrl.commentsCount('shopList', jsfCtrl.entity.primaryKey.encodedValue)}" title="#{jsfCtrl.getXhtmlLabel('labels', 'boutons.comment')}" onclick="commentPage();">
 							<f:ajax event="click" execute="@none" render="comment-list" />
 						</h:commandLink>
 	    				<ui:include src="../includes/comment.xhtml" />
 	    			</h:panelGroup>
 					<h:outputText value=" "/>
-					<h:commandButton id="printAction" styleClass="btn_print" image="../static/img/buttons/print.png" title="#{hh:label('labels', 'boutons.print')}" onclick="window.print(); return false;" />
+					<h:commandButton id="printAction" styleClass="btn_print" image="../static/img/buttons/print.png" title="#{jsfCtrl.getXhtmlLabel('labels', 'boutons.print')}" onclick="window.print(); return false;" />
 					<h:outputText value=" "/>
 				</div>
 			</td>
 			<td width="99%" style="text-align: right; white-space: nowrap;">
-				<h:commandButton id="validateAction" rendered="#{!jsfCtrl.displaySubActions()}" styleClass="btn_medium" value="#{hh:label('labels', 'boutons.valider')}"
+				<h:commandButton id="validateAction" rendered="#{!jsfCtrl.displaySubActions()}" styleClass="btn_medium" value="#{jsfCtrl.getXhtmlLabel('labels', 'boutons.valider')}"
 					action="#{jsfCtrl.validate}" onclick="if (actionClicked) { alert('Traitement en cours. Veuillez patienter...');return false;} else { actionClicked = true; return true; }" />
 				<h:outputText value=" "/>
-				<h:commandButton id="cancelAction" immediate="true" styleClass="btn_medium" value="#{hh:label('labels', 'boutons.annuler')}"
+				<h:commandButton id="cancelAction" immediate="true" styleClass="btn_medium" value="#{jsfCtrl.getXhtmlLabel('labels', 'boutons.annuler')}"
 					action="#{jsfCtrl.cancel}" onclick="return checkDirtyState(this);" />
 			</td>
 		</tr>
 	</table>
 	</div>
-	<h:panelGroup id="shopList" rendered="#{jsfCtrl.uiGroupPanel('', 'shopList', 'shopList').visible}" layout="none">
+	<h:panelGroup id="i0_shopList" rendered="#{jsfCtrl.uiGroupPanel('', 'shopList', 'shopList').visible}" layout="none">
 		<table class="group_table">
 			<tr>
 				<td class="group_table_col_1">
-					<h:panelGroup id="shopListInfos" rendered="#{jsfCtrl.uiGroupPanel('', 'shopList', 'shopListInfos').visible}" layout="none">
+					<h:panelGroup id="i0_shopListInfos" rendered="#{jsfCtrl.uiGroupPanel('', 'shopList', 'shopListInfos').visible}" layout="none">
 						<table class="group_table">
 							<tr>
 								<td class="group_table_col_1">
@@ -50,7 +50,7 @@
 										<table class="#{!jsfCtrl.isValid('mainForm:shopListInfos_shopList_name') ? 'error' : ''}">
 											<tr>
 												<td class="colFieldSetLeft">
-													<h:outputLabel id="i1_shopListInfos_shopList_name" escape="false" value="#{jsfCtrl.getLabel('shopList.name', 'shopListInfos.shopList.name')}" title="#{hh:label('tooltips', 'shopListInfos.shopList.name')}"/>
+													<h:outputLabel id="i1_shopListInfos_shopList_name" escape="false" value="#{jsfCtrl.getLabel('shopList.name', 'shopListInfos.shopList.name')}" title="#{jsfCtrl.getXhtmlLabel('tooltips', 'shopListInfos.shopList.name')}"/>
 													<h:outputLabel value="*" styleClass="mandatory_label" rendered="#{jsfCtrl.isMandatory('shopList.name')}"/>
 												</td>
 												<td class="colFieldSetMid">
@@ -74,7 +74,7 @@
 										<table>
 											<tr>
 												<td class="colFieldSetLeft">
-													<h:outputLabel id="i0_shopListInfos_0_shopArticleLUser" escape="false" value="#{jsfCtrl.getLabel('shopArticleLUser', 'shopListInfos.0.shopArticleLUser')}" title="#{hh:label('tooltips', 'shopListInfos.0.shopArticleLUser')}"/>
+													<h:outputLabel id="i0_shopListInfos_0_shopArticleLUser" escape="false" value="#{jsfCtrl.getLabel('shopArticleLUser', 'shopListInfos.0.shopArticleLUser')}" title="#{jsfCtrl.getXhtmlLabel('tooltips', 'shopListInfos.0.shopArticleLUser')}"/>
 													
 													<h:outputLabel value="*" styleClass="mandatory_label" rendered="#{jsfCtrl.isMandatory('shopArticleLUser')}"/>
 												</td>
@@ -82,7 +82,7 @@
 													<h:outputLabel value=":" />
 												</td>
 												<td class="colFieldSetRight">
-													<h:selectOneMenu disabledClass="disabledCombo" disabled="#{jsfCtrl.uiLinkCombo('shopArticleLUser', 'shopUser', 'SHOP_USER').readonly}" value="#{jsfCtrl.uiLinkCombo('shopArticleLUser', 'shopUser', 'SHOP_USER').selectedValue}"  label="#{hh:label('genLabels', 'shopListInfos.0.shopArticleLUser')}" onchange="markAsDirty(this)">
+													<h:selectOneMenu disabledClass="disabledCombo" disabled="#{jsfCtrl.uiLinkCombo('shopArticleLUser', 'shopUser', 'SHOP_USER').readonly}" value="#{jsfCtrl.uiLinkCombo('shopArticleLUser', 'shopUser', 'SHOP_USER').selectedValue}"  label="#{jsfCtrl.getXhtmlLabel('genLabels', 'shopListInfos.0.shopArticleLUser')}" onchange="markAsDirty(this)">
 													
 														<f:selectItem noSelectionOption="true" itemLabel=" "/>
 														<f:selectItems value="#{jsfCtrl.uiLinkCombo('shopArticleLUser', 'shopUser', 'SHOP_USER').comboValues}" />
@@ -102,14 +102,14 @@
 				<td class="group_table_col_1">
 					<ui:fragment rendered="#{jsfCtrl.isVisible('shopListLArticleLList')}">
 						<div class="mainTable_container" id="list_i0_shopListLArticleLList_shopArticles2">
-							<div class="table_title"><h:graphicImage library='img' name='close_content.gif' styleClass='actionContent' alt="close" /><h:outputText value="#{jsfCtrl.getLabel('shopListLArticleLList_SHOP_ARTICLES2', 'shopList.0.shopListLArticleLList')}" /></div>
+							<div class="table_title"><h:outputText value="#{jsfCtrl.getLabel('shopListLArticleLList_SHOP_ARTICLES2', 'shopList.0.shopListLArticleLList')}" /></div>
 							<div class="table_container">
 								<div class="actions">
 									<table style="width: 100%">
 										<tr>
 											<td style="text-align: left;" class="filter">
 												<span class="filter-line">
-													<span><h:outputText value="#{hh:label('labels', 'filtrer')}" /></span>
+													<span><h:outputText value="#{jsfCtrl.getXhtmlLabel('labels', 'filtrer')}" /></span>
 													<h:outputText value=" " />
 													
 													<h:inputText id="globalFilter_shopListLArticleLList_shopArticles2" value="#{jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES2', 'SHOP_LIST_L_ARTICLE').jsFilter}" onkeyup="showLines(null, this.value, 'i0_shopListLArticleLList_shopArticles2')" styleClass="filter linklist-filter" />
@@ -121,25 +121,25 @@
 												<h:panelGroup rendered="#{!jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES2', 'SHOP_LIST_L_ARTICLE').readonly}">
 													<h:commandButton id="shopListLArticleLList_shopArticles2_button0" alt='commandButton0' styleClass="btn_icon btn_medium"
 														rendered="#{sessionCtrl.isActionRendered('shopListLArticle', 0) and !jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES2', 'SHOP_LIST_L_ARTICLE').protected}"
-														value="#{hh:label('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_0')}" title="#{hh:label('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_0')}" action="#{jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES2', 'SHOP_LIST_L_ARTICLE').prepareActionCode(0)}" style="background-image: url('#{application.contextPath}/static/img/icons/create.png');" />
+														value="#{jsfCtrl.getXhtmlLabel('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_0')}" title="#{jsfCtrl.getXhtmlLabel('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_0')}" action="#{jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES2', 'SHOP_LIST_L_ARTICLE').prepareActionCode(0)}" style="background-image: url('#{application.contextPath}/static/img/icons/create.png');" />
 													<h:outputText value=" " />
 													<h:commandButton id="shopListLArticleLList_shopArticles2_button70" alt='commandButton70' styleClass="btn_icon btn_medium"
 														rendered="#{sessionCtrl.isActionRendered('shopListLArticle', 70) and !jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES2', 'SHOP_LIST_L_ARTICLE').protected}"
-														value="#{hh:label('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_70')}" title="#{hh:label('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_70')}" action="#{jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES2', 'SHOP_LIST_L_ARTICLE').prepareActionCode(70)}" style="background-image: url('#{application.contextPath}/static/img/icons/select.png');" />
+														value="#{jsfCtrl.getXhtmlLabel('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_70')}" title="#{jsfCtrl.getXhtmlLabel('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_70')}" action="#{jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES2', 'SHOP_LIST_L_ARTICLE').prepareActionCode(70)}" style="background-image: url('#{application.contextPath}/static/img/icons/select.png');" />
 													<h:outputText value=" " />
 													<span class="listButtons" id="buttonshopListLArticleLList_shopArticles2">
 														<h:commandButton id="shopListLArticleLList_shopArticles2_button2" alt='commandButton2' styleClass="btn_icon btn_medium"
 														rendered="#{sessionCtrl.isActionRendered('shopListLArticle', 2) and !jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES2', 'SHOP_LIST_L_ARTICLE').protected}"
-														value="#{hh:label('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_2')}" title="#{hh:label('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_2')}" action="#{jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES2', 'SHOP_LIST_L_ARTICLE').prepareActionCode(2)}" style="background-image: url('#{application.contextPath}/static/img/icons/edit.png');" />
+														value="#{jsfCtrl.getXhtmlLabel('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_2')}" title="#{jsfCtrl.getXhtmlLabel('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_2')}" action="#{jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES2', 'SHOP_LIST_L_ARTICLE').prepareActionCode(2)}" style="background-image: url('#{application.contextPath}/static/img/icons/edit.png');" />
 														<h:outputText value=" " />
 														<h:commandButton id="shopListLArticleLList_shopArticles2_button20" alt='commandButton20' styleClass="btn_icon btn_medium"
 														rendered="#{sessionCtrl.isActionRendered('shopListLArticle', 20) and !jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES2', 'SHOP_LIST_L_ARTICLE').protected}"
-														value="#{hh:label('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_20')}" title="#{hh:label('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_20')}" action="#{jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES2', 'SHOP_LIST_L_ARTICLE').prepareActionCode(20)}" style="background-image: url('#{application.contextPath}/static/img/icons/delete.png');" />
+														value="#{jsfCtrl.getXhtmlLabel('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_20')}" title="#{jsfCtrl.getXhtmlLabel('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_20')}" action="#{jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES2', 'SHOP_LIST_L_ARTICLE').prepareActionCode(20)}" style="background-image: url('#{application.contextPath}/static/img/icons/delete.png');" />
 														<h:outputText value=" " />
 													</span>
 												</h:panelGroup>
 												<h:commandButton id="shopListLArticleLList_shopArticles2_buttonXls" alt="commandButtonXlsExport" rendered="#{applicationCtrl.displayXlsExport and jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES2', 'SHOP_LIST_L_ARTICLE').rows.size() > 0}" styleClass="btn_medium"
-													value="#{hh:label('labels', 'boutons.exportExcel')}" action="#{jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES2', 'SHOP_LIST_L_ARTICLE').export('xls')}" />
+													value="#{jsfCtrl.getXhtmlLabel('labels', 'boutons.exportExcel')}" action="#{jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES2', 'SHOP_LIST_L_ARTICLE').export('xls')}" />
 											</span></td>
 										</tr>
 									</table>
@@ -148,19 +148,20 @@
 								</div>
 								<div class="results_container">
 									<font color="red" style="font-style: italic;">
-										<h:outputText value="#{hh:label('labels', 'results.nodata')}" rendered="#{empty jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES2', 'SHOP_LIST_L_ARTICLE').rows}" />
+										<h:outputText value="#{jsfCtrl.getXhtmlLabel('labels', 'results.nodata')}" rendered="#{empty jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES2', 'SHOP_LIST_L_ARTICLE').rows}" />
 									</font>
 									<h:dataTable vanilla="false" id="tablei0_shopListLArticleLList_shopArticles2" columnClasses="first, default, default, numeric, defValue" rowClasses="odd,even"
 										onRowClick="launchLinkAction('#{tempVar.primaryKey.encodedValue}', 'shopListLArticleLList_shopArticles2');"
 										value="#{jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES2', 'SHOP_LIST_L_ARTICLE').rows}" var="tempVar"
-										rendered="#{not empty jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES2', 'SHOP_LIST_L_ARTICLE').rows}">
-										<h:column headerClass="first" rendered="#{!jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES2', 'SHOP_LIST_L_ARTICLE').readonly}">
-											<f:facet name="header">
-												<input type="checkbox" onclick="manageChecks(this, 'shopListLArticleLList_shopArticles2');" />
-											</f:facet>
-											<h:selectBooleanCheckbox value="#{tempVar.checked}" onclick="clickCheck(this, 'shopListLArticleLList_shopArticles2');"/>
-											<input type="hidden" name="trdatashopListLArticleLList_shopArticles2" value="#{tempVar.filterField}"/>
-										</h:column>
+										rendered="#{not empty jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES2', 'SHOP_LIST_L_ARTICLE').rows}"
+										>
+											<h:column headerClass="first" rendered="#{!jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES2', 'SHOP_LIST_L_ARTICLE').readonly}">
+												<f:facet name="header">
+													<input type="checkbox" onclick="manageChecks(this, 'shopListLArticleLList_shopArticles2');" />
+												</f:facet>
+												<h:selectBooleanCheckbox value="#{tempVar.checked}" onclick="clickCheck(this, 'shopListLArticleLList_shopArticles2');"/>
+												<input type="hidden" name="trdatashopListLArticleLList_shopArticles2" value="#{tempVar.filterField}"/>
+											</h:column>
 											<h:column rendered="#{jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES2', 'SHOP_LIST_L_ARTICLE').columns.T3_name.visible}">
 												<f:facet name="header">
 													<h:commandLink style="#{jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES2', 'SHOP_LIST_L_ARTICLE').sortedStyle('T3_name')}">
@@ -219,10 +220,10 @@
 	<table style="width: 100%">
 		<tr>
 			<td style="text-align: right;">
-				<h:commandButton id="validateAction2" rendered="#{!jsfCtrl.displaySubActions()}" styleClass="btn_medium" value="#{hh:label('labels', 'boutons.valider')}"
+				<h:commandButton id="validateAction2" rendered="#{!jsfCtrl.displaySubActions()}" styleClass="btn_medium" value="#{jsfCtrl.getXhtmlLabel('labels', 'boutons.valider')}"
 					action="#{jsfCtrl.validate}"  onclick="if (actionClicked) { alert('Traitement en cours. Veuillez patienter...');return false;} else { actionClicked = true; return true; }" />
 				<h:outputText value=" "/>
-				<h:commandButton id="cancelAction2" immediate="true" styleClass="btn_medium" value="#{hh:label('labels', 'boutons.annuler')}"
+				<h:commandButton id="cancelAction2" immediate="true" styleClass="btn_medium" value="#{jsfCtrl.getXhtmlLabel('labels', 'boutons.annuler')}"
 					action="#{jsfCtrl.cancel}" onclick="return checkDirtyState(this);" />
 			</td>
 		</tr>

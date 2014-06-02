@@ -211,7 +211,7 @@ $(document).ready(function() {
 
 				if (parentMenus.length > 0) {
 					feedback.element.element.css({
-						top : hash.top - feedback.target.height,
+						top : feedback.target.height * feedback.target.element.index(),
 						left : feedback.target.width
 					});
 				} else {
@@ -601,15 +601,15 @@ function datatableAlignColumns(listName, forceAlignment) {
 }
 
 function initTreeTable(listName) {
-	var treeTable = $('.ui-treetable-scrollable-body').first();
-	treeTable.css('display', 'none');
-	// FIXME : Corriger formule ici
-	var height = $(".wrapper").first().height() - $(".content").first().outerHeight(true);
-	height -= (treeTable.outerHeight(true) - treeTable.innerHeight());
-	height -= (treeTable.innerHeight() - treeTable.height());
-	height -= 20;
-	treeTable.css('height', height);
-	treeTable.css('display', 'block');
+	var $treeTable = $('.ui-treetable-scrollable-body').first();
+	var headerHeight = $('.header').outerHeight(true);
+	var wrapperHeight = $(window).height();
+	$treeTable.css('height', wrapperHeight - headerHeight);
+
+	while (($('.content').outerHeight(true) + headerHeight) > wrapperHeight && $treeTable.height() > 60) {
+		$treeTable.css('height', $treeTable.height() - 4);
+	}
+	$treeTable.css('height', $treeTable.height() - 20);
 }
 
 var actionClicked = false;

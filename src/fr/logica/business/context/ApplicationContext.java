@@ -4,18 +4,28 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import fr.logica.application.ApplicationUtils;
+
 public class ApplicationContext implements Serializable {
 
 	/** serialUID */
 	private static final long serialVersionUID = -1304368564807700534L;
 
-	private String appName = "demo";
+	private String appName = "";
 
-	private String appDescription = "Application de DEMO";
+	private String appDescription = "";
 
-	private String appVersion = "3.0.0";
+	private String appVersion = "";
 
 	private Map<String, Object> attributes = new HashMap<String, Object>();
+
+	public ApplicationContext() {
+		ApplicationUtils.getApplicationLogic().initializeApplication(this);
+	}
+
+	public void finalize() {
+		ApplicationUtils.getApplicationLogic().finalizeApplication(this);
+	}
 
 	public String getAppName() {
 		return appName;

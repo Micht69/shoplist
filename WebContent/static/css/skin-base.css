@@ -361,15 +361,35 @@ input.inline {
 .table_container > .actions > table > tbody > tr > td:first-child > span.filter-line > input.filter {
 	width: 250px;
 	padding-left: 30px;
-	margin-bottom: 7px;
 }
 
 /* Adding an icon */
 .table_container > .actions > table > tbody > tr > td:first-child > span.filter-line > span:last-child:before {
 	content: url("../img/form/icon-filter.png");
 	position: absolute;
-	top: -9px;
+	top: -7px;
 	left: 0px;
+}
+
+td.globalSearch {
+	width: 50%;
+}
+
+input.globalSearch {
+	margin: 0;
+	border-radius: 4px 0 0 4px;
+	width: 55%;
+}
+
+input.maxRow {
+	width: 33px;
+	margin-left: -1px;
+	border-radius: 0;
+}
+
+td.globalSearch .btn_large input {
+	margin-left: -1px;
+	border-radius: 0 4px 4px 0;
 }
 
 .list_results_container table > thead > tr > th,
@@ -472,7 +492,9 @@ form > .actions {
 	
 }
 
-
+.line {
+	border-top: 1px solid rgb(0, 116, 202);
+}
 
 /******************************************************************************
 * Tabs

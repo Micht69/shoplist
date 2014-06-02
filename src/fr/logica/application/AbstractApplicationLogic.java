@@ -7,6 +7,7 @@ import java.util.Map;
 import fr.logica.application.logic.User;
 import fr.logica.business.context.ApplicationContext;
 import fr.logica.business.context.RequestContext;
+import fr.logica.business.context.SessionContext;
 import fr.logica.business.controller.Request;
 
 /**
@@ -67,12 +68,13 @@ public abstract class AbstractApplicationLogic implements Serializable {
 	public abstract String getDefaultPage(User user);
 
 	/**
-	 * Delegates the user locale management. This method is called by MessageUtils to get the current user Locale. Default application logic will
-	 * always sends back default JVM locale (Locale.getDefault()). Locale management depends on user session management.
+	 * Delegates the user locale management. This method is called when a new sessionContext is created to get the current user Locale. <br/>
+	 * Default application logic will get available languages from server.properties. Il requested locale is present amongst available languages,
+	 * it is choosen. Otherwise, it will use the first available language.
 	 * 
-	 * @return A Locale to use
+	 * Choosen locale is set into SessionContext
 	 */
-	public abstract Locale getCurrentUserLocale();
+	public abstract void setDefaultLocale(SessionContext context, Locale requestedLocale);
 
 	/**
 	 * Are the social features (google +1, Facebook Like) enabled on the application.
@@ -141,13 +143,25 @@ public abstract class AbstractApplicationLogic implements Serializable {
 	public abstract void finalizeApplication(ApplicationContext context);
 	
 	/**
+	 * Create the permalink to display to the user from base url and url parameters *
+	 * 
+	 * @param baseUrl
+	 *            the server url (starts with http and ends <b>without</b> '?')
+	 * @param urlParams
+	 *            a map with all url parameters [key can be : entityName, queryName, actionCode, encodedKeyList]
+	 * @return the permalink to display to the user
+	 */
+	public abstract String getPermaLink(String baseUrl, Map<String, String> urlParams);
+
+	/**
 	 * Parses current HTTP Request parameters to build a user Request in order to directly access to a specific view. <br/>
 	 * Default handled parameters are built through the "Permalink" menu in footer of any page. This method can be overriden to handle any
 	 * parameter <br/>
 	 * 
-	 * @param parameters HTTP Request parameters
-	 * @param context Request Context that will be attached to the request on processing. Contains a link towards SessionContext of the current
-	 *        user.
+	 * @param parameters
+	 *            HTTP Request parameters
+	 * @param context
+	 *            Request Context that will be attached to the request on processing. Contains a link towards SessionContext of the current user.
 	 * @return A valid Request with entityName, action and all needed parameters (queryName, keys, page, etc.)
 	 */
 	public abstract Request<?> getPermalinkRequest(Map<String, String> parameters, RequestContext context);

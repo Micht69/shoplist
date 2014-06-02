@@ -9,26 +9,26 @@
 <ui:define name="body">
 
 <hh:tabPanel id="tabs-selected_pageAdmin" styleClass="jquery-ui-tabs">
-	<hh:tab id="tabListConnections" title="#{hh:label('labels', 'adminPage.connectionTitle')}">
+	<hh:tab id="tabListConnections" title="#{jsfCtrl.getXhtmlLabel('labels', 'adminPage.connectionTitle')}">
 		<div class="mainTable_container">
 			<div class="form_container" id="connection#{conn.id}">
-				<font color="red" style="font-style: italic;"><h:outputText value="#{hh:label('labels', 'results.nodata')}" rendered="#{empty applicationCtrl.listConnections}" /></font>
+				<font color="red" style="font-style: italic;"><h:outputText value="#{jsfCtrl.getXhtmlLabel('labels', 'results.nodata')}" rendered="#{empty applicationCtrl.listConnections}" /></font>
 			</div>
 			<ui:repeat var="conn" value="${applicationCtrl.listConnections}">
 				<h:panelGroup id="connection#{conn.id}" layout="none">
 				<div class="form_container" id="connection#{conn.id}">
 					<div class="form_title">
-						<h:outputText value="#{hh:label('labels', 'adminPage.connection')}" /><h:outputText value="#{conn.id}" />
+						<h:outputText value="#{jsfCtrl.getXhtmlLabel('labels', 'adminPage.connection')}" /><h:outputText value="#{conn.id}" />
 					</div>
 					<div class="actions">
 						<table style="width: 100%">
 							<tr>
 								<td style="text-align: left;">
-									<h:outputText value="#{hh:label('labels', 'adminPage.connectionClass')} : #{conn.connectionClass.name}" />
+									<h:outputText value="#{jsfCtrl.getXhtmlLabel('labels', 'adminPage.connectionClass')} : #{conn.connectionClass.name}" />
 								</td>
 								<td style="text-align: right;">
 									<h:commandButton id="fermerConnectionButton" alt='fermerConnectionButton' styleClass="btn_large" 
-									 value="#{hh:label('labels', 'action.fermerConnection')}"
+									 value="#{jsfCtrl.getXhtmlLabel('labels', 'action.fermerConnection')}"
 									 action="#{applicationCtrl.closeConnection(conn.id)}" />
 								</td>
 							</tr>
@@ -38,14 +38,14 @@
 					<table class="group_table">
 						<tr>
 							<td class="group_table_col_1">
-								<h:outputText value="#{hh:label('labels', 'adminPage.stacktrace')} : "/><br />
+								<h:outputText value="#{jsfCtrl.getXhtmlLabel('labels', 'adminPage.stacktrace')} : "/><br />
 								<div style="height:100px; overflow-y:hidden;" id="stackTrace#{conn.id}">
 									<ui:repeat var="stackTrace" value="#{conn.stackTrace}">
 										<h:outputText value="#{stackTrace}"/><br />
 									</ui:repeat>
 								</div>
 								<div style="text-align:center; margin-top:15px;">
-									~ ~ ~ ~ ~ ~ <span id="stackTraceButton#{conn.id}" onclick="javascript:toggleStackTrace(#{conn.id})" style="cursor:pointer;"><h:outputText value="#{hh:label('labels', 'adminPage.plus')}"/></span> ~ ~ ~ ~ ~ ~
+									~ ~ ~ ~ ~ ~ <span id="stackTraceButton#{conn.id}" onclick="javascript:toggleStackTrace(#{conn.id})" style="cursor:pointer;"><h:outputText value="#{jsfCtrl.getXhtmlLabel('labels', 'adminPage.plus')}"/></span> ~ ~ ~ ~ ~ ~
 								</div>
 							</td>
 						</tr>
@@ -55,19 +55,19 @@
 			</ui:repeat>
 		</div>
 	</hh:tab>
-	<hh:tab id="tabFootPrint" title="#{hh:label('labels', 'adminPage.footPrintTitle')}">
+	<hh:tab id="tabFootPrint" title="#{jsfCtrl.getXhtmlLabel('labels', 'adminPage.footPrintTitle')}">
 		<div class="mainTable_container">
 			<div class="form_container" id="connection#{conn.id}">
 				<ui:include src="../includes/footprint.xhtml" />
 			</div>
 		</div>
 	</hh:tab>
-	<hh:tab id="tabParam" title="#{hh:label('labels', 'adminPage.tabParamTitle')}">
+	<hh:tab id="tabParam" title="#{jsfCtrl.getXhtmlLabel('labels', 'adminPage.tabParamTitle')}">
 		<ul>
-			<li><h:selectBooleanCheckbox id="disableJS" value="${sessionCtrl.disableJS}"></h:selectBooleanCheckbox> <h:outputText value="#{hh:label('labels', 'adminPage.disableJS')}" /></li>
-			<li><h:selectBooleanCheckbox id="disableCustom" value="${sessionCtrl.disableCustom}"></h:selectBooleanCheckbox> <h:outputText value="#{hh:label('labels', 'adminPage.disableCustom')}" /></li>
-			<li><h:selectBooleanCheckbox id="disableCSS" value="${sessionCtrl.disableCSS}"></h:selectBooleanCheckbox> <h:outputText value="#{hh:label('labels', 'adminPage.disableCSS')}" /></li>	
-			<li><h:commandButton style=" margin-top:10px; margin-left:10px; margin-right:10px;" value="#{hh:label('labels', 'adminPage.save')}" styleClass="btn_large"/></li>
+			<li><h:selectBooleanCheckbox id="disableJS" value="${sessionCtrl.disableJS}"></h:selectBooleanCheckbox> <h:outputText value="#{jsfCtrl.getXhtmlLabel('labels', 'adminPage.disableJS')}" /></li>
+			<li><h:selectBooleanCheckbox id="disableCustom" value="${sessionCtrl.disableCustom}"></h:selectBooleanCheckbox> <h:outputText value="#{jsfCtrl.getXhtmlLabel('labels', 'adminPage.disableCustom')}" /></li>
+			<li><h:selectBooleanCheckbox id="disableCSS" value="${sessionCtrl.disableCSS}"></h:selectBooleanCheckbox> <h:outputText value="#{jsfCtrl.getXhtmlLabel('labels', 'adminPage.disableCSS')}" /></li>	
+			<li><h:commandButton style=" margin-top:10px; margin-left:10px; margin-right:10px;" value="#{jsfCtrl.getXhtmlLabel('labels', 'adminPage.save')}" styleClass="btn_large"/></li>
 		
 		</ul>
 	</hh:tab>
@@ -76,11 +76,11 @@
 
 <script type="text/javascript" >
 function toggleStackTrace(idConn) {
-	if ($("#stackTraceButton" + idConn).html() == "#{hh:label('labels', 'adminPage.plus')}") {
-		$("#stackTraceButton" + idConn).html("#{hh:label('labels', 'adminPage.moins')}");
+	if ($("#stackTraceButton" + idConn).html() == "#{jsfCtrl.getXhtmlLabel('labels', 'adminPage.plus')}") {
+		$("#stackTraceButton" + idConn).html("#{jsfCtrl.getXhtmlLabel('labels', 'adminPage.moins')}");
 		$("#stackTrace" + idConn).css({'height' : '', 'overflow-y' : ''});
 	} else {
-		$("#stackTraceButton" + idConn).html("#{hh:label('labels', 'adminPage.plus')}");
+		$("#stackTraceButton" + idConn).html("#{jsfCtrl.getXhtmlLabel('labels', 'adminPage.plus')}");
 		$("#stackTrace" + idConn).css({'height' : '100px', 'overflow-y' : 'hidden'});
 	}
 }

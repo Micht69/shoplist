@@ -677,6 +677,19 @@ $.widget("db.jWizard", {
 			}
 
 			function proceed() {
+				if (window.initMap) {
+					try {
+						initMap($step.attr('id'));
+					} catch (e) {
+						if (window.console && console.error)
+							console.error(e.message);
+					}
+				}
+				displayTables($step);
+				$step.find('td[class="first"]').click(function(event) {
+					event.stopPropagation();
+				});
+				initButtons();
 				wizard._enableButtons();
 				dfd.resolve();
 			}
@@ -698,6 +711,10 @@ $.widget("db.jWizard", {
 			}
 			$(wizard.$current).find('[id^="mainForm"]').each(function() {
 				var elem = $(this);
+
+				if (elem.is('input') && (elem.is('[type="button"]') || elem.is('[type="submit"]'))) {
+					return true;
+				}
 				data[elem.attr('id')] = elem.val();
 			});
 

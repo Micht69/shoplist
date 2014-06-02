@@ -60,6 +60,9 @@ public class BackRefListModel extends AbstractListModel implements Serializable 
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see fr.logica.jsf.model.DataModel#loadData()
+	 */
 	@Override
 	public void loadData(RequestContext context) {
 		data = new BusinessController().getBackRefListData(entity, entityName, linkName, queryName, criteria, viewCtrl.getCurrentView()
@@ -84,6 +87,9 @@ public class BackRefListModel extends AbstractListModel implements Serializable 
 		return prepareAction(Action.getAttachBackRefAction(filterName));
 	}
 
+	/* (non-Javadoc)
+	 * @see fr.logica.jsf.model.list.AbstractListModel#export()
+	 */
 	@Override
 	public void export(String exportType, RequestContext context) {
 		File export = null;
@@ -96,11 +102,25 @@ public class BackRefListModel extends AbstractListModel implements Serializable 
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see fr.logica.jsf.model.DataModel#isProtected()
+	 */
 	@Override
 	public boolean isProtected() {
-		if (data != null) {
+		if (data == null)
+			return super.isProtected();
+		else
 			return data.isProtected();
-		}
-		return super.isProtected();
+	}
+
+	/* (non-Javadoc)
+	 * @see fr.logica.jsf.model.DataModel#isReadonly()
+	 */
+	@Override
+	public boolean isReadonly() {
+		if (data == null)
+			return super.isReadonly();
+		else
+			return data.isReadOnly();
 	}
 }

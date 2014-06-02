@@ -12,11 +12,10 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.Set;
 
-import fr.logica.application.logic.ApplicationLogic;
+import fr.logica.business.context.RequestContext;
 import fr.logica.reflect.DomainUtils;
 import fr.logica.ui.Message;
 import fr.logica.ui.Message.Severity;
-
 
 public class MessageUtils {
 
@@ -38,26 +37,14 @@ public class MessageUtils {
 	public static synchronized Set<Locale> getAvailableLanguages() {
 		if (availableLanguages == null) {
 			availableLanguages = new HashSet<Locale>();
-			ClassLoader loader = Thread.currentThread().getContextClassLoader();
-			final String bundlepackage = "fr.logica";
-			final String bundlename = "labels";
 
-			File root = new File(loader.getResource(bundlepackage.replace('.', '/')).getFile());
-			File[] files = root.listFiles(new FilenameFilter() {
-				@Override
-				public boolean accept(File dir, String name) {
-					return name.matches("^" + bundlename + "(_\\w{2}(_\\w{2})?)?\\.properties$");
-				}
-			});
-
-			if (files != null) {
-				for (File file : files) {
-					String language = file.getName().replaceAll("^" + bundlename + "(_)?|\\.properties$", "");
-					if ("".equals(language)) {
-						availableLanguages.add(Locale.getDefault());
-					} else {
-						availableLanguages.add(new Locale(language));
-					}
+			String availableLanguagesString = getServerProperty("available.languages");
+			if (availableLanguagesString == null || "".equals(availableLanguagesString)) {
+				availableLanguages.add(Locale.getDefault());
+			} else {
+				String[] langs = availableLanguagesString.split(",");
+				for (String lang : langs) {
+					availableLanguages.add(new Locale(lang.trim()));
 				}
 			}
 		}
@@ -68,10 +55,22 @@ public class MessageUtils {
 	 * Gets an instance of MessageUtils for the current user depending on its current locale. Current locale is determined by ApplicationLogic
 	 * behavior.
 	 * 
+	 * @param l
+	 *            Locale to use. If null, Locale.getDefault() will be used
 	 * @return An instance of MessageUtils based on current user locale if any, default JVM locale otherwise.
 	 */
-	public static MessageUtils getInstance() {
-		Locale l = new ApplicationLogic().getCurrentUserLocale();
+	public static MessageUtils getInstance(RequestContext ctx) {
+		return getInstance(ctx.getSessionContext().getLocale());
+	}
+
+	/**
+	 * Gets an instance of MessageUtils for the specified locale.
+	 * 
+	 * @param l
+	 *            Locale to use. If null, Locale.getDefault() will be used
+	 * @return An instance of MessageUtils based on specified locale if any, default JVM locale otherwise.
+	 */
+	public static MessageUtils getInstance(Locale l) {
 		if (l == null) {
 			l = Locale.getDefault();
 		}
@@ -87,7 +86,8 @@ public class MessageUtils {
 	/**
 	 * Constructor for a MessageUtils instance. Loads all bundles for locale l.
 	 * 
-	 * @param l Locale to use for bundle loading.
+	 * @param l
+	 *            Locale to use for bundle loading.
 	 */
 	public MessageUtils(Locale l) {
 		ResourceBundle.clearCache();
@@ -103,8 +103,10 @@ public class MessageUtils {
 	/**
 	 * Récupère une valeur dans le bundle "messages".
 	 * 
-	 * @param key la clé de la valeur
-	 * @param params les paramètres à intégrer
+	 * @param key
+	 *            la clé de la valeur
+	 * @param params
+	 *            les paramètres à intégrer
 	 * @return la valeur associée à la clé avec fusion des params si non null
 	 */
 	public String getMessage(String key, Object... params) {
@@ -114,8 +116,10 @@ public class MessageUtils {
 	/**
 	 * Récupère le titre d'un couple entité / action.
 	 * 
-	 * @param entityName le nom de la liste
-	 * @param action le N° de l'action
+	 * @param entityName
+	 *            le nom de la liste
+	 * @param action
+	 *            le N° de l'action
 	 * @return le titre
 	 */
 	public String getTitle(String entityName, int action) {
@@ -125,8 +129,10 @@ public class MessageUtils {
 	/**
 	 * Récupère le titre d'un couple entité / variable.
 	 * 
-	 * @param entityName le nom de la liste
-	 * @param var le nom de la variable
+	 * @param entityName
+	 *            le nom de la liste
+	 * @param var
+	 *            le nom de la variable
 	 * @return le titre
 	 */
 	public String getVarTitle(String entityName, String varName) {
@@ -136,10 +142,13 @@ public class MessageUtils {
 	/**
 	 * Récupère le titre d'un couple query / variable.
 	 * 
-	 * @param queryName le nom de la liste
+	 * @param queryName
+	 *            le nom de la liste
 	 * 
-	 * @param alias l' alias de la table
-	 * @param var le nom de la variable
+	 * @param alias
+	 *            l' alias de la table
+	 * @param var
+	 *            le nom de la variable
 	 * @return le titre
 	 */
 	public String getQryVarTitle(String queryName, String alias, String varName) {
@@ -149,7 +158,8 @@ public class MessageUtils {
 	/**
 	 * Récupère le titre d'un liste.
 	 * 
-	 * @param listName le nom de la liste
+	 * @param listName
+	 *            le nom de la liste
 	 * @return le titre de la liste
 	 */
 	public String getListTitle(String listName) {
@@ -159,8 +169,10 @@ public class MessageUtils {
 	/**
 	 * Récupère une valeur dans le bundle "genLabels".
 	 * 
-	 * @param key la clé de la valeur
-	 * @param params les paramètres à intégrer
+	 * @param key
+	 *            la clé de la valeur
+	 * @param params
+	 *            les paramètres à intégrer
 	 * @return la valeur associée à la clé avec fusion des params si non null
 	 */
 	public String getGenLabel(String key, Object... params) {
@@ -170,8 +182,10 @@ public class MessageUtils {
 	/**
 	 * Récupère une valeur dans le bundle "labels".
 	 * 
-	 * @param key la clé de la valeur
-	 * @param params les paramètres à intégrer
+	 * @param key
+	 *            la clé de la valeur
+	 * @param params
+	 *            les paramètres à intégrer
 	 * @return la valeur associée à la clé avec fusion des params si non null
 	 */
 	public String getLabel(String key, Object... params) {
@@ -181,9 +195,12 @@ public class MessageUtils {
 	/**
 	 * Récupère une valeur dans le bundle "genLabels".
 	 * 
-	 * @param key la clé de la valeur
-	 * @param params les paramètres à intégrer
-	 * @param emptyStringForMissingResource true si on veut récupérer une chaine vide quand le libellé n'existe pas
+	 * @param key
+	 *            la clé de la valeur
+	 * @param params
+	 *            les paramètres à intégrer
+	 * @param emptyStringForMissingResource
+	 *            true si on veut récupérer une chaine vide quand le libellé n'existe pas
 	 * @return la valeur associée à la clé avec fusion des params si non null
 	 */
 	public String getGenLabel(String key, Object[] params, boolean emptyStringForMissingResource) {
@@ -193,8 +210,10 @@ public class MessageUtils {
 	/**
 	 * Récupère une valeur dans le bundle "custom".
 	 * 
-	 * @param key la clé de la valeur
-	 * @param params les paramètres à intégrer
+	 * @param key
+	 *            la clé de la valeur
+	 * @param params
+	 *            les paramètres à intégrer
 	 * @return la valeur associée à la clé avec fusion des params si non null
 	 */
 	public String getCustom(String key, Object... params) {
@@ -204,9 +223,12 @@ public class MessageUtils {
 	/**
 	 * Récupère une valeur dans le bundle passé.
 	 * 
-	 * @param bundle le ResourceBundle associé
-	 * @param key la clé de la valeur
-	 * @param params les paramètres à intégrer
+	 * @param bundle
+	 *            le ResourceBundle associé
+	 * @param key
+	 *            la clé de la valeur
+	 * @param params
+	 *            les paramètres à intégrer
 	 * @return la valeur associée à la clé avec fusion des params si non null
 	 */
 	private String getString(String bundleName, String key, Object params[]) {
@@ -216,10 +238,14 @@ public class MessageUtils {
 	/**
 	 * Récupère une valeur dans le bundle passé.
 	 * 
-	 * @param bundle le ResourceBundle associé
-	 * @param key la clé de la valeur
-	 * @param params les paramètres à intégrer
-	 * @param emptyStringForMissingResource true si on doit renvoyer une chaine vide si la variable n'existe pas
+	 * @param bundle
+	 *            le ResourceBundle associé
+	 * @param key
+	 *            la clé de la valeur
+	 * @param params
+	 *            les paramètres à intégrer
+	 * @param emptyStringForMissingResource
+	 *            true si on doit renvoyer une chaine vide si la variable n'existe pas
 	 * @return la valeur associée à la clé avec fusion des params si non null
 	 */
 	private String getString(String bundleName, String key, Object params[], boolean emptyStringForMissingResource) {
@@ -246,8 +272,10 @@ public class MessageUtils {
 	 * Renvoi le libellé dans le bundle spcédifié.<br>
 	 * Utilisé dans la function pour l'affichage dans JSF.
 	 * 
-	 * @param bundle le nom du bundle
-	 * @param key la clé
+	 * @param bundle
+	 *            le nom du bundle
+	 * @param key
+	 *            la clé
 	 * @return le libellé du bundle <b>ou</b> '???'++bundle+':'+key+'???' si le bundle n'existe pas
 	 */
 	public String getXhtmlLabel(String bundle, String key) {
@@ -276,7 +304,8 @@ public class MessageUtils {
 	/**
 	 * Récupère la valeur d'une propriété dans le fichier server.properties.
 	 * 
-	 * @param key String
+	 * @param key
+	 *            String
 	 * @return String
 	 */
 	public static String getServerProperty(String key) {
@@ -295,19 +324,19 @@ public class MessageUtils {
 		return new Message(message, Severity.ERROR);
 	}
 
-	public static Message addExternalizedErrorMessage(String key, Object[] params) {
-		return addStringErrorMessage(getInstance().getCustom(key, params));
+	public static Message addExternalizedErrorMessage(String key, Object[] params, RequestContext ctx) {
+		return addStringErrorMessage(getInstance(ctx).getCustom(key, params));
 	}
 
-	public static Message addExternalizedErrorMessage(String key) {
-		return addStringErrorMessage(getInstance().getCustom(key, (Object[]) null));
+	public static Message addExternalizedErrorMessage(String key, RequestContext ctx) {
+		return addStringErrorMessage(getInstance(ctx).getCustom(key, (Object[]) null));
 	}
 
-	public static Message addExternalizedMessage(String key, Object[] params) {
-		return addStringMessage(getInstance().getCustom(key, params));
+	public static Message addExternalizedMessage(String key, Object[] params, RequestContext ctx) {
+		return addStringMessage(getInstance(ctx).getCustom(key, params));
 	}
 
-	public static Message addExternalizedMessage(String key) {
-		return addStringMessage(getInstance().getCustom(key, (Object[]) null));
+	public static Message addExternalizedMessage(String key, RequestContext ctx) {
+		return addStringMessage(getInstance(ctx).getCustom(key, (Object[]) null));
 	}
 }

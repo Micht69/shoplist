@@ -220,6 +220,7 @@ public class DbEntity {
 			Entity association = DomainUtils.newDomain(link.getModel().getEntityName());
 			association.setForeignKey(associatedKeyName, selectedKey);
 			association.setForeignKey(link.getModel().getKeyName(), baseBean.getPrimaryKey());
+			association.getLink(linkName).setEntity(baseBean);
 			DB.persist(association, new Action(Constants.SELECT, Constants.SELECT), ctx);
 		}
 	}
@@ -250,7 +251,7 @@ public class DbEntity {
 			}
 			return removed;
 		} catch (SQLIntegrityConstraintViolationException sqlEx) {
-			throw new TechnicalException(MessageUtils.getInstance()
+			throw new TechnicalException(MessageUtils.getInstance(ctx)
 					.getMessage("db.remove.error.constraint") + sqlEx.getMessage());
 		} catch (SQLException sqlEx) {
 			throw new DbException(sqlEx.getMessage(), sqlEx);
@@ -286,6 +287,7 @@ public class DbEntity {
 			Entity association = DomainUtils.newDomain(link.getModel().getEntityName());
 			association.setForeignKey(associatedKeyName, selectedKey);
 			association.setForeignKey(link.getModel().getKeyName(), baseBean.getPrimaryKey());
+			association.getLink(linkName).setEntity(baseBean);
 			DB.remove(association, new Action(Constants.DETACH, Constants.DETACH), ctx);
 		}
 	}

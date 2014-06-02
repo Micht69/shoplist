@@ -309,4 +309,10 @@ public class Action implements Serializable, Cloneable {
 	public boolean is(int code) {
 		return (this.code != null) && this.code.intValue() == code;
 	}
+
+	@Override
+	public String toString() {
+		return "Action [code=" + code + ", queryName=" + queryName + ", pageName=" + pageName + ", next=" + next + ", input=" + input
+				+ ", persistence=" + persistence + ", ui=" + ui + ", process=" + process + "]";
+	}
 }

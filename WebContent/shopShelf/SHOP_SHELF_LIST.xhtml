@@ -26,7 +26,7 @@
 						<span id="openResultats" style="display: #{jsfCtrl.uiList('SHOP_SHELF').displayCriterias ? 'block' : 'none'}"><h:graphicImage library="img" name="open_content.gif" alt="open" /></span>
 						<span id="closeResultats" style="display: #{jsfCtrl.uiList('SHOP_SHELF').displayCriterias ? 'none' : 'block'}"><h:graphicImage library="img" name="close_content.gif" alt="close" /></span>
 					</td>
-					<td class="accordion-title"><h:outputText value="#{hh:label('labels', 'liste.resultats')}" /></td>
+					<td class="accordion-title"><h:outputText value="#{jsfCtrl.getXhtmlLabel('labels', 'liste.resultats')}" /></td>
 					<td class="accordion-title-description">
 						<h:outputText class="result-count #{jsfCtrl.uiList('SHOP_SHELF').resultCountStyle}" id="resultCount" value="#{jsfCtrl.uiList('SHOP_SHELF').resultCount}" />
 						<h:outputText class="total-result-count" id="totalResultCount" value="#{jsfCtrl.uiList('SHOP_SHELF').totalResultCount}" />
@@ -44,7 +44,7 @@
 				<tr>
 					<td style="text-align: left;">
 						<span class="filter-line">
-							<span><h:outputText value="#{hh:label('labels', 'filtrer')}" /></span>
+							<span><h:outputText value="#{jsfCtrl.getXhtmlLabel('labels', 'filtrer')}" /></span>
 							<h:outputText value=" " />
 							<h:inputText id="globalFilter_SHOP_SHELF" value="#{jsfCtrl.uiList('SHOP_SHELF').jsFilter}" onkeyup="showLines(null, this.value, 'SHOP_SHELF')" styleClass="filter" />
 							<span id="filterCount_SHOP_SHELF"> </span>
@@ -53,33 +53,33 @@
 					<td style="text-align: right;"><span class="allActionButtons">
 						<h:panelGroup rendered="#{jsfCtrl.select}">
 							<span class="listButtons" id="buttonSHOP_SHELF">
-								<h:commandButton id="SHOP_SHELF_buttonSelect" alt="commandButtonSelect" styleClass="btn_medium" value="#{hh:label('labels', 'action.selectionner')}" action="#{jsfCtrl.validate}"/>
+								<h:commandButton id="SHOP_SHELF_buttonSelect" alt="commandButtonSelect" styleClass="btn_medium" value="#{jsfCtrl.getXhtmlLabel('labels', 'action.selectionner')}" action="#{jsfCtrl.validate}"/>
 							</span>
-							<h:commandButton id="SHOP_SHELF_buttonCancel" alt="cancelButtonSelect" styleClass="btn_medium" value="#{hh:label('labels', 'action.annuler')}" action="#{jsfCtrl.cancel}"/>
+							<h:commandButton id="SHOP_SHELF_buttonCancel" alt="cancelButtonSelect" styleClass="btn_medium" value="#{jsfCtrl.getXhtmlLabel('labels', 'action.annuler')}" action="#{jsfCtrl.cancel}"/>
 						</h:panelGroup>
-						<h:panelGroup rendered="#{applicationCtrl.displaySelectActions}">
+						<h:panelGroup rendered="#{applicationCtrl.displaySelectActions or !jsfCtrl.select}">
 		
 							<h:commandButton id="SHOP_SHELF_button0" alt='commandButton0' styleClass="btn_icon btn_medium"
 								rendered="#{sessionCtrl.isActionRendered('shopShelf', 0)}"
-								value="#{hh:label('genLabels', 'SHOP_SHELF_ACTION_0')}" title="#{hh:label('genLabels', 'SHOP_SHELF_ACTION_0')}" action="#{jsfCtrl.uiList('SHOP_SHELF').prepareActionCode(0)}" style="background-image: url('#{application.contextPath}/static/img/icons/create.png');" />
+								value="#{jsfCtrl.getXhtmlLabel('genLabels', 'SHOP_SHELF_ACTION_0')}" title="#{jsfCtrl.getXhtmlLabel('genLabels', 'SHOP_SHELF_ACTION_0')}" action="#{jsfCtrl.uiList('SHOP_SHELF').prepareActionCode(0)}" style="background-image: url('#{application.contextPath}/static/img/icons/create.png');" />
 		
 							<span class="listButtons" id="buttonSHOP_SHELF">
 		
 								<h:commandButton id="SHOP_SHELF_button2" alt='commandButton2' styleClass="btn_icon btn_medium"
 									rendered="#{sessionCtrl.isActionRendered('shopShelf', 2)}"
-									value="#{hh:label('genLabels', 'SHOP_SHELF_ACTION_2')}" title="#{hh:label('genLabels', 'SHOP_SHELF_ACTION_2')}" action="#{jsfCtrl.uiList('SHOP_SHELF').prepareActionCode(2)}" style="background-image: url('#{application.contextPath}/static/img/icons/edit.png');" />
+									value="#{jsfCtrl.getXhtmlLabel('genLabels', 'SHOP_SHELF_ACTION_2')}" title="#{jsfCtrl.getXhtmlLabel('genLabels', 'SHOP_SHELF_ACTION_2')}" action="#{jsfCtrl.uiList('SHOP_SHELF').prepareActionCode(2)}" style="background-image: url('#{application.contextPath}/static/img/icons/edit.png');" />
 		
 								<h:commandButton id="SHOP_SHELF_button4" alt='commandButton4' styleClass="btn_icon btn_medium"
 									rendered="#{sessionCtrl.isActionRendered('shopShelf', 4)}"
-									value="#{hh:label('genLabels', 'SHOP_SHELF_ACTION_4')}" title="#{hh:label('genLabels', 'SHOP_SHELF_ACTION_4')}" action="#{jsfCtrl.uiList('SHOP_SHELF').prepareActionCode(4)}" style="background-image: url('#{application.contextPath}/static/img/icons/delete.png');" />
+									value="#{jsfCtrl.getXhtmlLabel('genLabels', 'SHOP_SHELF_ACTION_4')}" title="#{jsfCtrl.getXhtmlLabel('genLabels', 'SHOP_SHELF_ACTION_4')}" action="#{jsfCtrl.uiList('SHOP_SHELF').prepareActionCode(4)}" style="background-image: url('#{application.contextPath}/static/img/icons/delete.png');" />
 		
 								<h:commandButton id="SHOP_SHELF_button5" alt='commandButton5' styleClass="btn_icon btn_medium"
 									rendered="#{sessionCtrl.isActionRendered('shopShelf', 5)}"
-									value="#{hh:label('genLabels', 'SHOP_SHELF_ACTION_5')}" title="#{hh:label('genLabels', 'SHOP_SHELF_ACTION_5')}" action="#{jsfCtrl.uiList('SHOP_SHELF').prepareActionCode(5)}" style="background-image: url('#{application.contextPath}/static/img/icons/display.png');" />
+									value="#{jsfCtrl.getXhtmlLabel('genLabels', 'SHOP_SHELF_ACTION_5')}" title="#{jsfCtrl.getXhtmlLabel('genLabels', 'SHOP_SHELF_ACTION_5')}" action="#{jsfCtrl.uiList('SHOP_SHELF').prepareActionCode(5)}" style="background-image: url('#{application.contextPath}/static/img/icons/display.png');" />
 		
 							</span>
 						</h:panelGroup>
-							<h:commandButton id="SHOP_SHELF_buttonXls" alt='commandButtonXlsExport' styleClass="btn_medium" rendered="#{!jsfCtrl.select and applicationCtrl.displayXlsExport}" value="#{hh:label('labels', 'boutons.exportExcel')}" action="#{jsfCtrl.uiList('SHOP_SHELF').export('xls')}" />
+							<h:commandButton id="SHOP_SHELF_buttonXls" alt='commandButtonXlsExport' styleClass="btn_medium" rendered="#{!jsfCtrl.select and applicationCtrl.displayXlsExport}" value="#{jsfCtrl.getXhtmlLabel('labels', 'boutons.exportExcel')}" action="#{jsfCtrl.uiList('SHOP_SHELF').export('xls')}" />
 		
 					</span></td>
 				</tr>
@@ -91,11 +91,9 @@
 	
 			<div class="list_results_container">
 				<h:panelGroup id="noResult" layout="block" styleClass="no-result">
-					<h:outputText value="#{hh:label('labels', 'results.nodata')}" rendered="#{empty jsfCtrl.uiList('SHOP_SHELF').rows}" />
+					<h:outputText value="#{jsfCtrl.getXhtmlLabel('labels', 'results.nodata')}" rendered="#{empty jsfCtrl.uiList('SHOP_SHELF').rows}" />
 				</h:panelGroup>
 				<h:panelGroup id="results" layout="block">
-
-				
 				<h:dataTable vanilla="false" id="tableSHOP_SHELF"
 						columnClasses="first, default, default, numeric" rowClasses="odd,even"
 						value="#{jsfCtrl.uiList('SHOP_SHELF').rows}" var="tempVar"
@@ -143,7 +141,7 @@
 						<h:outputLabel value="#{tempVar.SH_position}" />
 					</h:column>
 					<f:facet name="footer">
-						<h:commandButton image="/static/img/buttons/plus.png" rendered="#{jsfCtrl.uiList('SHOP_SHELF').hasMoreRows()}" styleClass="btn_more_lines" title="#{hh:label('labels', 'liste.data.more')}">
+						<h:commandButton image="/static/img/buttons/plus.png" rendered="#{jsfCtrl.uiList('SHOP_SHELF').hasMoreRows()}" styleClass="btn_more_lines" title="#{jsfCtrl.getXhtmlLabel('labels', 'liste.data.more')}">
 							<f:ajax event="click" onevent="updateList" render=":mainForm:messages :mainForm:resultCount :mainForm:results" listener="#{jsfCtrl.uiList('SHOP_SHELF').moreLines}"/> 
 						</h:commandButton>
 					</f:facet>

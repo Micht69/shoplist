@@ -10,7 +10,6 @@ import fr.logica.business.Constants;
 import fr.logica.business.MessageUtils;
 import fr.logica.business.context.RequestContext;
 import fr.logica.business.context.SessionContext;
-import fr.logica.security.SecurityFunction;
 
 public class DefaultSecurityManager extends AbstractSecurityManager {
 
@@ -18,19 +17,19 @@ public class DefaultSecurityManager extends AbstractSecurityManager {
 	private static final long serialVersionUID = 4883968451152865426L;
 
 	@Override
-	public User getUser(String login, String password) {
+	public User getUser(String login, String password, RequestContext ctx) {
 		User user = null;
 
 		String hash = SecurityUtils.hash(password);
 		String adminHash = SecurityUtils.hash("admin");
 		if (adminHash.equals(hash)) {
-			user = new User(MessageUtils.getInstance().getLabel("login.root", new Object[0]));
+			user = new User(MessageUtils.getInstance(ctx).getLabel("login.root", new Object[0]));
 		}
 		return user;
 	}
 
 	@Override
-	public List<SecurityFunction> getSecurity(User user) {
+	public List<SecurityFunction> getSecurity(User user, RequestContext ctx) {
 		List<SecurityFunction> fonctions = new ArrayList<SecurityFunction>();
 		return fonctions;
 	}
@@ -44,15 +43,15 @@ public class DefaultSecurityManager extends AbstractSecurityManager {
 	 * This method is called to load everything needed in user session. For instance application access to lists and actions.
 	 */
 	@Override
-	public final void initializeAccessRights(SessionContext context) {
-		User user = context.getUser();
+	public final void initializeAccessRights(RequestContext context) {
+		User user = context.getSessionContext().getUser();
 
 		// No user => No access
 		if (user == null) {
 			return;
 		}
 
-		List<SecurityFunction> fonctions = getSecurity(context.getUser());
+		List<SecurityFunction> fonctions = getSecurity(user, context);
 
 		for (SecurityFunction f : fonctions) {
 			if (f.getAction() != null) {
@@ -141,7 +140,7 @@ public class DefaultSecurityManager extends AbstractSecurityManager {
 		}
 		return disableSecurity();
 	}
-	
+
 	protected SecurityFunction getQuerySecurityFunction(String entite, String query) {
 		return getSecurityFunction(entite, null, query);
 	}
@@ -159,7 +158,7 @@ public class DefaultSecurityManager extends AbstractSecurityManager {
 			sf.setAction(action);
 		return sf;
 	}
-	
+
 	/**
 	 * Instantiates a stub context that can be used for authentication purpose. Do not forget to CLOSE IT !
 	 * 

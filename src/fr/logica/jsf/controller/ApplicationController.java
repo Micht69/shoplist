@@ -3,6 +3,9 @@ package fr.logica.jsf.controller;
 import java.io.Serializable;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+
 import fr.logica.application.ApplicationUtils;
 import fr.logica.business.context.ApplicationContext;
 import fr.logica.db.ConnectionLogger;
@@ -12,6 +15,22 @@ public class ApplicationController implements Serializable {
 
 	/** serialUID */
 	private static final long serialVersionUID = 726513615928591066L;
+
+	@PostConstruct
+	public void initialize() {
+		// Init context
+		getContext();
+	}
+
+	@PreDestroy
+	public void finalize() {
+		// Close connections
+		for (ConnectionObject conn : getListConnections()) {
+			conn.close();
+		}
+		// Close context
+		getContext().finalize();
+	}
 
 	public ApplicationContext getContext() {
 		return ApplicationUtils.getApplicationContext();

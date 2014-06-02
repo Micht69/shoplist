@@ -1,53 +1,54 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:f="http://java.sun.com/jsf/core" xmlns:hh="http://cgi.com/jsf/html">
-
 <h:body>
 <ui:composition>
-    <!-- Header start -->
+	<!-- Header start -->
 	<div class="header">
 		<script type="text/javascript">
 		openScrollablePopUp = function(pathName, height, width) {
-		    var topp = (screen.height - height) / 2;
-		    var left = (screen.width - width) / 2;
-		    var features = 'width='
-		            + width
-		            + ', height='
-		            + height
-		            + ', left='
-		            + left
-		            + ', top='
-		            + topp
-		            + ', toolbar=0, location=0, directories=0, status=0, menubar=0, scrollbars=1, resizable=0, copyhistory=0';
-		    window.open(pathName, 'FENETRE', features);
+			var topp = (screen.height - height) / 2;
+			var left = (screen.width - width) / 2;
+			var features = 'width='
+					+ width
+					+ ', height='
+					+ height
+					+ ', left='
+					+ left
+					+ ', top='
+					+ topp
+					+ ', toolbar=0, location=0, directories=0, status=0, menubar=0, scrollbars=1, resizable=0, copyhistory=0';
+			window.open(pathName, 'FENETRE', features);
 		};
 		</script>
 		<div class="header_left">
 			<a href="../" title="#{labels['back.home']}" class="logo_client" onclick="return checkDirtyState(this);"><img src="../static/img/logo_client.jpg" align="left" alt="" border="0" /></a>
 			<h1 class="header_title">
-				<h:outputText value="#{hh:label('genlabels', '_application.description')}" />
+				<h:outputText value="#{jsfCtrl.getXhtmlLabel('genlabels', '_application.description')}" />
 			</h1>
 		</div>
 		<div class="header_right">
 			<a href="../" class="back_home"></a>
 		</div>
 		<div class="clear"></div>
-	    <!-- Menu start -->
-	    <h:form id="menuForm" rendered="#{sessionCtrl.context.user != null}">
-	        <div class="menu">
-	        <ul id="menu" class="ui-menu ui-widget ui-widget-content ui-corner-all">
-	        	<ui:include src="../includes/menu.xhtml" />
-	        	<ui:include src="../includes/custom/customMenu.xhtml" />
-	        </ul>
-	        </div>			
-	    </h:form>
-	    <!-- Menu end-->
-		<ui:include src="../includes/custom/customHeader.xhtml" />
+		<!-- Menu start -->
+		<h:form id="menuForm" rendered="#{sessionCtrl.context.user != null}">
+			<div class="menu">
+			<ul id="menu" class="ui-menu ui-widget ui-widget-content ui-corner-all">
+				<ui:include src="../includes/menu.xhtml" />
+				<ui:include src="../includes/custom/customMenu.xhtml" />
+			</ul>
+			</div>			
+		</h:form>
+		<!-- Menu end-->
+		<h:form id="customHeaderForm">
+			<ui:include src="../includes/custom/customHeader.xhtml" />
+		</h:form>
 		<h:form id="breadcrumbForm" rendered="#{jsfCtrl.currentView != null}">
 			<hh:breadcrumbs view="#{jsfCtrl.currentView}" method="#{jsfCtrl.back}" id="breadcrumb"
 				 onclick="return checkDirtyState(this);" immediate="true" />
 		</h:form>
 	</div>
-    <!-- Header end -->
+	<!-- Header end -->
 </ui:composition>
 </h:body>
 </html>

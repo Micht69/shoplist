@@ -502,17 +502,17 @@ public class DbManager {
 						rsResult = null;
 					}
 					if (var.model.hasDefinedValues()) {
-						rsResultDisplay = var.model.getDefinedLabel(rsResult);
+						rsResultDisplay = var.model.getDefinedLabel(rsResult, ctx.getSessionContext().getLocale());
 					}
 				} else if ("BOOLEAN".equals(var.model.getSqlType())) {
 					rsResult = rs.getBoolean(index);
 					if (var.model.hasDefinedValues()) {
-						rsResultDisplay = var.model.getDefinedLabel(rsResult);
+						rsResultDisplay = var.model.getDefinedLabel(rsResult, ctx.getSessionContext().getLocale());
 					}
 				} else if ("VARCHAR2".equals(var.model.getSqlType()) || "CHAR".equals(var.model.getSqlType())) {
 					rsResult = rs.getString(index);
 					if (var.model.hasDefinedValues()) {
-						rsResultDisplay = var.model.getDefinedLabel(rsResult);
+						rsResultDisplay = var.model.getDefinedLabel(rsResult, ctx.getSessionContext().getLocale());
 					}
 				} else if ("DATE".equals(var.model.getSqlType())) {
 					rsResult = rs.getDate(index);

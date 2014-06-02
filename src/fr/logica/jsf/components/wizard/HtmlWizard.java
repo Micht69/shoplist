@@ -22,8 +22,8 @@ import javax.faces.event.PostAddToViewEvent;
 import fr.logica.jsf.components.tab.HtmlTab;
 
 @ResourceDependencies({
-		@ResourceDependency(name = "wizard/jquery.jWizard.css"),
-		@ResourceDependency(name = "wizard/jquery.jWizard.js")
+		@ResourceDependency(name = "wizard/jquery.jWizard.css", target = "body"),
+		@ResourceDependency(name = "wizard/jquery.jWizard.js", target = "body")
 })
 @FacesComponent(HtmlWizard.COMPONENT_TYPE)
 @ListenerFor(systemEventClass = PostAddToViewEvent.class)
@@ -158,7 +158,7 @@ public class HtmlWizard extends UIInput {
 				UIOutput resource = new UIOutput();
 				resource.getAttributes().put("name", "wizard/jquery.jWizard.fr.js");
 				resource.setRendererType("javax.faces.resource.Script");
-				context.getViewRoot().addComponentResource(context, resource);
+				context.getViewRoot().addComponentResource(context, resource, "body");
 			}
 		}
 		super.processEvent(event);

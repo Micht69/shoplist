@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-
+import java.util.Map.Entry;
 
 import javax.faces.context.FacesContext;
 
@@ -15,8 +15,10 @@ import fr.logica.business.EntityManager;
 import fr.logica.business.EntityModel;
 import fr.logica.business.FunctionalException;
 import fr.logica.business.Key;
+import fr.logica.business.MessageUtils;
 import fr.logica.business.context.ApplicationContext;
 import fr.logica.business.context.RequestContext;
+import fr.logica.business.context.SessionContext;
 import fr.logica.business.controller.Request;
 import fr.logica.db.DB;
 import fr.logica.jsf.controller.SessionController;
@@ -73,17 +75,19 @@ public class DefaultApplicationLogic extends AbstractApplicationLogic {
 	}
 	
 	@Override
-	public Locale getCurrentUserLocale() {
-		
-		//FIXME bellangerf renouxg Reprendre pour ne pas appeler JSF 2, cette méthode sert dans les WS par exemple.
-		FacesContext ctx = FacesContext.getCurrentInstance();
-		if (ctx != null) {
-			SessionController sessionCtrl = (SessionController) JSFBeanUtils.getManagedBean(FacesContext.getCurrentInstance(), "sessionCtrl");
-			if (sessionCtrl != null) {
-				return sessionCtrl.getCurrentUserLocale();
+	public void setDefaultLocale(SessionContext context, Locale requestedLocale) {
+		String availableLanguages = MessageUtils.getServerProperty("available.languages");
+		if (availableLanguages == null) {
+			context.setLocale(requestedLocale);
+		} else {
+			String[] languages = availableLanguages.split(",");
+			context.setLocale(new Locale(languages[0]));
+			for (String lang : languages) {
+				if (lang.equals(requestedLocale.getLanguage())) {
+					context.setLocale(requestedLocale);
+				}
 			}
 		}
-		return Locale.getDefault();
 	}
 
 	@Override
@@ -126,7 +130,35 @@ public class DefaultApplicationLogic extends AbstractApplicationLogic {
 
 	}
 
-		@Override
+	@Override
+	public String getPermaLink(String baseUrl, Map<String, String> urlParams) {
+		return baseUrl + getParamsString(urlParams);
+	};
+
+	/**
+	 * Create url string with all parameters
+	 * 
+	 * @param urlParams
+	 *            the parameters map
+	 * @return an url part like <i>?param1_key=param1_value&amp;param2_key=param2_value[...]&amp;paramN_key=paramN_value</i>
+	 */
+	protected String getParamsString(Map<String, String> urlParams) {
+		StringBuilder url = new StringBuilder();
+		boolean first = true;
+		for (Entry<String, String> e : urlParams.entrySet()) {
+			if (first)
+				url.append("?");
+			else
+				url.append("&");
+			first = false;
+			url.append(e.getKey());
+			url.append("=");
+			url.append(e.getValue());
+		}
+		return url.toString();
+	}
+
+	@Override
 	public Request<?> getPermalinkRequest(Map<String, String> parameters, RequestContext context) {
 
 		// Get user parameters

@@ -5,8 +5,8 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
+import fr.logica.business.DateTimeUpgraded;
 import java.util.Date;
-import fr.logica.business.DateUtils;
 
 import fr.logica.business.Entity;
 import fr.logica.business.Key;

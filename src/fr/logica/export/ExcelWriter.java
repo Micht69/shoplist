@@ -11,6 +11,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 
+import fr.logica.business.context.RequestContext;
 import fr.logica.business.MessageUtils;
 import fr.logica.business.data.ColumnData;
 import fr.logica.business.data.ListData;
@@ -35,8 +36,8 @@ public class ExcelWriter {
 	 * @throws IOException Exception thrown is an error occurred during writing workbook or closing the file output stream.
 	 * @see #writeFile(File, Workbook)
 	 */
-	public void export(File file, DbQuery query, ListData data) throws IOException {
-		MessageUtils msg = MessageUtils.getInstance();
+	public void export(File file, DbQuery query, ListData data, RequestContext ctx) throws IOException {
+		MessageUtils msg = MessageUtils.getInstance(ctx);
 		Workbook workbook = new HSSFWorkbook();
 		Sheet sheet = workbook.createSheet(query.getName());
 

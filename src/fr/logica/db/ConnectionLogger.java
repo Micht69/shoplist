@@ -8,8 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import fr.logica.db.ConnectionObject;
-
 /**
  * Log all Db Connections.
  */
@@ -73,9 +71,7 @@ public class ConnectionLogger {
 		if (mapConnections.containsKey(id)) {
 			ConnectionObject conn = mapConnections.get(id);
 			if (conn != null) {
-				if (conn.getConnection() instanceof DbConnection) {
-					((DbConnection) conn.getConnection()).close();
-				}
+				conn.close();
 			}
 		}
 		mapConnections.remove(id);

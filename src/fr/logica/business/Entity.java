@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -154,8 +155,10 @@ public abstract class Entity implements Cloneable {
 	/**
 	 * Fixe les valeurs des champs de l'entité qui correspondent à une clé étrangère.
 	 * 
-	 * @param keyName Le nom de la clé étrangère de l'entité courante que l'on va fixer.
-	 * @param key La nouvelle clé primaire valorisée que l'on va référencer avec notre clé étrangère.
+	 * @param keyName
+	 *            Le nom de la clé étrangère de l'entité courante que l'on va fixer.
+	 * @param key
+	 *            La nouvelle clé primaire valorisée que l'on va référencer avec notre clé étrangère.
 	 */
 	public void setForeignKey(String keyName, Key key) {
 		ForeignKeyModel fk = getModel().getForeignKeyModel(keyName);
@@ -278,15 +281,7 @@ public abstract class Entity implements Cloneable {
 		}
 		return result;
 	}
-
-	public Map<String, Object> enumValues(String enumName) {
-		return getModel().enumValues(enumName);
-	}
-
-	public String label(String fieldName) {
-		return getModel().getField(fieldName).getDefinedLabel(invokeGetter(fieldName));
-	}
-
+	
 	public Links getLinks() {
 		return links;
 	}
@@ -312,7 +307,8 @@ public abstract class Entity implements Cloneable {
 	/**
 	 * Loads the current bean with all values of the bean instance given in parameter
 	 * 
-	 * @param e Bean to load values from
+	 * @param e
+	 *            Bean to load values from
 	 */
 	public void syncFromBean(Entity e) {
 		for (String f : getModel().getFields()) {
@@ -323,7 +319,8 @@ public abstract class Entity implements Cloneable {
 	/**
 	 * Inserts the current bean in database
 	 * 
-	 * @param ctx Current context with opened database connection
+	 * @param ctx
+	 *            Current context with opened database connection
 	 */
 	public void insert(RequestContext ctx) {
 		DB.insert(this, ctx);
@@ -332,7 +329,8 @@ public abstract class Entity implements Cloneable {
 	/**
 	 * Persists the current bean in database
 	 * 
-	 * @param ctx Current context with opened database connection
+	 * @param ctx
+	 *            Current context with opened database connection
 	 */
 	public void persist(RequestContext ctx) {
 		DB.persist(this, ctx);
@@ -341,7 +339,8 @@ public abstract class Entity implements Cloneable {
 	/**
 	 * Removes the current bean in database
 	 * 
-	 * @param ctx Current context with opened database connection
+	 * @param ctx
+	 *            Current context with opened database connection
 	 */
 	public void remove(RequestContext ctx) {
 		DB.remove(this, ctx);
@@ -350,7 +349,8 @@ public abstract class Entity implements Cloneable {
 	/**
 	 * Finds and loads bean from database based on its current primary key.
 	 * 
-	 * @param ctx Current context with opened database connection
+	 * @param ctx
+	 *            Current context with opened database connection
 	 * @return <code>true</code> if the bean has been found and loaded, <code>false</code> if primary key is not full or if no matching bean has
 	 *         been found.
 	 */
@@ -370,7 +370,8 @@ public abstract class Entity implements Cloneable {
 	 * Compares the current instance to corresponding data in database. This method will access database using context ctx and compare all fields
 	 * stored in database. BLOB and CLOB fields are ignored. transient variables are ignored.
 	 * 
-	 * @param ctx Current context with opened database connection.
+	 * @param ctx
+	 *            Current context with opened database connection.
 	 * @return <code>true</code> if some data is different between current Entity and database value, <code>false</code> if they are the same.
 	 *         This method returns <code>true</code> if the current instance has no primary key or if there is no matching database instance.
 	 */
@@ -408,7 +409,7 @@ public abstract class Entity implements Cloneable {
 	 * 
 	 * @return A map where each entry associates a field to the difference in value.
 	 */
-	public Map<String, Diff> difference(Entity that) {
+	public Map<String, Diff> difference(Entity that, RequestContext ctx) {
 		if (that == null || !that.getClass().equals(this.getClass())) {
 			throw new IllegalArgumentException(String.valueOf(that));
 		}
@@ -425,7 +426,7 @@ public abstract class Entity implements Cloneable {
 			Object thisValue = this.invokeGetter(fieldName);
 			Object thatValue = that.invokeGetter(fieldName);
 			if (thisValue == null && thatValue != null || thisValue != null && !thisValue.equals(thatValue)) {
-				String label = MessageUtils.getInstance().getGenLabel(this.getModel().name() + "." + fieldName);
+				String label = MessageUtils.getInstance(ctx).getGenLabel(this.getModel().name() + "." + fieldName);
 				if ("BLOB".equals(fieldMetadata.getSqlType()) || "CLOB".equals(fieldMetadata.getSqlType())) {
 					result.put(fieldName, new Diff(label));
 				} else {

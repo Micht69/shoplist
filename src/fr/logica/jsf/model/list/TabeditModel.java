@@ -18,10 +18,12 @@ import fr.logica.business.TechnicalException;
 import fr.logica.business.context.RequestContext;
 import fr.logica.business.controller.BusinessController;
 import fr.logica.business.controller.Request;
+import fr.logica.business.data.ListCriteria;
 import fr.logica.business.data.ListData;
 import fr.logica.business.data.Row;
 import fr.logica.db.DB;
 import fr.logica.jsf.controller.ViewController;
+import fr.logica.jsf.model.list.ListModel;
 import fr.logica.reflect.DomainUtils;
 import fr.logica.ui.Message;
 import fr.logica.ui.Message.Severity;
@@ -98,7 +100,7 @@ public class TabeditModel extends ListModel implements Serializable {
 	private boolean existsCreateAction(RequestContext ctx) {
 		if (createAction == null) {
 			LOGGER.error("No create action defined for current page");
-			String msg = MessageUtils.getInstance().getMessage("error.bug", null);
+			String msg = MessageUtils.getInstance(ctx).getMessage("error.bug", null);
 			ctx.getMessages().add(new Message(msg, Severity.ERROR));
 			return false;
 		}
@@ -108,7 +110,7 @@ public class TabeditModel extends ListModel implements Serializable {
 	private boolean existsModifyAction(RequestContext ctx) {
 		if (modifyAction == null) {
 			LOGGER.error("No modify action defined for current page");
-			String msg = MessageUtils.getInstance().getMessage("error.bug", null);
+			String msg = MessageUtils.getInstance(ctx).getMessage("error.bug", null);
 			ctx.getMessages().add(new Message(msg, Severity.ERROR));
 			return false;
 		}
@@ -145,7 +147,7 @@ public class TabeditModel extends ListModel implements Serializable {
 
 	public void validateCreate(RequestContext ctx) {
 		if (currentEntity == null) {
-			String msg = MessageUtils.getInstance().getMessage("error.bug", null);
+			String msg = MessageUtils.getInstance(ctx).getMessage("error.bug", null);
 			ctx.getMessages().add(new Message(msg, Severity.ERROR));
 			return;
 		}
@@ -173,7 +175,7 @@ public class TabeditModel extends ListModel implements Serializable {
 
 	public void validateModify(RequestContext ctx) {
 		if (currentEntity == null) {
-			String msg = MessageUtils.getInstance().getMessage("error.bug", null);
+			String msg = MessageUtils.getInstance(ctx).getMessage("error.bug", null);
 			ctx.getMessages().add(new Message(msg, Severity.ERROR));
 			return;
 		}
@@ -253,7 +255,7 @@ public class TabeditModel extends ListModel implements Serializable {
 		/* Launch query with same criteria AND bean primary key so we'll get only one row */
 		Entity copy = entity.clone();
 		copy.setPrimaryKey(currentEntity.getPrimaryKey());
-		ListData rowData = new BusinessController().getListData(copy, entityName, queryName, criteria, viewCtrl.getCurrentView().getAction(),
+		ListData rowData = new BusinessController().getListData(copy, entityName, queryName, new ListCriteria(), viewCtrl.getCurrentView().getAction(),
 				viewCtrl
 						.getCurrentView().getLinkName(), viewCtrl.getCurrentView().getLinkedEntity(),
 				context);
@@ -322,4 +324,31 @@ public class TabeditModel extends ListModel implements Serializable {
 		this.success = success;
 	}
 
+	/**
+	 * Overrides {@link ListModel#loadData(RequestContext)} to add create line upon new search.
+	 */
+	@Override
+	public void loadData(RequestContext context) {
+		super.loadData(context);
+		if (createAction != null)
+		{
+			boolean hasCreateLine = false;
+			List<Row> rows = data.getRows();
+			if (rows.size() > 0) {
+				Row lastRow = rows.get(rows.size() - 1);
+				if (lastRow != null && lastRow.get("$rownum") != null)
+				{
+					Integer rowNum = (Integer)lastRow.get("$rownum");
+					hasCreateLine = rowNum.intValue() == NEW_LINE_ROWNUM;
+				}
+			}
+			// No create line, add new one
+			if (!hasCreateLine)
+			{
+				Row row = new Row();
+				row.put("$rownum", NEW_LINE_ROWNUM);
+				rows.add(row);
+			}
+		}
+	}
 }

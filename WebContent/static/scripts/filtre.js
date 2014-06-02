@@ -9,7 +9,14 @@ function setFocusListe(){
 
 function showLines(e, data, listName) {
 	var t = $("table[id$='table" + listName + "']");
-	$.uiTableFilter(t, data);
+	$.uiTableFilter(t, data, null, linesHidden);
+}
+
+function linesHidden() {
+	// Display create line on editable list
+	var inputNewRow = $("input.rownum[value=-1]");
+	if (inputNewRow)
+		inputNewRow.parents("tr").show();
 }
 
 function cleanFilter(listName) {

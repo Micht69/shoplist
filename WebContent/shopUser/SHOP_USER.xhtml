@@ -18,27 +18,27 @@
 			<td width="1%" style="text-align: left; white-space: nowrap;">
 				<div id="advanced-actions">
 	    			<h:panelGroup rendered="#{commentCtrl.commentsEnabled}">
-						<h:commandLink id="commentAction" styleClass="btn_comment" value="#{commentCtrl.commentsCount('shopUser', jsfCtrl.entity.primaryKey.encodedValue)}" title="#{hh:label('labels', 'boutons.comment')}" onclick="commentPage();">
+						<h:commandLink id="commentAction" styleClass="btn_comment" value="#{commentCtrl.commentsCount('shopUser', jsfCtrl.entity.primaryKey.encodedValue)}" title="#{jsfCtrl.getXhtmlLabel('labels', 'boutons.comment')}" onclick="commentPage();">
 							<f:ajax event="click" execute="@none" render="comment-list" />
 						</h:commandLink>
 	    				<ui:include src="../includes/comment.xhtml" />
 	    			</h:panelGroup>
 					<h:outputText value=" "/>
-					<h:commandButton id="printAction" styleClass="btn_print" image="../static/img/buttons/print.png" title="#{hh:label('labels', 'boutons.print')}" onclick="window.print(); return false;" />
+					<h:commandButton id="printAction" styleClass="btn_print" image="../static/img/buttons/print.png" title="#{jsfCtrl.getXhtmlLabel('labels', 'boutons.print')}" onclick="window.print(); return false;" />
 					<h:outputText value=" "/>
 				</div>
 			</td>
 			<td width="99%" style="text-align: right; white-space: nowrap;">
-				<h:commandButton id="validateAction" rendered="#{!jsfCtrl.displaySubActions()}" styleClass="btn_medium" value="#{hh:label('labels', 'boutons.valider')}"
+				<h:commandButton id="validateAction" rendered="#{!jsfCtrl.displaySubActions()}" styleClass="btn_medium" value="#{jsfCtrl.getXhtmlLabel('labels', 'boutons.valider')}"
 					action="#{jsfCtrl.validate}" onclick="if (actionClicked) { alert('Traitement en cours. Veuillez patienter...');return false;} else { actionClicked = true; return true; }" />
 				<h:outputText value=" "/>
-				<h:commandButton id="cancelAction" immediate="true" styleClass="btn_medium" value="#{hh:label('labels', 'boutons.annuler')}"
+				<h:commandButton id="cancelAction" immediate="true" styleClass="btn_medium" value="#{jsfCtrl.getXhtmlLabel('labels', 'boutons.annuler')}"
 					action="#{jsfCtrl.cancel}" onclick="return checkDirtyState(this);" />
 			</td>
 		</tr>
 	</table>
 	</div>
-	<h:panelGroup id="shopUser" rendered="#{jsfCtrl.uiGroupPanel('', 'shopUser', 'shopUser').visible}" layout="none">
+	<h:panelGroup id="i0_shopUser" rendered="#{jsfCtrl.uiGroupPanel('', 'shopUser', 'shopUser').visible}" layout="none">
 		<table class="group_table">
 			<tr>
 				<td class="group_table_col_1">
@@ -46,7 +46,7 @@
 						<table class="#{!jsfCtrl.isValid('mainForm:shopUser_shopUser_login') ? 'error' : ''}">
 							<tr>
 								<td class="colFieldSetLeft">
-									<h:outputLabel id="i1_shopUser_shopUser_login" escape="false" value="#{jsfCtrl.getLabel('shopUser.login', 'shopUser.shopUser.login')}" title="#{hh:label('tooltips', 'shopUser.shopUser.login')}"/>
+									<h:outputLabel id="i1_shopUser_shopUser_login" escape="false" value="#{jsfCtrl.getLabel('shopUser.login', 'shopUser.shopUser.login')}" title="#{jsfCtrl.getXhtmlLabel('tooltips', 'shopUser.shopUser.login')}"/>
 									<h:outputLabel value="*" styleClass="mandatory_label" rendered="#{jsfCtrl.isMandatory('shopUser.login')}"/>
 								</td>
 								<td class="colFieldSetMid">
@@ -70,7 +70,7 @@
 						<table class="#{!jsfCtrl.isValid('mainForm:shopUser_shopUser_name') ? 'error' : ''}">
 							<tr>
 								<td class="colFieldSetLeft">
-									<h:outputLabel id="i1_shopUser_shopUser_name" escape="false" value="#{jsfCtrl.getLabel('shopUser.name', 'shopUser.shopUser.name')}" title="#{hh:label('tooltips', 'shopUser.shopUser.name')}"/>
+									<h:outputLabel id="i1_shopUser_shopUser_name" escape="false" value="#{jsfCtrl.getLabel('shopUser.name', 'shopUser.shopUser.name')}" title="#{jsfCtrl.getXhtmlLabel('tooltips', 'shopUser.shopUser.name')}"/>
 									<h:outputLabel value="*" styleClass="mandatory_label" rendered="#{jsfCtrl.isMandatory('shopUser.name')}"/>
 								</td>
 								<td class="colFieldSetMid">
@@ -94,7 +94,7 @@
 						<table class="#{!jsfCtrl.isValid('mainForm:shopUser_shopUser_password') ? 'error' : ''}">
 							<tr>
 								<td class="colFieldSetLeft">
-									<h:outputLabel id="i1_shopUser_shopUser_password" escape="false" value="#{jsfCtrl.getLabel('shopUser.password', 'shopUser.shopUser.password')}" title="#{hh:label('tooltips', 'shopUser.shopUser.password')}"/>
+									<h:outputLabel id="i1_shopUser_shopUser_password" escape="false" value="#{jsfCtrl.getLabel('shopUser.password', 'shopUser.shopUser.password')}" title="#{jsfCtrl.getXhtmlLabel('tooltips', 'shopUser.shopUser.password')}"/>
 									<h:outputLabel value="*" styleClass="mandatory_label" rendered="#{jsfCtrl.isMandatory('shopUser.password')}"/>
 								</td>
 								<td class="colFieldSetMid">
@@ -116,7 +116,7 @@
 						<table class="#{!jsfCtrl.isValid('mainForm:shopUser_shopUser_profile') ? 'error' : ''}">
 							<tr>
 								<td class="colFieldSetLeft">
-									<h:outputLabel id="i1_shopUser_shopUser_profile" escape="false" value="#{jsfCtrl.getLabel('shopUser.profile', 'shopUser.shopUser.profile')}" title="#{hh:label('tooltips', 'shopUser.shopUser.profile')}"/>
+									<h:outputLabel id="i1_shopUser_shopUser_profile" escape="false" value="#{jsfCtrl.getLabel('shopUser.profile', 'shopUser.shopUser.profile')}" title="#{jsfCtrl.getXhtmlLabel('tooltips', 'shopUser.shopUser.profile')}"/>
 									<h:outputLabel value="*" styleClass="mandatory_label" rendered="#{jsfCtrl.isMandatory('shopUser.profile')}"/>
 								</td>
 								<td class="colFieldSetMid">
@@ -125,7 +125,7 @@
 								<td class="colFieldSetRight">
 									<h:selectOneMenu disabledClass="disabledCombo" disabled="#{jsfCtrl.readonly('shopUser.profile')}" id="i0_shopUser_shopUser_profile" value="#{jsfCtrl.entity.profile}" label="#{jsfCtrl.getLabel('shopUser.profile', 'shopUser.profile')}"  onchange="markAsDirty(this)">
 									
-										<f:selectItems value="#{jsfCtrl.entity.enumValues('profile')}" />
+										<f:selectItems value="#{jsfCtrl.enumValues(jsfCtrl.entity,'profile')}" />
 									</h:selectOneMenu>
 									<h:message for="i0_shopUser_shopUser_profile" styleClass="errorLabel" />
 								</td>
@@ -140,10 +140,10 @@
 	<table style="width: 100%">
 		<tr>
 			<td style="text-align: right;">
-				<h:commandButton id="validateAction2" rendered="#{!jsfCtrl.displaySubActions()}" styleClass="btn_medium" value="#{hh:label('labels', 'boutons.valider')}"
+				<h:commandButton id="validateAction2" rendered="#{!jsfCtrl.displaySubActions()}" styleClass="btn_medium" value="#{jsfCtrl.getXhtmlLabel('labels', 'boutons.valider')}"
 					action="#{jsfCtrl.validate}"  onclick="if (actionClicked) { alert('Traitement en cours. Veuillez patienter...');return false;} else { actionClicked = true; return true; }" />
 				<h:outputText value=" "/>
-				<h:commandButton id="cancelAction2" immediate="true" styleClass="btn_medium" value="#{hh:label('labels', 'boutons.annuler')}"
+				<h:commandButton id="cancelAction2" immediate="true" styleClass="btn_medium" value="#{jsfCtrl.getXhtmlLabel('labels', 'boutons.annuler')}"
 					action="#{jsfCtrl.cancel}" onclick="return checkDirtyState(this);" />
 			</td>
 		</tr>

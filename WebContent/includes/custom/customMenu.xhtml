@@ -3,18 +3,16 @@
 <h:body>
 <ui:composition>
 
-<li class="ui-menu-item">
+<li class="ui-menu-item" style="float: right; padding-right: 10px;">
 	<a href="#" class="ui-corner-all">
 		<span>
 			<h:panelGroup rendered="#{sessionCtrl.context.user != null}">
-                <h:outputLabel value="#{sessionCtrl.context.user.login}" /> 
-            </h:panelGroup>
+				<h:outputLabel value="#{sessionCtrl.context.user.login}" /> 
+			</h:panelGroup>
 		</span>
 	</a>
 	<ul>
-
 		<li><h:commandLink action="#{sessionCtrl.logout}" onclick="return checkDirtyState(this);"><h:outputText value="#{labels['action.logout']}" /></h:commandLink></li>
-		<li><h:outputLink value="#" onclick="openScrollablePopUp('../#{viewCtrl.getHelp()}', 800, 600);">#{labels['action.help']}</h:outputLink></li>
 	</ul>
 </li>
 </ui:composition>

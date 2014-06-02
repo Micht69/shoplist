@@ -8,7 +8,7 @@ import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet; 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -29,6 +29,7 @@ import fr.logica.business.Entity;
 import fr.logica.business.EntityManager;
 import fr.logica.business.FunctionalException;
 import fr.logica.business.Key;
+import fr.logica.business.MessageUtils;
 import fr.logica.business.TechnicalException;
 import fr.logica.business.context.RequestContext;
 import fr.logica.business.controller.BusinessController;
@@ -39,14 +40,16 @@ import fr.logica.jsf.model.DataModel;
 import fr.logica.jsf.model.DataModel.UiTemplate;
 import fr.logica.jsf.model.group.GroupModel;
 import fr.logica.jsf.model.group.TabPanelModel;
+import fr.logica.jsf.model.group.WizardModel;
+import fr.logica.jsf.model.var.ClobFileModel;
 import fr.logica.jsf.model.var.FileUploadModel;
 import fr.logica.jsf.model.var.ImageLinkModel;
-import fr.logica.jsf.utils.LabelFunction;
 import fr.logica.jsf.webflow.View;
 import fr.logica.ui.Message;
 import fr.logica.ui.Message.Severity;
 import fr.logica.ui.UiAccess;
 
+@SuppressWarnings({ "unchecked", "rawtypes" })
 public class ViewController implements Serializable {
 
 	/** serialUID */
@@ -105,20 +108,21 @@ public class ViewController implements Serializable {
 		}
 		String cID = sessionCtrl.getViewConversations().get(vID);
 		View<?> v = sessionCtrl.getCurrentView(cID);
-			while (!v.getvID().equals(vID)) {
-				v = v.getNextView();
-				if (v == null) {
-					// Expired View - we set a marker in sessionMap before redirect because request messages won't be keep.
-					// This marker will be read and removed by the BrowserNavigationListener.
-					LOGGER.warn("Client asked for expired view");
-					fc.getExternalContext().getSessionMap()
-							.put(BrowserNavigationListener.EXPIRED_VIEW_TOKEN, BrowserNavigationListener.EXPIRED_VIEW_TOKEN);
-					fc.getApplication().getNavigationHandler().handleNavigation(fc, null, sessionCtrl.getCurrentView(cID).getURL());
-					return;
-				}
+		while (!v.getvID().equals(vID)) {
+			v = v.getNextView();
+			if (v == null) {
+				// Expired View - we set a marker in sessionMap before redirect because request messages won't be keep.
+				// This marker will be read and removed by the BrowserNavigationListener.
+				LOGGER.warn("Client asked for expired view");
+				fc.getExternalContext().getSessionMap()
+						.put(BrowserNavigationListener.EXPIRED_VIEW_TOKEN, BrowserNavigationListener.EXPIRED_VIEW_TOKEN);
+				fc.getApplication().getNavigationHandler().handleNavigation(fc, null, sessionCtrl.getCurrentView(cID).getURL());
+				return;
 			}
-			currentView = v;
-			sessionCtrl.setCurrentView(cID, currentView);
+		}
+		currentView = v;
+		sessionCtrl.setCurrentView(cID, currentView);
+		context.getAttributes().putAll(currentView.getCustomData());
 		this.viewModels = new HashMap<String, DataModel>();
 	}
 
@@ -146,6 +150,10 @@ public class ViewController implements Serializable {
 		return getVarModel(UiTemplate.VAR_FILE_UPLOAD, entityPath, entityName, varName);
 	}
 
+	public DataModel uiClob(String entityPath, String entityName, String varName) {
+		return getVarModel(UiTemplate.VAR_CLOB, entityPath, entityName, varName);
+	}
+
 	private DataModel getVarModel(UiTemplate ui, String entityPath, String entityName, String varName) {
 		String uniqueIdentifier = ui + "_" + entityPath + "_" + entityName + "_" + varName;
 		Entity e = getEntity(entityPath);
@@ -158,6 +166,8 @@ public class ViewController implements Serializable {
 				viewModels.put(uniqueIdentifier, new ImageLinkModel(this, modelStore, e, entityName, varName));
 			} else if (ui == UiTemplate.VAR_FILE_UPLOAD) {
 				viewModels.put(uniqueIdentifier, new FileUploadModel(this, modelStore, e, entityName, varName));
+			} else if (ui == UiTemplate.VAR_CLOB) {
+				viewModels.put(uniqueIdentifier, new ClobFileModel(this, modelStore, e, entityName, varName));
 			} else {
 				LOGGER.error("DataModel " + ui + " not supported. ");
 			}
@@ -179,6 +189,10 @@ public class ViewController implements Serializable {
 
 	public DataModel uiTabPanel(String entityPath, String entityName, String groupName) {
 		return getGroupModel(UiTemplate.GROUP_TABS, entityPath, entityName, groupName);
+	}
+
+	public DataModel uiWizardPanel(String entityPath, String entityName, String groupName) {
+		return getGroupModel(UiTemplate.GROUP_WIZARD, entityPath, entityName, groupName);
 	}
 
 	public DataModel uiList(String queryName) {
@@ -263,6 +277,8 @@ public class ViewController implements Serializable {
 			}
 			if (ui == UiTemplate.GROUP_TABS) {
 				viewModels.put(uniqueIdentifier, new TabPanelModel(this, modelStore, e, entityName, groupName));
+			} else if (ui == UiTemplate.GROUP_WIZARD) {
+				viewModels.put(uniqueIdentifier, new WizardModel(this, modelStore, e, entityName, groupName));
 			} else if (ui == UiTemplate.GROUP) {
 				viewModels.put(uniqueIdentifier, new GroupModel(this, modelStore, e, entityName, groupName));
 			} else {
@@ -489,9 +505,12 @@ public class ViewController implements Serializable {
 				response.setCustomData(customData);
 				return goToNextView(response);
 			}
+
+
 			return sessionCtrl.getDefaultPage();
 		} catch (FunctionalException fEx) {
-			displayMessages(fEx);
+			// all(?) msg from functional exception already stored in context
+			// will be displayed in finally block
 			LOGGER.debug(fEx);
 		} catch (TechnicalException tEx) {
 			displayMessages(tEx);
@@ -502,9 +521,9 @@ public class ViewController implements Serializable {
 		} finally {
 			if (context != null) {
 				context.close();
-				// Display potential messages from context
-				displayMessages(context);
 			}
+			// Display potential messages from context
+			displayMessages(context);
 		}
 		return currentView.getURL();
 	}
@@ -521,7 +540,6 @@ public class ViewController implements Serializable {
 		return ApplicationUtils.getApplicationLogic().getPageTitle(title);
 	}
 
-	@SuppressWarnings("unchecked")
 	public boolean isVisible(String field) {
 		if (currentView != null && currentView.getUiAccess() != null) {
 			if (currentView.getUiAccess().get(field) != null) {
@@ -553,7 +571,6 @@ public class ViewController implements Serializable {
 		return readonly(field);
 	}
 
-	@SuppressWarnings("unchecked")
 	public boolean readonly(String field) {
 		if (currentView != null && currentView.getUiAccess() != null) {
 			if (currentView.getUiAccess().get(field) != null) {
@@ -563,7 +580,6 @@ public class ViewController implements Serializable {
 		return false;
 	}
 
-	@SuppressWarnings("unchecked")
 	public boolean isMandatory(String field) {
 		if (currentView != null && currentView.getUiAccess() != null) {
 			if (currentView.getUiAccess().get(field) != null) {
@@ -573,14 +589,39 @@ public class ViewController implements Serializable {
 		return false;
 	}
 
-	@SuppressWarnings("unchecked")
 	public String getLabel(String field, String key) {
 		if (currentView != null && currentView.getUiAccess() != null) {
 			if (currentView.getUiAccess().get(field) != null && ((Map<String, UiAccess>) currentView.getUiAccess()).get(field).label != null) {
 				return ((Map<String, UiAccess>) currentView.getUiAccess()).get(field).label;
 			}
 		}
-		return LabelFunction.label("genLabels", key);
+		return getXhtmlLabel("genLabels", key);
+	}
+
+	/**
+	 * Gets a label from MessageUtils bundles based on user's current Locale
+	 * 
+	 * @param bundle
+	 *            Bundle where to get the text
+	 * @param key
+	 *            Label's unique identifier
+	 * @return Label from bundle for specified key
+	 */
+	public String getXhtmlLabel(String bundle, String key) {
+		return MessageUtils.getInstance(sessionCtrl.getContext().getLocale()).getXhtmlLabel(bundle, key);
+	}
+
+	/**
+	 * Gets enumeration labels for a specific enum in an entity in the current session Locale
+	 * 
+	 * @param e
+	 *            Entity containing the enumeration
+	 * @param enumName
+	 *            enumeration identifier
+	 * @return Map containing labels to display inside a combobox / radiobutton and associated values
+	 */
+	public Map<String, Object> enumValues(Entity e, String enumName) {
+		return e.getModel().enumValues(enumName, sessionCtrl.getContext().getLocale());
 	}
 
 	/**
@@ -657,17 +698,38 @@ public class ViewController implements Serializable {
 		return !FacesContext.getCurrentInstance().getMessages(field).hasNext();
 	}
 
+	/**
+	 * Returns custom data to be included in pages as {@code div} tag:<br>
+	 * {@code <div id=key>value</div>}
+	 * 
+	 * @return HTML string for custom data include
+	 */
+	@SuppressWarnings("unchecked")
 	public String getCustomData() {
-		StringBuilder cData = new StringBuilder();
+		String cData = "";
 		if (currentView != null && currentView.getCustomData() != null) {
-			for (Object e : currentView.getCustomData().entrySet()) {
-				Entry<String, Object> entry = (Entry<String, Object>) e;
-				cData.append("<div id=\"");
-				cData.append(entry.getKey());
-				cData.append("\">");
-				cData.append(String.valueOf(entry.getValue()));
-				cData.append("</div>");
-			}
+			// get custom data from the response
+			cData = buildCustomData(currentView.getCustomData().entrySet());
+		}
+		if (cData.isEmpty() && context != null) {
+			// if no data, try the request
+			cData = buildCustomData(context.getCustomData().entrySet());
+		}
+		return cData;
+	}
+
+	/**
+	 * @param customData
+	 * @return HTML string from custom data
+	 */
+	private String buildCustomData(Set<Entry<String, Object>> customData) {
+		StringBuilder cData = new StringBuilder();
+		for (Entry<String, Object> entry : customData) {
+			cData.append("<div id=\"");
+			cData.append(entry.getKey());
+			cData.append("\">");
+			cData.append(String.valueOf(entry.getValue()));
+			cData.append("</div>");
 		}
 		return cData.toString();
 	}
@@ -879,20 +941,22 @@ public class ViewController implements Serializable {
 		String server = ext.getRequestServerName();
 		String port = String.valueOf(ext.getRequestServerPort());
 		String context = ext.getRequestContextPath();
-
 		String servlet = "/index/viewAccess.jsf";
 
+		// Get base url
 		String baseUrl = protocol + "://" + server + ":" + port + context;
 		if (currentView == null) {
 			return baseUrl + getDefaultPage() + ".jsf";
 		}
-		String url = baseUrl + servlet + "?";
-		url += "entityName=" + currentView.getEntityName();
+		baseUrl = baseUrl + servlet;
 
+		// Get url parameters
+		Map<String, String> urlParams = new HashMap<String, String>(3);
+		urlParams.put("entityName", currentView.getEntityName());
 		if (currentView.getAction().getQueryName() != null) {
-			url += "&queryName=" + currentView.getAction().getQueryName();
+			urlParams.put("queryName", currentView.getAction().getQueryName());
 		} else {
-			url += "&actionCode=" + currentView.getAction().getCode();
+			urlParams.put("actionCode", currentView.getAction().getCode().toString());
 			if (currentView.getKeys() != null) {
 				StringBuilder keys = new StringBuilder();
 				for (Key k : (List<Key>) currentView.getKeys()) {
@@ -902,10 +966,11 @@ public class ViewController implements Serializable {
 					keys.append(k.getEncodedValue());
 				}
 				if (keys.length() > 0) {
-					url += "&encodedKeyList=" + keys.toString();
+					urlParams.put("encodedKeyList", keys.toString());
 				}
 			}
 		}
-		return url;
+
+		return ApplicationUtils.getApplicationLogic().getPermaLink(baseUrl, urlParams);
 	}
 }

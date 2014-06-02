@@ -23,14 +23,6 @@ public class FunctionalException extends LogicaException {
 		return messages;
 	}
 
-	/**
-	 * <b> DO NOT USE THIS CONSTRUCTOR IN DOMAIN LOGIC CLASSES. </b><br/>
-	 * Rare corner case outside of the base classes : you should usually have at least one message. 
-	 */
-	public FunctionalException() {
-		super();
-	}
-
 	public FunctionalException(List<Message> errors) {
 		super();
 		messages.addAll(errors);

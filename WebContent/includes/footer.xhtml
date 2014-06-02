@@ -1,29 +1,42 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:f="http://java.sun.com/jsf/core" xmlns:hh="http://cgi.com/jsf/html">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:f="http://java.sun.com/jsf/core">
 
 <h:body>
 <ui:composition>
-    <!-- Footer Beginning -->
+	<!-- Footer Beginning -->
 	<div class="footer png_fix">
 	<h:form>
 		<div class="bottomLogo"><img src="../static/img/logo_bottom.jpg" align="left" alt="" border="0" /></div>
-	    <ul>
-	    	<ui:fragment rendered="#{sessionCtrl.languageSelector}">
-	    	<li>
-	    		<span class="language_selector">
-	    			<h:commandButton value="#{labels['language.selector']}" action="#{sessionCtrl.redirectFromAccueil}" />
-	    			<h:selectOneMenu value="#{sessionCtrl.language}">
-						<f:selectItems value="#{sessionCtrl.languages}" />
-					</h:selectOneMenu>
+		<ul>
+			<ui:fragment rendered="#{applicationCtrl.displayPermalink}">
+			<li>
+				<h:outputLabel id="permalink" style="cursor: pointer" if="permalink" value="#{labels['permalink.label']}" />
+				<h:outputLabel style="display:none" escape="false" id="permalink-data" value="#{jsfCtrl.permalink}" />
+				<script type="text/Javascript">
+					$(document).ready(function() {
+						$('label[id$="permalink"]').click(function() {
+							 window.prompt("#{labels['permalink.copy.paste']}", $('label[id$="permalink-data"]').text());
+						});
+					});
+				</script>
+			</li>
+			</ui:fragment>
+			<ui:fragment rendered="#{sessionCtrl.languageSelector}">
+			<li>
+				<span class="language_selector">
+					<ui:repeat var="entry" value="#{sessionCtrl.languages}">
+						<h:commandButton action="#{sessionCtrl.selectLanguage(entry.value)}" image="../static/img/lang/#{entry.value}.png" title="#{entry.key}" />
+					</ui:repeat>
 				</span>
-	    	</li>
-	    	</ui:fragment>
-	        <li><h:outputText value="#{sessionCtrl.version}" /></li>
-	    </ul>
-    </h:form>
-    <ui:include src="../includes/custom/customFooter.xhtml" />
-    </div>
-    <!-- Footer Ending -->
+			</li>
+			</ui:fragment>
+			<li><h:outputText value="#{sessionCtrl.version}" /></li>
+		</ul>
+	</h:form>
+	<ui:include src="../includes/custom/customFooter.xhtml" />
+	</div>
+	<!-- Footer Ending -->
+
 </ui:composition>
 </h:body>
 </html>

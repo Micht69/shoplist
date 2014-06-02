@@ -2,6 +2,7 @@ package fr.logica.domain.logic;
 
 import java.util.Map;
 
+import fr.logica.business.Action;
 import fr.logica.business.DefaultLogic;
 import fr.logica.business.context.RequestContext;
 import fr.logica.db.DbManager;
@@ -38,5 +39,13 @@ public class ShopListLogic extends DefaultLogic<ShopList> {
 			}
 		}
 		return super.uiListVarValue(vars, queryName, domainName, varName, ctx);
+	}
+	
+	@Override
+	public void dbPostLoad(ShopList bean, Action action, RequestContext ctx) {
+		if (action.is(ShopList.Action.ACTION_0)) {
+			bean.setUser(ctx.getSessionContext().getUser().getLogin());
+		}
+		super.dbPostLoad(bean, action, ctx);
 	}
 }

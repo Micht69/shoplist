@@ -46,7 +46,7 @@ public class CustomDateTimeConverter extends DateTimeConverter {
 					} else {
 						key = "javax.faces.converter.DateTimeConverter.TIME";
 					}
-					throw new ConverterException(MessageFactory.getMessage(key, calendar.getLabel(), format.format(new Date())), pe);
+					throw new ConverterException(MessageFactory.getMessage(key, calendar.getLabel(), format.format(new Date()), value), pe);
 				}
 			}
 		}

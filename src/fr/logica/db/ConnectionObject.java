@@ -30,4 +30,10 @@ public class ConnectionObject {
 	public Object getConnection() {
 		return this.connection;
 	}
+
+	public void close() {
+		if (connection instanceof DbConnection) {
+			((DbConnection) connection).close();
+		}
+	}
 }

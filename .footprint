@@ -2,11 +2,11 @@
 ### Generated with layers
 * jsf2-3.1.0-SNAPSHOT
 * jweb-3.1.0-SNAPSHOT
-* rorschach-3.1.0-SNAPSHOT
+* rorschach-3.1.2-SNAPSHOT
 * sql-3.1.0-SNAPSHOT
 
 ### Generation options
-exportData=false
+exportData=true
 locale=fr
 lock=none
 webServer=tomcat7
@@ -19,6 +19,7 @@ mavenProject=false
 execTimesStack=false
 actionTooltips=false
 multiapp=false
+persistence.schema=none
 datasource=auto
 css=default
 

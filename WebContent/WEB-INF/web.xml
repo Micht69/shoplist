@@ -71,6 +71,14 @@
     <filter-name>Upload filter</filter-name>
     <url-pattern>/*</url-pattern>
   </filter-mapping>
+  <filter>
+    <filter-name>JSFFilter</filter-name>
+    <filter-class>fr.logica.jsf.controller.JSFFilter</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>JSFFilter</filter-name>
+    <url-pattern>*.jsf</url-pattern>
+  </filter-mapping>
   
 
 

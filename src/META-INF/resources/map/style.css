@@ -1,7 +1,6 @@
 div.olMap {
     z-index: 0;
     padding: 0 !important;
-    margin: auto !important;
     cursor: default;
 }
 

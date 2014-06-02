@@ -26,7 +26,7 @@
 						<span id="openResultats" style="display: #{jsfCtrl.uiList('SHOP_LIST_L_ARTICLE').displayCriterias ? 'block' : 'none'}"><h:graphicImage library="img" name="open_content.gif" alt="open" /></span>
 						<span id="closeResultats" style="display: #{jsfCtrl.uiList('SHOP_LIST_L_ARTICLE').displayCriterias ? 'none' : 'block'}"><h:graphicImage library="img" name="close_content.gif" alt="close" /></span>
 					</td>
-					<td class="accordion-title"><h:outputText value="#{hh:label('labels', 'liste.resultats')}" /></td>
+					<td class="accordion-title"><h:outputText value="#{jsfCtrl.getXhtmlLabel('labels', 'liste.resultats')}" /></td>
 					<td class="accordion-title-description">
 						<h:outputText class="result-count #{jsfCtrl.uiList('SHOP_LIST_L_ARTICLE').resultCountStyle}" id="resultCount" value="#{jsfCtrl.uiList('SHOP_LIST_L_ARTICLE').resultCount}" />
 						<h:outputText class="total-result-count" id="totalResultCount" value="#{jsfCtrl.uiList('SHOP_LIST_L_ARTICLE').totalResultCount}" />
@@ -44,7 +44,7 @@
 				<tr>
 					<td style="text-align: left;">
 						<span class="filter-line">
-							<span><h:outputText value="#{hh:label('labels', 'filtrer')}" /></span>
+							<span><h:outputText value="#{jsfCtrl.getXhtmlLabel('labels', 'filtrer')}" /></span>
 							<h:outputText value=" " />
 							<h:inputText id="globalFilter_SHOP_LIST_L_ARTICLE" value="#{jsfCtrl.uiList('SHOP_LIST_L_ARTICLE').jsFilter}" onkeyup="showLines(null, this.value, 'SHOP_LIST_L_ARTICLE')" styleClass="filter" />
 							<span id="filterCount_SHOP_LIST_L_ARTICLE"> </span>
@@ -53,37 +53,37 @@
 					<td style="text-align: right;"><span class="allActionButtons">
 						<h:panelGroup rendered="#{jsfCtrl.select}">
 							<span class="listButtons" id="buttonSHOP_LIST_L_ARTICLE">
-								<h:commandButton id="SHOP_LIST_L_ARTICLE_buttonSelect" alt="commandButtonSelect" styleClass="btn_medium" value="#{hh:label('labels', 'action.selectionner')}" action="#{jsfCtrl.validate}"/>
+								<h:commandButton id="SHOP_LIST_L_ARTICLE_buttonSelect" alt="commandButtonSelect" styleClass="btn_medium" value="#{jsfCtrl.getXhtmlLabel('labels', 'action.selectionner')}" action="#{jsfCtrl.validate}"/>
 							</span>
-							<h:commandButton id="SHOP_LIST_L_ARTICLE_buttonCancel" alt="cancelButtonSelect" styleClass="btn_medium" value="#{hh:label('labels', 'action.annuler')}" action="#{jsfCtrl.cancel}"/>
+							<h:commandButton id="SHOP_LIST_L_ARTICLE_buttonCancel" alt="cancelButtonSelect" styleClass="btn_medium" value="#{jsfCtrl.getXhtmlLabel('labels', 'action.annuler')}" action="#{jsfCtrl.cancel}"/>
 						</h:panelGroup>
-						<h:panelGroup rendered="#{applicationCtrl.displaySelectActions}">
+						<h:panelGroup rendered="#{applicationCtrl.displaySelectActions or !jsfCtrl.select}">
 		
 							<h:commandButton id="SHOP_LIST_L_ARTICLE_button0" alt='commandButton0' styleClass="btn_icon btn_medium"
 								rendered="#{sessionCtrl.isActionRendered('shopListLArticle', 0)}"
-								value="#{hh:label('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_0')}" title="#{hh:label('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_0')}" action="#{jsfCtrl.uiList('SHOP_LIST_L_ARTICLE').prepareActionCode(0)}" style="background-image: url('#{application.contextPath}/static/img/icons/create.png');" />
+								value="#{jsfCtrl.getXhtmlLabel('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_0')}" title="#{jsfCtrl.getXhtmlLabel('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_0')}" action="#{jsfCtrl.uiList('SHOP_LIST_L_ARTICLE').prepareActionCode(0)}" style="background-image: url('#{application.contextPath}/static/img/icons/create.png');" />
 		
 							<h:commandButton id="SHOP_LIST_L_ARTICLE_button51" alt='commandButton51' styleClass="btn_icon btn_medium"
 								rendered="#{sessionCtrl.isActionRendered('shopListLArticle', 51)}"
-								value="#{hh:label('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_51')}" title="#{hh:label('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_51')}" action="#{jsfCtrl.uiList('SHOP_LIST_L_ARTICLE').prepareActionCode(51)}" style="background-image: url('#{application.contextPath}/static/img/icons/create.png');" />
+								value="#{jsfCtrl.getXhtmlLabel('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_51')}" title="#{jsfCtrl.getXhtmlLabel('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_51')}" action="#{jsfCtrl.uiList('SHOP_LIST_L_ARTICLE').prepareActionCode(51)}" style="background-image: url('#{application.contextPath}/static/img/icons/create.png');" />
 		
 							<h:commandButton id="SHOP_LIST_L_ARTICLE_button70" alt='commandButton70' styleClass="btn_icon btn_medium"
 								rendered="#{sessionCtrl.isActionRendered('shopListLArticle', 70)}"
-								value="#{hh:label('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_70')}" title="#{hh:label('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_70')}" action="#{jsfCtrl.uiList('SHOP_LIST_L_ARTICLE').prepareActionCode(70)}" style="background-image: url('#{application.contextPath}/static/img/icons/select.png');" />
+								value="#{jsfCtrl.getXhtmlLabel('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_70')}" title="#{jsfCtrl.getXhtmlLabel('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_70')}" action="#{jsfCtrl.uiList('SHOP_LIST_L_ARTICLE').prepareActionCode(70)}" style="background-image: url('#{application.contextPath}/static/img/icons/select.png');" />
 		
 							<span class="listButtons" id="buttonSHOP_LIST_L_ARTICLE">
 		
 								<h:commandButton id="SHOP_LIST_L_ARTICLE_button2" alt='commandButton2' styleClass="btn_icon btn_medium"
 									rendered="#{sessionCtrl.isActionRendered('shopListLArticle', 2)}"
-									value="#{hh:label('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_2')}" title="#{hh:label('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_2')}" action="#{jsfCtrl.uiList('SHOP_LIST_L_ARTICLE').prepareActionCode(2)}" style="background-image: url('#{application.contextPath}/static/img/icons/edit.png');" />
+									value="#{jsfCtrl.getXhtmlLabel('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_2')}" title="#{jsfCtrl.getXhtmlLabel('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_2')}" action="#{jsfCtrl.uiList('SHOP_LIST_L_ARTICLE').prepareActionCode(2)}" style="background-image: url('#{application.contextPath}/static/img/icons/edit.png');" />
 		
 								<h:commandButton id="SHOP_LIST_L_ARTICLE_button20" alt='commandButton20' styleClass="btn_icon btn_medium"
 									rendered="#{sessionCtrl.isActionRendered('shopListLArticle', 20)}"
-									value="#{hh:label('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_20')}" title="#{hh:label('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_20')}" action="#{jsfCtrl.uiList('SHOP_LIST_L_ARTICLE').prepareActionCode(20)}" style="background-image: url('#{application.contextPath}/static/img/icons/delete.png');" />
+									value="#{jsfCtrl.getXhtmlLabel('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_20')}" title="#{jsfCtrl.getXhtmlLabel('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_20')}" action="#{jsfCtrl.uiList('SHOP_LIST_L_ARTICLE').prepareActionCode(20)}" style="background-image: url('#{application.contextPath}/static/img/icons/delete.png');" />
 		
 								<h:commandButton id="SHOP_LIST_L_ARTICLE_button60" alt='commandButton60' styleClass="btn_icon btn_medium"
 									rendered="#{sessionCtrl.isActionRendered('shopListLArticle', 60)}"
-									value="#{hh:label('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_60')}" title="#{hh:label('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_60')}" action="#{jsfCtrl.uiList('SHOP_LIST_L_ARTICLE').prepareActionCode(60)}" style="background-image: url('#{application.contextPath}/static/img/icons/mark.png');" />
+									value="#{jsfCtrl.getXhtmlLabel('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_60')}" title="#{jsfCtrl.getXhtmlLabel('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_60')}" action="#{jsfCtrl.uiList('SHOP_LIST_L_ARTICLE').prepareActionCode(60)}" style="background-image: url('#{application.contextPath}/static/img/icons/mark.png');" />
 		
 								<h:commandButton id="SHOP_LIST_L_ARTICLE_buttonDefaultAction" alt='commandButton05' styleClass="btn_icon btn_medium"
 									rendered="#{sessionCtrl.isDisplayActionRendered('shopListLArticle', 2)}"
@@ -91,7 +91,7 @@
 		
 							</span>
 						</h:panelGroup>
-							<h:commandButton id="SHOP_LIST_L_ARTICLE_buttonXls" alt='commandButtonXlsExport' styleClass="btn_medium" rendered="#{!jsfCtrl.select and applicationCtrl.displayXlsExport}" value="#{hh:label('labels', 'boutons.exportExcel')}" action="#{jsfCtrl.uiList('SHOP_LIST_L_ARTICLE').export('xls')}" />
+							<h:commandButton id="SHOP_LIST_L_ARTICLE_buttonXls" alt='commandButtonXlsExport' styleClass="btn_medium" rendered="#{!jsfCtrl.select and applicationCtrl.displayXlsExport}" value="#{jsfCtrl.getXhtmlLabel('labels', 'boutons.exportExcel')}" action="#{jsfCtrl.uiList('SHOP_LIST_L_ARTICLE').export('xls')}" />
 		
 					</span></td>
 				</tr>
@@ -103,11 +103,9 @@
 	
 			<div class="list_results_container">
 				<h:panelGroup id="noResult" layout="block" styleClass="no-result">
-					<h:outputText value="#{hh:label('labels', 'results.nodata')}" rendered="#{empty jsfCtrl.uiList('SHOP_LIST_L_ARTICLE').rows}" />
+					<h:outputText value="#{jsfCtrl.getXhtmlLabel('labels', 'results.nodata')}" rendered="#{empty jsfCtrl.uiList('SHOP_LIST_L_ARTICLE').rows}" />
 				</h:panelGroup>
 				<h:panelGroup id="results" layout="block">
-
-				
 				<h:dataTable vanilla="false" id="tableSHOP_LIST_L_ARTICLE"
 						columnClasses="first, numeric, numeric, numeric, defValue, default" rowClasses="odd,even"
 						value="#{jsfCtrl.uiList('SHOP_LIST_L_ARTICLE').rows}" var="tempVar"
@@ -176,7 +174,7 @@
 						<h:outputLabel value="#{tempVar.T1_deleteInfos}" />
 					</h:column>
 					<f:facet name="footer">
-						<h:commandButton image="/static/img/buttons/plus.png" rendered="#{jsfCtrl.uiList('SHOP_LIST_L_ARTICLE').hasMoreRows()}" styleClass="btn_more_lines" title="#{hh:label('labels', 'liste.data.more')}">
+						<h:commandButton image="/static/img/buttons/plus.png" rendered="#{jsfCtrl.uiList('SHOP_LIST_L_ARTICLE').hasMoreRows()}" styleClass="btn_more_lines" title="#{jsfCtrl.getXhtmlLabel('labels', 'liste.data.more')}">
 							<f:ajax event="click" onevent="updateList" render=":mainForm:messages :mainForm:resultCount :mainForm:results" listener="#{jsfCtrl.uiList('SHOP_LIST_L_ARTICLE').moreLines}"/> 
 						</h:commandButton>
 					</f:facet>

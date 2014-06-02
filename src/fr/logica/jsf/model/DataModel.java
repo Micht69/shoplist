@@ -148,6 +148,8 @@ public abstract class DataModel implements Serializable {
 		VAR_IMAGE_LINK,
 		/** File upload */
 		VAR_FILE_UPLOAD,
+		/** CLOB */
+		VAR_CLOB,
 		/** Classic list template */
 		LIST,
 		/** Editable list */
@@ -180,6 +182,8 @@ public abstract class DataModel implements Serializable {
 		GROUP,
 		/** Tabs */
 		GROUP_TABS,
+		/** Wizard */
+		GROUP_WIZARD,
 		/** Custom template */
 		CUSTOM,
 	}

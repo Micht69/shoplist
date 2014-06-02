@@ -90,14 +90,42 @@ public class RequestContext implements Serializable {
 		return attributes;
 	}
 
+	/**
+	 * Removes a user custom data from current request context
+	 * @param key	Unique identifier for custom data
+	 */
 	public void removeCustomData(String key) {
 		String newKey = Constants.CUSTOM_DATA + key;
 		attributes.remove(newKey);
 	}
 
+	/**
+	 * Stores a user custom data inside current context. If this request's response has a User Interface, this custom data will be dump into final HTML DOM in the custom data div. <br/><br/>
+	 * <pre>
+	 * Example: 
+	 * - When Domain Logic method uiActionOnLoad() adds custom data: 
+	 * 		context.putCustomData("color", "blue")
+	 * - Final DOM will contain a div like this: 
+	 * 		&lt;div style="display: none;"&gt;
+	 * 			&lt;div id="cData_key_color"&gt;blue&lt;/div&gt;
+	 * 		&lt;/div&gt;
+	 * </pre>
+	 * Request Context will add "cData_key_" prefix to all stored custom data. 
+	 * @param key	Unique identifier for custom data
+	 * @param data  Custom data to store inside context
+	 */
 	public void putCustomData(String key, Object data) {
 		String newKey = Constants.CUSTOM_DATA + key;
 		attributes.put(newKey, data);
+	}
+	
+	/**
+	 * Gets a user stored custom data inside current context. 
+	 * @param key	Unique identifier for custom data
+	 * @return Custom data stored inside context
+	 */
+	public Object getCustomData(String key) {
+		return attributes.get(Constants.CUSTOM_DATA + key); 
 	}
 
 	public void setAttachment(File file) {

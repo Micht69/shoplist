@@ -4,14 +4,14 @@
 <h:body>
 <ui:composition>
     <!-- Comment Beginning -->
-	<div id="comment-popup" title="#{hh:label('labels', 'comment.title')}" style="display: none;">
+	<div id="comment-popup" title="#{jsfCtrl.getXhtmlLabel('labels', 'comment.title')}" style="display: none;">
 		<table class="group_table">
 		<tbody>
 			<tr>
 				<td class="group_table_col_1">
 					<h:panelGroup id="comment-list">
 					<div class="form_container">
-						<div class="form_title"><h:outputText value="#{hh:label('labels', 'comment.existing')}" /></div>
+						<div class="form_title"><h:outputText value="#{jsfCtrl.getXhtmlLabel('labels', 'comment.existing')}" /></div>
 						<ui:repeat var="commentRow" value="#{commentCtrl.comments}">
 						<table class="group_table">
 						<tbody>
@@ -31,14 +31,14 @@
 			<tr>
 				<td class="group_table_col_1">
 					<div class="form_container" id="comment-form">
-						<div class="form_title"><h:outputText value="#{hh:label('labels', 'comment.add')}" /></div>
+						<div class="form_title"><h:outputText value="#{jsfCtrl.getXhtmlLabel('labels', 'comment.add')}" /></div>
 						<table class="group_table">
 						<tbody>
 							<tr>
 								<td style="padding-top: 9px; text-align: center;">
 									<h:inputTextarea id="comment-comment" value="#{commentCtrl.comment.comment}" style="width: 95%; height: 80px;" />
 									
-									<h:commandButton styleClass="btn_medium" value="#{hh:label('labels', 'action.valider')}" style="float: right; margin-right: 10px; margin-top: 10px;" >
+									<h:commandButton styleClass="btn_medium" value="#{jsfCtrl.getXhtmlLabel('labels', 'action.valider')}" style="float: right; margin-right: 10px; margin-top: 10px;" >
 										<f:ajax event="click" execute="comment-comment" render="messages commentAction" listener="#{commentCtrl.saveComment()}" onevent="saveComment" />
 									</h:commandButton>
 								</td>

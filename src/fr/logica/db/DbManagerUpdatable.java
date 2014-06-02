@@ -1,7 +1,12 @@
 package fr.logica.db;
 
+import java.lang.ref.WeakReference;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import fr.logica.business.Entity;
@@ -71,6 +76,8 @@ public class DbManagerUpdatable extends DbManager {
 	public static Entity fillAutoIncrement(Entity entity, RequestContext ctx) {
 		for (String fieldName : entity.getModel().getFields()) {
 			if (entity.getModel().isAutoIncrementField(fieldName) && entity.invokeGetter(fieldName) == null) {
+				// compute delta here to avoid context alive when getting count from db but dead when computing delta
+				int delta = concurrentAccesses(entity.getModel().name(), ctx);
 				// Auto Increment field is not filled
 				String selectNextValSql = "SELECT MAX(" + entity.getModel().getField(fieldName).getSqlName() + ") + 1 FROM "
 						+ entity.getModel().dbName();
@@ -78,13 +85,54 @@ public class DbManagerUpdatable extends DbManager {
 				DbManager dbManager = new DbManager(ctx, selectNextValSql);
 				Integer nextVal = 1;
 				if (dbManager.next()) {
-					nextVal = dbManager.getInt(1);
+					nextVal = dbManager.getInt(1) + delta;
 					dbManager.close();
 				}
 				entity.invokeSetter(fieldName, nextVal);
 			}
 		}
 		return entity;
+	}
+
+	private static Map<String, List<WeakReference<RequestContext>>> activeContexts = new Hashtable<String, List<WeakReference<RequestContext>>>();
+
+	/**
+	 * get the number of concurrent access to a given entity
+	 * 
+	 * @param entityName
+	 * @param ctx
+	 * @return
+	 */
+	private static synchronized int concurrentAccesses(String entityName, RequestContext ctx) {
+		int delta = 0;
+		List<WeakReference<RequestContext>> contexts;
+		if (activeContexts.keySet().contains(entityName)) {
+			contexts = activeContexts.get(entityName);
+			// remove obsolete contexts
+			Iterator<WeakReference<RequestContext>> it = contexts.iterator();
+			while (it.hasNext()) {
+				WeakReference<RequestContext> weakRequestContext = it.next();
+				RequestContext rc = weakRequestContext.get();
+				if (rc != null) {
+					DbConnection dbCxn = rc.getDbConnection();
+					if (dbCxn.getCnx() == null) {
+						// connection closed --> remove context
+						weakRequestContext.clear();
+						it.remove();
+					}
+				}
+			}
+			// get delta from unique contexts
+			if (!contexts.contains(ctx)) {
+				delta = contexts.size();
+				contexts.add(new WeakReference<RequestContext>(ctx));
+			}
+		} else {
+			contexts = new ArrayList<WeakReference<RequestContext>>(2);
+			contexts.add(new WeakReference<RequestContext>(ctx));
+			activeContexts.put(entityName, contexts);
+		}
+		return delta;
 	}
 
 }

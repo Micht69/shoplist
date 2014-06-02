@@ -18,30 +18,30 @@
 			<td width="1%" style="text-align: left; white-space: nowrap;">
 				<div id="advanced-actions">
 	    			<h:panelGroup rendered="#{commentCtrl.commentsEnabled}">
-						<h:commandLink id="commentAction" styleClass="btn_comment" value="#{commentCtrl.commentsCount('shopListLArticle', jsfCtrl.entity.primaryKey.encodedValue)}" title="#{hh:label('labels', 'boutons.comment')}" onclick="commentPage();">
+						<h:commandLink id="commentAction" styleClass="btn_comment" value="#{commentCtrl.commentsCount('shopListLArticle', jsfCtrl.entity.primaryKey.encodedValue)}" title="#{jsfCtrl.getXhtmlLabel('labels', 'boutons.comment')}" onclick="commentPage();">
 							<f:ajax event="click" execute="@none" render="comment-list" />
 						</h:commandLink>
 	    				<ui:include src="../includes/comment.xhtml" />
 	    			</h:panelGroup>
 					<h:outputText value=" "/>
-					<h:commandButton id="printAction" styleClass="btn_print" image="../static/img/buttons/print.png" title="#{hh:label('labels', 'boutons.print')}" onclick="window.print(); return false;" />
+					<h:commandButton id="printAction" styleClass="btn_print" image="../static/img/buttons/print.png" title="#{jsfCtrl.getXhtmlLabel('labels', 'boutons.print')}" onclick="window.print(); return false;" />
 					<h:outputText value=" "/>
 				</div>
 			</td>
 			<td width="99%" style="text-align: right; white-space: nowrap;">
-				<h:commandButton id="validateAction" rendered="#{!jsfCtrl.displaySubActions()}" styleClass="btn_medium" value="#{hh:label('labels', 'boutons.valider')}"
+				<h:commandButton id="validateAction" rendered="#{!jsfCtrl.displaySubActions()}" styleClass="btn_medium" value="#{jsfCtrl.getXhtmlLabel('labels', 'boutons.valider')}"
 					action="#{jsfCtrl.validate}" onclick="if (actionClicked) { alert('Traitement en cours. Veuillez patienter...');return false;} else { actionClicked = true; return true; }" />
 				<h:outputText value=" "/>
-				<h:commandButton id="cancelAction" immediate="true" styleClass="btn_medium" value="#{hh:label('labels', 'boutons.annuler')}"
+				<h:commandButton id="cancelAction" immediate="true" styleClass="btn_medium" value="#{jsfCtrl.getXhtmlLabel('labels', 'boutons.annuler')}"
 					action="#{jsfCtrl.cancel}" onclick="return checkDirtyState(this);" />
 			</td>
 		</tr>
 	</table>
 	</div>
-	<h:panelGroup id="shopListLArticleDelete" rendered="#{jsfCtrl.uiGroupPanel('', 'shopListLArticle', 'shopListLArticleDelete').visible}" layout="none">
-	<div class="form_container" id="shopListLArticleDelete">
+	<h:panelGroup id="i0_shopListLArticleDelete" rendered="#{jsfCtrl.uiGroupPanel('', 'shopListLArticle', 'shopListLArticleDelete').visible}" layout="none">
+	<div class="form_container" id="i0_shopListLArticleDelete">
 		<div class="form_title">
-			<h:outputText value="#{hh:label('genLabels', 'tpl.shopListLArticleDelete')}" />
+			<h:outputText value="#{jsfCtrl.getXhtmlLabel('genLabels', 'tpl.shopListLArticleDelete')}" />
 		</div>
 		<table class="group_table">
 			<tr>
@@ -50,7 +50,7 @@
 						<table class="#{!jsfCtrl.isValid('mainForm:shopListLArticleDelete_shopListLArticle_deleteInfos') ? 'error' : ''}">
 							<tr>
 								<td class="colFieldSetLeft">
-									<h:outputLabel id="i1_shopListLArticleDelete_shopListLArticle_deleteInfos" escape="false" value="#{jsfCtrl.getLabel('shopListLArticle.deleteInfos', 'shopListLArticleDelete.shopListLArticle.deleteInfos')}" title="#{hh:label('tooltips', 'shopListLArticleDelete.shopListLArticle.deleteInfos')}"/>
+									<h:outputLabel id="i1_shopListLArticleDelete_shopListLArticle_deleteInfos" escape="false" value="#{jsfCtrl.getLabel('shopListLArticle.deleteInfos', 'shopListLArticleDelete.shopListLArticle.deleteInfos')}" title="#{jsfCtrl.getXhtmlLabel('tooltips', 'shopListLArticleDelete.shopListLArticle.deleteInfos')}"/>
 								</td>
 								<td class="colFieldSetMid">
 									<h:outputLabel value=":" />
@@ -72,10 +72,10 @@
 	<table style="width: 100%">
 		<tr>
 			<td style="text-align: right;">
-				<h:commandButton id="validateAction2" rendered="#{!jsfCtrl.displaySubActions()}" styleClass="btn_medium" value="#{hh:label('labels', 'boutons.valider')}"
+				<h:commandButton id="validateAction2" rendered="#{!jsfCtrl.displaySubActions()}" styleClass="btn_medium" value="#{jsfCtrl.getXhtmlLabel('labels', 'boutons.valider')}"
 					action="#{jsfCtrl.validate}"  onclick="if (actionClicked) { alert('Traitement en cours. Veuillez patienter...');return false;} else { actionClicked = true; return true; }" />
 				<h:outputText value=" "/>
-				<h:commandButton id="cancelAction2" immediate="true" styleClass="btn_medium" value="#{hh:label('labels', 'boutons.annuler')}"
+				<h:commandButton id="cancelAction2" immediate="true" styleClass="btn_medium" value="#{jsfCtrl.getXhtmlLabel('labels', 'boutons.annuler')}"
 					action="#{jsfCtrl.cancel}" onclick="return checkDirtyState(this);" />
 			</td>
 		</tr>

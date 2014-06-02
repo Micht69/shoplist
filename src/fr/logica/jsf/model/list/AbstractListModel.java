@@ -87,12 +87,12 @@ public abstract class AbstractListModel extends DataModel implements Serializabl
 
 	public String getResultCount() {
 		if (data.getRows().size() == 0) {
-			return MessageUtils.getInstance().getLabel("results.nodata", null);
+			return MessageUtils.getInstance(viewCtrl.getContext()).getLabel("results.nodata", (Object[]) null);
 		}
 		if (data.getRows().size() == 1) {
-			return "1 " + MessageUtils.getInstance().getLabel("liste.result.resultat", null);
+			return "1 " + MessageUtils.getInstance(viewCtrl.getContext()).getLabel("liste.result.resultat", (Object[]) null);
 		}
-		return data.getRows().size() + " " + MessageUtils.getInstance().getLabel("liste.result.resultats", null);
+		return data.getRows().size() + " " + MessageUtils.getInstance(viewCtrl.getContext()).getLabel("liste.result.resultats", (Object[]) null);
 	}
 
 	public String getResultCountStyle() {
@@ -104,7 +104,7 @@ public abstract class AbstractListModel extends DataModel implements Serializabl
 
 	public String getTotalResultCount() {
 		if (data.getRows().size() > 0 && data.getTotalRowCount() > data.getRows().size()) {
-			return " " + MessageUtils.getInstance().getLabel("liste.result.total", new Object[] { Integer.valueOf(data.getTotalRowCount()) });
+			return " " + MessageUtils.getInstance(viewCtrl.getContext()).getLabel("liste.result.total", new Object[] { Integer.valueOf(data.getTotalRowCount()) });
 		}
 		return "";
 	}
@@ -217,4 +217,13 @@ public abstract class AbstractListModel extends DataModel implements Serializabl
 	public void setSelectedRowEncodedKey(String selectedRowEncodedKey) {
 		this.selectedRowEncodedKey = selectedRowEncodedKey;
 	}
+
+	public String getSearchCriteria() {
+		return criteria.searchCriteria;
+	}
+
+	public void setSearchCriteria(String searchCriteria) {
+		criteria.searchCriteria = searchCriteria;
+	}
+
 }

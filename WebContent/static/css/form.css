@@ -21,7 +21,8 @@ form > .form_container > .form_title,
 .group_table .form_container > .form_title > img.actionContent,
 form > .form_container > .form_title > img.actionContent,
 .mainTable_container > .table_title > img.actionContent {
-	display: none;
+	vertical-align: bottom;
+	padding-right: 4px;
 }
 
 .form_container,
@@ -162,8 +163,13 @@ button.btn_large {
 	width: 80%;
 	white-space: nowrap;
 }
+
 .group_table_col_2 .colFieldSetRight {
 	width: 60%;
+}
+
+.colFieldSetRight .errorLabel {
+	white-space: normal;
 }
 
 .colFieldSetRight > input,
@@ -411,18 +417,15 @@ span.quickSearch a ~ a ~ input {
 }
 
 .line {
-    border-bottom: 1px solid #9DB4ED;
-    height: 10px;
-    line-height: 20px;
     margin: 8px 0 18px;
-    text-align: left;
 }
 
+.line,
 .lineTitle {
 	cursor: default;
-	-webkit-border-radius: 4px;
-	   -moz-border-radius: 4px;
-	        border-radius: 4px;
+	-webkit-border-radius: 4px 0 4px 4px;
+	   -moz-border-radius: 4px 0 4px 4px;
+	        border-radius: 4px 0 4px 4px;
 }
 
 a.subActions {

@@ -24,7 +24,9 @@ public class ListData implements Serializable {
 
 	protected Map<String, ColumnData> columns;
 
-	protected boolean isProtected;
+	protected boolean isProtected = false;
+	
+	protected boolean isReadOnly = false;
 
 	public List<Row> getRows() {
 		return rows;
@@ -81,5 +83,13 @@ public class ListData implements Serializable {
 
 	public void setProtected(boolean isProtected) {
 		this.isProtected = isProtected;
+	}
+	
+	public boolean isReadOnly(){
+		return isReadOnly;
+	}
+	
+	public void setReadOnly(boolean readOnly){
+		isReadOnly = readOnly;
 	}
 }

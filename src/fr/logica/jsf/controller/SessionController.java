@@ -1,7 +1,9 @@
 package fr.logica.jsf.controller;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -78,31 +80,35 @@ public class SessionController implements Serializable {
 			return null;
 		}
 
-		User user;
-		user = sm.getUser(login, password);
+		try {
+			RequestContext requestContext = new RequestContext(context);
+			User user = sm.getUser(login, password, requestContext);
 
-		if (user != null) {
-			context.setUser(user);
-			sm.initializeAccessRights(context);
-			if (context.getAttributes().get(Constants.PERMALINK_LOGIN_KEY) != null) {
-				Map<String, String> parameters = (Map<String, String>) context.getAttributes().get(Constants.PERMALINK_LOGIN_KEY);
-				context.getAttributes().remove(Constants.PERMALINK_LOGIN_KEY);
-				RequestContext requestContext = new RequestContext(context);
-				ViewController viewController = (ViewController) JSFBeanUtils.getManagedBean(ctx, "jsfCtrl");
-				viewController.setContext(requestContext);
-				try {
-					Request<?> request = new ApplicationLogic().getPermalinkRequest(parameters, requestContext);
-					return viewController.prepareView(request);
-				} catch (FunctionalException ex) {
-					ctx.addMessage(null, new FacesMessage(javax.faces.application.FacesMessage.SEVERITY_ERROR, ex.getMessage(),
-							null));
-					return getDefaultPage();
+			if (user != null) {
+				context.setUser(user);
+				sm.initializeAccessRights(requestContext);
+				if (context.getAttributes().get(Constants.PERMALINK_LOGIN_KEY) != null) {
+					Map<String, String> parameters = (Map<String, String>) context.getAttributes().get(Constants.PERMALINK_LOGIN_KEY);
+					context.getAttributes().remove(Constants.PERMALINK_LOGIN_KEY);
+					ViewController viewController = (ViewController) JSFBeanUtils.getManagedBean(ctx, "jsfCtrl");
+					viewController.setContext(requestContext);
+					try {
+						Request<?> request = new ApplicationLogic().getPermalinkRequest(parameters, requestContext);
+						return viewController.prepareView(request);
+					} catch (FunctionalException ex) {
+						ctx.addMessage(null, new FacesMessage(javax.faces.application.FacesMessage.SEVERITY_ERROR, ex.getMessage(),
+								null));
+						return getDefaultPage();
+					}
 				}
+				return getDefaultPage();
+			} else {
+				ctx.addMessage(null, new FacesMessage(javax.faces.application.FacesMessage.SEVERITY_ERROR,
+						"Utilisateur / Mot de passe incorrect",
+						null));
 			}
-			return getDefaultPage();
-		} else {
-			ctx.addMessage(null, new FacesMessage(javax.faces.application.FacesMessage.SEVERITY_ERROR, "Utilisateur / Mot de passe incorrect",
-					null));
+		} finally {
+			context.close();
 		}
 		// On reste sur la page de login.
 		return "/index/login.jsf?faces-redirect=true";
@@ -176,17 +182,6 @@ public class SessionController implements Serializable {
 		return ctx.getAttributes();
 	}	
 
-	private Locale currentUserLocale;
-
-	public Locale getCurrentUserLocale() {
-		if (currentUserLocale == null) {
-			// Initialization
-			currentUserLocale = FacesContext.getCurrentInstance().getExternalContext().getRequestLocale();
-			FacesContext.getCurrentInstance().getViewRoot().setLocale(currentUserLocale);
-		}
-		return currentUserLocale;
-	}
-
 	private Map<String, String> availableLanguages;
 
 	public void loadLanguages() {
@@ -201,21 +196,25 @@ public class SessionController implements Serializable {
 		}
 	}
 
-	public Map<String, String> getLanguages() {
+	public List<Map.Entry<String, String>> getLanguages() {
 		loadLanguages();
-		return availableLanguages;
+		return new ArrayList(availableLanguages.entrySet());
 	}
 
 	public String getLanguage() {
-		return getCurrentUserLocale().getLanguage();
+		return context.getLocale().getLanguage();
 	}
 
 	public void setLanguage(String language) {
 		if (language != null) {
-			currentUserLocale = new Locale(language);
-			FacesContext.getCurrentInstance().getViewRoot().setLocale(currentUserLocale);
+			context.setLocale(new Locale(language));
 			loadLanguages();
 		}
+	}
+
+	public String selectLanguage(String language) {
+		setLanguage(language);
+		return redirectFromAccueil();
 	}
 
 	public boolean isLanguageSelector() {
@@ -267,6 +266,9 @@ public class SessionController implements Serializable {
 	@PostConstruct
 	public void initializeContext() {
 		context = new SessionContext(applicationCtrl.getContext());
+		// Initialize locale. We request HTTP Request Locale if available
+		ApplicationUtils.getApplicationLogic().setDefaultLocale(context,
+				FacesContext.getCurrentInstance().getExternalContext().getRequestLocale());
 	}
 
 	@PreDestroy

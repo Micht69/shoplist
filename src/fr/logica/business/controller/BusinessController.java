@@ -51,6 +51,7 @@ import fr.logica.ui.Message;
 import fr.logica.ui.Message.Severity;
 import fr.logica.ui.UiAccess;
 
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class BusinessController implements Serializable {
 
 	/** serialUID */
@@ -138,7 +139,7 @@ public class BusinessController implements Serializable {
 			DomainLogic domainLogic = DomainUtils.getLogic(request.getEntityName());
 			List<Key> keys = domainLogic.internalUiCtrlMenuAction(action, request.getContext());
 			if (keys == null) {
-				String errorMsg = MessageUtils.getInstance().getMessage("error.menu.action.no.elt",
+				String errorMsg = MessageUtils.getInstance(request.getContext()).getMessage("error.menu.action.no.elt",
 						new String[] { request.getEntityName(), request.getEntityName() });
 				throw new TechnicalException(errorMsg);
 			}
@@ -190,10 +191,11 @@ public class BusinessController implements Serializable {
 		Action action = request.getAction();
 
 		E mainEntityBackup = (E) request.getEntity().clone();
+		backupInner(request.getEntity(), mainEntityBackup);
 
 		try {
 			domainLogic.internalUiActionOnValidation(request, context);
-			validateInner(request, request.getEntity(), false, mainEntityBackup);
+			validateInner(request, request.getEntity(), false);
 
 			if (action.getProcess() == Process.STANDARD) {
 				validateStandard(request);
@@ -203,7 +205,7 @@ public class BusinessController implements Serializable {
 				validateWebService(request);
 			}
 
-			validateInner(request, request.getEntity(), true, mainEntityBackup);
+			validateInner(request, request.getEntity(), true);
 
 		} catch (RuntimeException e) {
 			restoreBackup(request, mainEntityBackup);
@@ -225,6 +227,31 @@ public class BusinessController implements Serializable {
 			return process(nextRequest);
 		}
 		return null;
+	}
+
+	/**
+	 * Backups main entity values and linked entities values. This method is used to backup entity to the state it is before dbOnSave call.
+	 * 
+	 * @param entity Entity to backup
+	 * @param entityBackup Backup
+	 */
+	private <E extends Entity> void backupInner(E entity, E entityBackup) {
+		for (String linkName : entity.getBackRefs().keySet()) {
+			Link backRef = entity.getBackRef(linkName);
+			if (backRef.isApplyActionOnLink()) {
+				Entity backRefBackup = backRef.getEntity().clone();
+				entityBackup.getBackRef(linkName).setEntity(backRefBackup);
+				backupInner(backRef.getEntity(), backRefBackup);
+			}
+		}
+		for (String linkName : entity.getLinks().keySet()) {
+			Link link = entity.getLink(linkName);
+			if (link.isApplyActionOnLink()) {
+				Entity linkBackup = link.getEntity().clone();
+				entityBackup.getLink(linkName).setEntity(linkBackup);
+				backupInner(link.getEntity(), linkBackup);
+			}
+		}
 	}
 
 	/**
@@ -299,30 +326,26 @@ public class BusinessController implements Serializable {
 		}
 	}
 
-	private <E extends Entity> void validateInner(Request<?> request, E entity, boolean validateBackRef, E entityBackup) {
+	private <E extends Entity> void validateInner(Request<?> request, E entity, boolean validateBackRef) {
 		if (validateBackRef) {
 			for (String linkName : entity.getBackRefs().keySet()) {
 				Link backRef = entity.getBackRef(linkName);
 				if (backRef.isApplyActionOnLink()) {
-					Entity backRefBackup = backRef.getEntity().clone();
-					entityBackup.getBackRef(linkName).setEntity(backRefBackup);
-					validateInner(request, backRef.getEntity(), false, backRefBackup);
+					validateInner(request, backRef.getEntity(), false);
 					// Execution of an action on a backRef, so we may have to set / update the foreign key in child entity to make it reference
 					// our entity's primary key
 					if (request.getAction().getPersistence() == Persistence.INSERT || request.getAction().getPersistence() == Persistence.UPDATE) {
 						backRef.getEntity().setForeignKey(backRef.getModel().getKeyName(), entity.getPrimaryKey());
 					}
 					applyActionOnLink(request, backRef.getEntity());
-					validateInner(request, backRef.getEntity(), true, backRefBackup);
+					validateInner(request, backRef.getEntity(), true);
 				}
 			}
 		} else {
 			for (String linkName : entity.getLinks().keySet()) {
 				Link link = entity.getLink(linkName);
 				if (link.isApplyActionOnLink()) {
-					Entity linkBackup = link.getEntity().clone();
-					entityBackup.getLink(linkName).setEntity(linkBackup);
-					validateInner(request, link.getEntity(), false, linkBackup);
+					validateInner(request, link.getEntity(), false);
 					applyActionOnLink(request, link.getEntity());
 					// We executed an action on a link, so we can now update the foreign key in child entity
 					if (request.getAction().getPersistence() == Persistence.INSERT || request.getAction().getPersistence() == Persistence.UPDATE) {
@@ -330,7 +353,7 @@ public class BusinessController implements Serializable {
 					} else if (request.getAction().getPersistence() == Persistence.DELETE) {
 						entity.setForeignKey(entity.getModel().getLinkModel(linkName).getKeyName(), null);
 					}
-					validateInner(request, link.getEntity(), true, linkBackup);
+					validateInner(request, link.getEntity(), true);
 				}
 			}
 		}
@@ -371,6 +394,7 @@ public class BusinessController implements Serializable {
 			for (Key selectedKey : keys) {
 				Entity selectedEntity = DB.get(link.getModel().getEntityName(), selectedKey, action, context);
 				selectedEntity.setForeignKey(link.getModel().getKeyName(), linkedEntity.getPrimaryKey());
+				selectedEntity.getLink(linkName).setEntity(linkedEntity);
 				DB.persist(selectedEntity, action, context);
 			}
 		}
@@ -384,6 +408,7 @@ public class BusinessController implements Serializable {
 			for (Key selectedKey : keys) {
 				Entity selectedEntity = DB.get(link.getModel().getEntityName(), selectedKey, action, context);
 				selectedEntity.setForeignKey(link.getModel().getKeyName(), null);
+				selectedEntity.getLink(linkName).setEntity(linkedEntity);
 				DB.persist(selectedEntity, action, context);
 			}
 		}
@@ -522,7 +547,11 @@ public class BusinessController implements Serializable {
 				Var v = query.getOutVar(criteria.orderByField);
 				query.addSortBy(v.name, v.tableId, criteria.orderByDirection, true);
 			}
-			domainLogic.internalUiListPrepare(query, entity, action, linkName, linkedEntity, context);
+			if (criteria.searchCriteria != null) {
+				domainLogic.internalUiListPrepare(query, criteria.searchCriteria, action, linkName, linkedEntity, context);
+			} else {
+				domainLogic.internalUiListPrepare(query, entity, action, linkName, linkedEntity, context);
+			}
 			data = getListData(query, true, context);
 		}
 		return data;
@@ -548,7 +577,7 @@ public class BusinessController implements Serializable {
 		} catch (TechnicalException e) {
 			data = new ListData(query.getMainEntity().name()); // Prevent from having a null ListData
 			context.getMessages().add(new Message(
-					MessageUtils.getInstance().getMessage("uiControlerModel.queryExecError", new Object[] { (Object) e.getMessage() }),
+					MessageUtils.getInstance(context).getMessage("uiControlerModel.queryExecError", new Object[] { (Object) e.getMessage() }),
 					Severity.ERROR));
 			LOGGER.error(e.getMessage(), e);
 		} finally {
@@ -581,6 +610,7 @@ public class BusinessController implements Serializable {
 		// ListIsProtected is called on target entity
 		DomainLogic targetDomainLogic = DomainUtils.getLogic(targetEntity.name());
 		data.setProtected(targetDomainLogic.internalUiListIsProtected(targetEntity, linkName, queryName, action, context));
+		data.setReadOnly(targetDomainLogic.internalUiListIsReadOnly(targetEntity, linkName, queryName, action, context));
 		return data;
 	}
 
@@ -690,16 +720,16 @@ public class BusinessController implements Serializable {
 		try {
 			Map<Key, String> values = domainLogic.internalUiLinkLoadValues(sourceEntity, link.getModel(), filterQuery, true, context);
 			if (null == values || values.isEmpty()) {
-				result.put("-1", MessageUtils.getInstance().getMessage("autocomplete.noResult", null));
+				result.put("-1", MessageUtils.getInstance(context).getMessage("autocomplete.noResult", null));
 			} else if (values.size() > Constants.AUTOCOMPLETE_MAX_ROW) {
-				result.put("-1", MessageUtils.getInstance().getMessage("autocomplete.tooManyResults", new Object[] { values.size() }));
+				result.put("-1", MessageUtils.getInstance(context).getMessage("autocomplete.tooManyResults", new Object[] { values.size() }));
 			} else {
 				for (Entry<Key, String> e : values.entrySet()) {
 					result.put(e.getKey().getEncodedValue(), e.getValue());
 				}
 			}
 		} catch (TechnicalException exception) {
-			result.put("-1", MessageUtils.getInstance().getMessage("autocomplete.error", null));
+			result.put("-1", MessageUtils.getInstance(context).getMessage("autocomplete.error", null));
 		}
 		return result;
 	}
@@ -727,12 +757,18 @@ public class BusinessController implements Serializable {
 	public Map<String, Integer> generateMenuCounters(Map<String, String[]> menuQueries, RequestContext context) {
 		Map<String, Integer> menuCounters = new HashMap<String, Integer>();
 		for (Entry<String, String[]> menuEntry : menuQueries.entrySet()) {
+			DbManager dbManager = null;
 			try {
 				DbQuery query = DB.getQuery(context, menuEntry.getValue()[0], menuEntry.getValue()[1]);
 				query.setCount(true);
-				menuCounters.put(menuEntry.getKey(), DB.count(query, context));
+				dbManager = DB.createDbManager(context, query);
+				menuCounters.put(menuEntry.getKey(), dbManager.count());
 			} catch (Exception e) {
 				LOGGER.error(e.getMessage(), e);
+			} finally {
+				if (dbManager != null) {
+					dbManager.close();
+				}
 			}
 		}
 		return menuCounters;
@@ -864,13 +900,28 @@ public class BusinessController implements Serializable {
 		File excelFile = null;
 		try {
 			excelFile = File.createTempFile(query.getName(), ".xls");
-			new ExcelWriter().export(excelFile, query, data);
+			new ExcelWriter().export(excelFile, query, data, ctx);
 		} catch (Exception e) {
 			ctx.getMessages().add(new Message(
-					MessageUtils.getInstance().getMessage("uiControlerModel.cvsExportError", new Object[] { (Object) e.getMessage() }),
+					MessageUtils.getInstance(ctx).getMessage("uiControlerModel.cvsExportError", new Object[] { (Object) e.getMessage() }),
 					Severity.ERROR));
 		}
 		return excelFile;
+	}
+
+	public <E extends Entity> boolean checkWizardStep(E bean, Action action, String currentStep, String nextStep, RequestContext context) {
+		boolean allowed = true;
+
+		try {
+			DomainLogic<E> domainLogic = (DomainLogic<E>) DomainUtils.getLogic(bean.name());
+			allowed = domainLogic.internalUiWizardCheckStep(bean, action, currentStep, nextStep, context);
+		} catch (Exception e) {
+//			context.getMessages().add(new Message(
+//					MessageUtils.getInstance().getMessage("uiControlerModel.queryExecError", new Object[] { (Object) e.getMessage() }),
+//					Severity.ERROR));
+			LOGGER.error(e.getMessage(), e);
+		}
+		return allowed;
 	}
 
 }

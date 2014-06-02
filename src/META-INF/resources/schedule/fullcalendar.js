@@ -5303,6 +5303,11 @@ $.fullCalendar.setDefaults({
 	eventClick: function(event, jsEvent, view) {
 		saveEventData(this, 'selectedEvent', event.id, false);
 		var schedule = $(this).parents(".fc");
+		schedule.find('.fc-event').removeClass('fc-event-selected');
+
+		if (jsEvent && jsEvent.currentTarget) {
+			$(jsEvent.currentTarget).addClass('fc-event-selected');
+		}
 
 		if (!schedule.data('fullCalendar').options.editable) {
 			var id = schedule.attr('id');
@@ -5382,20 +5387,29 @@ function filterEvents(filter, scheduleId) {
 					filtered = true;
 				}
 			}
+			var wasFiltered = event.filtered || false;
 
 			if (filtered) {
 				event.filtered = filtered;
 			} else {
 				delete event.filtered;
 			}
-			schedule.fullCalendar('updateEvent', event);
+
+			if (wasFiltered !== filtered) {
+				schedule.fullCalendar('updateEvent', event);
+			}
 		}
 
 	} else {
+		var wasFiltered;
+
 		for (var i = 0; i < events.length; i++) {
 			var event = events[i];
+			wasFiltered = event.filtered || false;
 			delete event.filtered;
-			schedule.fullCalendar('updateEvent', event);
+			if (wasFiltered) {
+				schedule.fullCalendar('updateEvent', event);
+			}
 		}
 	}
 }

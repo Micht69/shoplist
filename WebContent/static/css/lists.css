@@ -8,6 +8,7 @@
 }
 
 .listButtons .btn_medium input,
+.listButtons input.btn_medium,
 .fc-header-right .fc-button {
 	font-size: 14px;
 	margin-left: -1px;
@@ -17,6 +18,7 @@
 }
 
 .listButtons a:first-child input,
+.listButtons input.btn_medium:first-child,
 .fc-header-right .fc-button:first-child,
 .fc-header-left .fc-button-prev {
 	margin-left: 0;
@@ -26,6 +28,7 @@
 }
 
 .listButtons a:last-child input,
+.listButtons input.btn_medium:last-child,
 .fc-header-right .fc-button:last-child,
 .fc-header-left .fc-button-next {
 	-webkit-border-radius: 0 4px 4px 0;
@@ -52,7 +55,9 @@
 }
 
 a.btn_medium ~ .listButtons,
+input.btn_medium ~ .listButtons,
 .listButtons ~ a.btn_medium,
+.listButtons ~ input.btn_medium,
 .listButtons ~ .listButtons,
 a.btn_medium ~ a.btn_medium {
 	margin-left: 10px;
@@ -162,8 +167,8 @@ table tr td a.btn_tablerow input {
 	text-align: right;
 }
 
-.list_results_container table tbody > tr:first-child > td:only-child,
-.results_container table tbody > tr:first-child > td:only-child {
+.list_results_container div.datatable-empty tbody td,
+.results_container div.datatable-empty tbody td {
 	border: 0;
 }
 
@@ -190,6 +195,7 @@ table tr td a.btn_tablerow input {
 
 .ui-treetable-header, .ui-treetable-scrollable-header {
 	background: white;
+	color: #333333;
 }
 
 .ui-treetable-header button.ui-state-default {

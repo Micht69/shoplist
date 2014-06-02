@@ -18,27 +18,27 @@
 			<td width="1%" style="text-align: left; white-space: nowrap;">
 				<div id="advanced-actions">
 	    			<h:panelGroup rendered="#{commentCtrl.commentsEnabled}">
-						<h:commandLink id="commentAction" styleClass="btn_comment" value="#{commentCtrl.commentsCount('shopListLArticle', jsfCtrl.entity.primaryKey.encodedValue)}" title="#{hh:label('labels', 'boutons.comment')}" onclick="commentPage();">
+						<h:commandLink id="commentAction" styleClass="btn_comment" value="#{commentCtrl.commentsCount('shopListLArticle', jsfCtrl.entity.primaryKey.encodedValue)}" title="#{jsfCtrl.getXhtmlLabel('labels', 'boutons.comment')}" onclick="commentPage();">
 							<f:ajax event="click" execute="@none" render="comment-list" />
 						</h:commandLink>
 	    				<ui:include src="../includes/comment.xhtml" />
 	    			</h:panelGroup>
 					<h:outputText value=" "/>
-					<h:commandButton id="printAction" styleClass="btn_print" image="../static/img/buttons/print.png" title="#{hh:label('labels', 'boutons.print')}" onclick="window.print(); return false;" />
+					<h:commandButton id="printAction" styleClass="btn_print" image="../static/img/buttons/print.png" title="#{jsfCtrl.getXhtmlLabel('labels', 'boutons.print')}" onclick="window.print(); return false;" />
 					<h:outputText value=" "/>
 				</div>
 			</td>
 			<td width="99%" style="text-align: right; white-space: nowrap;">
-				<h:commandButton id="validateAction" rendered="#{!jsfCtrl.displaySubActions()}" styleClass="btn_medium" value="#{hh:label('labels', 'boutons.valider')}"
+				<h:commandButton id="validateAction" rendered="#{!jsfCtrl.displaySubActions()}" styleClass="btn_medium" value="#{jsfCtrl.getXhtmlLabel('labels', 'boutons.valider')}"
 					action="#{jsfCtrl.validate}" onclick="if (actionClicked) { alert('Traitement en cours. Veuillez patienter...');return false;} else { actionClicked = true; return true; }" />
 				<h:outputText value=" "/>
-				<h:commandButton id="cancelAction" immediate="true" styleClass="btn_medium" value="#{hh:label('labels', 'boutons.annuler')}"
+				<h:commandButton id="cancelAction" immediate="true" styleClass="btn_medium" value="#{jsfCtrl.getXhtmlLabel('labels', 'boutons.annuler')}"
 					action="#{jsfCtrl.cancel}" onclick="return checkDirtyState(this);" />
 			</td>
 		</tr>
 	</table>
 	</div>
-	<h:panelGroup id="shopListLArticle" rendered="#{jsfCtrl.uiGroupPanel('', 'shopListLArticle', 'shopListLArticle').visible}" layout="none">
+	<h:panelGroup id="i0_shopListLArticle" rendered="#{jsfCtrl.uiGroupPanel('', 'shopListLArticle', 'shopListLArticle').visible}" layout="none">
 		<table class="group_table">
 			<tr>
 				<td class="group_table_col_1">
@@ -46,7 +46,7 @@
 						<table>
 							<tr>
 								<td class="colFieldSetLeft">
-									<h:outputLabel id="i0_shopListLArticle_0_shopListLArticleLList" escape="false" value="#{jsfCtrl.getLabel('shopListLArticleLList', 'shopListLArticle.0.shopListLArticleLList')}" title="#{hh:label('tooltips', 'shopListLArticle.0.shopListLArticleLList')}"/>
+									<h:outputLabel id="i0_shopListLArticle_0_shopListLArticleLList" escape="false" value="#{jsfCtrl.getLabel('shopListLArticleLList', 'shopListLArticle.0.shopListLArticleLList')}" title="#{jsfCtrl.getXhtmlLabel('tooltips', 'shopListLArticle.0.shopListLArticleLList')}"/>
 									
 									<h:outputLabel value="*" styleClass="mandatory_label" rendered="#{jsfCtrl.isMandatory('shopListLArticleLList')}"/>
 								</td>
@@ -54,7 +54,7 @@
 									<h:outputLabel value=":" />
 								</td>
 								<td class="colFieldSetRight">
-									<h:selectOneMenu disabledClass="disabledCombo" disabled="#{jsfCtrl.uiLinkCombo('shopListLArticleLList', 'shopList', 'SHOP_LIST').readonly}" value="#{jsfCtrl.uiLinkCombo('shopListLArticleLList', 'shopList', 'SHOP_LIST').selectedValue}"  label="#{hh:label('genLabels', 'shopListLArticle.0.shopListLArticleLList')}" onchange="markAsDirty(this)">
+									<h:selectOneMenu disabledClass="disabledCombo" disabled="#{jsfCtrl.uiLinkCombo('shopListLArticleLList', 'shopList', 'SHOP_LIST').readonly}" value="#{jsfCtrl.uiLinkCombo('shopListLArticleLList', 'shopList', 'SHOP_LIST').selectedValue}"  label="#{jsfCtrl.getXhtmlLabel('genLabels', 'shopListLArticle.0.shopListLArticleLList')}" onchange="markAsDirty(this)">
 									
 										<f:selectItem noSelectionOption="true" itemLabel=" "/>
 										<f:selectItems value="#{jsfCtrl.uiLinkCombo('shopListLArticleLList', 'shopList', 'SHOP_LIST').comboValues}" />
@@ -72,7 +72,7 @@
 						<table class="#{!jsfCtrl.isValid('mainForm:shopListLArticle_1_shopListLArticleLArticle-key') ? 'error' : ''}">
 							<tr>
 								<td class="colFieldSetLeft">
-									<h:outputLabel id="i0_shopListLArticle_1_shopListLArticleLArticle" escape="false" value="#{jsfCtrl.getLabel('shopListLArticleLArticle', 'shopListLArticle.1.shopListLArticleLArticle')}" title="#{hh:label('tooltips', 'shopListLArticle.1.shopListLArticleLArticle')}"/>
+									<h:outputLabel id="i0_shopListLArticle_1_shopListLArticleLArticle" escape="false" value="#{jsfCtrl.getLabel('shopListLArticleLArticle', 'shopListLArticle.1.shopListLArticleLArticle')}" title="#{jsfCtrl.getXhtmlLabel('tooltips', 'shopListLArticle.1.shopListLArticleLArticle')}"/>
 									
 									<h:outputLabel value="*" styleClass="mandatory_label" rendered="#{jsfCtrl.isMandatory('shopListLArticleLArticle')}"/>
 								</td>
@@ -82,7 +82,7 @@
 								<td class="colFieldSetRight">
 									<h:panelGroup styleClass="quickSearch">
 									<h:commandLink rendered="#{!jsfCtrl.uiLinkQuickSearch('shopListLArticleLArticle', 'shopArticle', 'SHOP_ARTICLE').readonly}" action="#{jsfCtrl.uiLinkQuickSearch('shopListLArticleLArticle', 'shopArticle', 'SHOP_ARTICLE').attach}" tabindex="-1">
-										<h:graphicImage class="iconAction" library="img" name="link.png" alt="#{hh:label('labels', 'action.selectionner')}" title="#{hh:label('labels', 'action.selectionner')}" />
+										<h:graphicImage class="iconAction" library="img" name="link.png" alt="#{jsfCtrl.getXhtmlLabel('labels', 'action.selectionner')}" title="#{jsfCtrl.getXhtmlLabel('labels', 'action.selectionner')}" />
 										<f:param name="skipRequired" value="true" />
 									</h:commandLink>
 									
@@ -92,19 +92,19 @@
 										</a>
 										<div class="link-actions-buttons">
 											<ul>
-											<li><h:commandLink rendered="#{!(jsfCtrl.uiLinkQuickSearch('shopListLArticleLArticle', 'shopArticle', 'SHOP_ARTICLE').targetEntity != null) and sessionCtrl.isActionRendered('shopArticle', 0)}" action="#{jsfCtrl.uiLinkQuickSearch('shopListLArticleLArticle', 'shopArticle', 'SHOP_ARTICLE').prepareActionCode(0)}" tabindex="-1">			<h:outputLabel value="#{hh:label('genLabels', 'SHOP_ARTICLE_ACTION_0')}" />
+											<li><h:commandLink rendered="#{!(jsfCtrl.uiLinkQuickSearch('shopListLArticleLArticle', 'shopArticle', 'SHOP_ARTICLE').targetEntity != null) and sessionCtrl.isActionRendered('shopArticle', 0)}" action="#{jsfCtrl.uiLinkQuickSearch('shopListLArticleLArticle', 'shopArticle', 'SHOP_ARTICLE').prepareActionCode(0)}" tabindex="-1">			<h:outputLabel value="#{jsfCtrl.getXhtmlLabel('genLabels', 'SHOP_ARTICLE_ACTION_0')}" />
 												<f:param name="skipRequired" value="true" />
 											</h:commandLink></li>
-											<li><h:commandLink rendered="#{jsfCtrl.uiLinkQuickSearch('shopListLArticleLArticle', 'shopArticle', 'SHOP_ARTICLE').targetEntity != null and sessionCtrl.isActionRendered('shopArticle', 2)}" action="#{jsfCtrl.uiLinkQuickSearch('shopListLArticleLArticle', 'shopArticle', 'SHOP_ARTICLE').prepareActionCode(2)}" tabindex="-1">			<h:outputLabel value="#{hh:label('genLabels', 'SHOP_ARTICLE_ACTION_2')}" />
+											<li><h:commandLink rendered="#{jsfCtrl.uiLinkQuickSearch('shopListLArticleLArticle', 'shopArticle', 'SHOP_ARTICLE').targetEntity != null and sessionCtrl.isActionRendered('shopArticle', 2)}" action="#{jsfCtrl.uiLinkQuickSearch('shopListLArticleLArticle', 'shopArticle', 'SHOP_ARTICLE').prepareActionCode(2)}" tabindex="-1">			<h:outputLabel value="#{jsfCtrl.getXhtmlLabel('genLabels', 'SHOP_ARTICLE_ACTION_2')}" />
 												<f:param name="skipRequired" value="true" />
 											</h:commandLink></li>
-											<li><h:commandLink rendered="#{jsfCtrl.uiLinkQuickSearch('shopListLArticleLArticle', 'shopArticle', 'SHOP_ARTICLE').targetEntity != null and sessionCtrl.isActionRendered('shopArticle', 4)}" action="#{jsfCtrl.uiLinkQuickSearch('shopListLArticleLArticle', 'shopArticle', 'SHOP_ARTICLE').prepareActionCode(4)}" tabindex="-1">			<h:outputLabel value="#{hh:label('genLabels', 'SHOP_ARTICLE_ACTION_4')}" />
+											<li><h:commandLink rendered="#{jsfCtrl.uiLinkQuickSearch('shopListLArticleLArticle', 'shopArticle', 'SHOP_ARTICLE').targetEntity != null and sessionCtrl.isActionRendered('shopArticle', 4)}" action="#{jsfCtrl.uiLinkQuickSearch('shopListLArticleLArticle', 'shopArticle', 'SHOP_ARTICLE').prepareActionCode(4)}" tabindex="-1">			<h:outputLabel value="#{jsfCtrl.getXhtmlLabel('genLabels', 'SHOP_ARTICLE_ACTION_4')}" />
 												<f:param name="skipRequired" value="true" />
 											</h:commandLink></li>
-											<li><h:commandLink rendered="#{jsfCtrl.uiLinkQuickSearch('shopListLArticleLArticle', 'shopArticle', 'SHOP_ARTICLE').targetEntity != null and sessionCtrl.isActionRendered('shopArticle', 5)}" action="#{jsfCtrl.uiLinkQuickSearch('shopListLArticleLArticle', 'shopArticle', 'SHOP_ARTICLE').prepareActionCode(5)}" tabindex="-1">			<h:outputLabel value="#{hh:label('genLabels', 'SHOP_ARTICLE_ACTION_5')}" />
+											<li><h:commandLink rendered="#{jsfCtrl.uiLinkQuickSearch('shopListLArticleLArticle', 'shopArticle', 'SHOP_ARTICLE').targetEntity != null and sessionCtrl.isActionRendered('shopArticle', 5)}" action="#{jsfCtrl.uiLinkQuickSearch('shopListLArticleLArticle', 'shopArticle', 'SHOP_ARTICLE').prepareActionCode(5)}" tabindex="-1">			<h:outputLabel value="#{jsfCtrl.getXhtmlLabel('genLabels', 'SHOP_ARTICLE_ACTION_5')}" />
 												<f:param name="skipRequired" value="true" />
 											</h:commandLink></li>
-											<li><h:commandLink rendered="#{!(jsfCtrl.uiLinkQuickSearch('shopListLArticleLArticle', 'shopArticle', 'SHOP_ARTICLE').targetEntity != null) and sessionCtrl.isActionRendered('shopArticle', 50)}" action="#{jsfCtrl.uiLinkQuickSearch('shopListLArticleLArticle', 'shopArticle', 'SHOP_ARTICLE').prepareActionCode(50)}" tabindex="-1">			<h:outputLabel value="#{hh:label('genLabels', 'SHOP_ARTICLE_ACTION_50')}" />
+											<li><h:commandLink rendered="#{!(jsfCtrl.uiLinkQuickSearch('shopListLArticleLArticle', 'shopArticle', 'SHOP_ARTICLE').targetEntity != null) and sessionCtrl.isActionRendered('shopArticle', 50)}" action="#{jsfCtrl.uiLinkQuickSearch('shopListLArticleLArticle', 'shopArticle', 'SHOP_ARTICLE').prepareActionCode(50)}" tabindex="-1">			<h:outputLabel value="#{jsfCtrl.getXhtmlLabel('genLabels', 'SHOP_ARTICLE_ACTION_50')}" />
 												<f:param name="skipRequired" value="true" />
 											</h:commandLink></li>
 											</ul>
@@ -159,7 +159,7 @@
 						<table class="#{!jsfCtrl.isValid('mainForm:shopListLArticle_shopListLArticle_quantity') ? 'error' : ''}">
 							<tr>
 								<td class="colFieldSetLeft">
-									<h:outputLabel id="i1_shopListLArticle_shopListLArticle_quantity" escape="false" value="#{jsfCtrl.getLabel('shopListLArticle.quantity', 'shopListLArticle.shopListLArticle.quantity')}" title="#{hh:label('tooltips', 'shopListLArticle.shopListLArticle.quantity')}"/>
+									<h:outputLabel id="i1_shopListLArticle_shopListLArticle_quantity" escape="false" value="#{jsfCtrl.getLabel('shopListLArticle.quantity', 'shopListLArticle.shopListLArticle.quantity')}" title="#{jsfCtrl.getXhtmlLabel('tooltips', 'shopListLArticle.shopListLArticle.quantity')}"/>
 									<h:outputLabel value="*" styleClass="mandatory_label" rendered="#{jsfCtrl.isMandatory('shopListLArticle.quantity')}"/>
 								</td>
 								<td class="colFieldSetMid">
@@ -183,7 +183,7 @@
 						<table class="#{!jsfCtrl.isValid('mainForm:shopListLArticle_shopListLArticle_status') ? 'error' : ''}">
 							<tr>
 								<td class="colFieldSetLeft">
-									<h:outputLabel id="i1_shopListLArticle_shopListLArticle_status" escape="false" value="#{jsfCtrl.getLabel('shopListLArticle.status', 'shopListLArticle.shopListLArticle.status')}" title="#{hh:label('tooltips', 'shopListLArticle.shopListLArticle.status')}"/>
+									<h:outputLabel id="i1_shopListLArticle_shopListLArticle_status" escape="false" value="#{jsfCtrl.getLabel('shopListLArticle.status', 'shopListLArticle.shopListLArticle.status')}" title="#{jsfCtrl.getXhtmlLabel('tooltips', 'shopListLArticle.shopListLArticle.status')}"/>
 									<h:outputLabel value="*" styleClass="mandatory_label" rendered="#{jsfCtrl.isMandatory('shopListLArticle.status')}"/>
 								</td>
 								<td class="colFieldSetMid">
@@ -192,7 +192,7 @@
 								<td class="colFieldSetRight">
 									<h:selectOneMenu disabledClass="disabledCombo" disabled="#{jsfCtrl.readonly('shopListLArticle.status')}" id="i0_shopListLArticle_shopListLArticle_status" value="#{jsfCtrl.entity.status}" label="#{jsfCtrl.getLabel('shopListLArticle.status', 'shopListLArticle.status')}"  onchange="markAsDirty(this)">
 									
-										<f:selectItems value="#{jsfCtrl.entity.enumValues('status')}" />
+										<f:selectItems value="#{jsfCtrl.enumValues(jsfCtrl.entity,'status')}" />
 									</h:selectOneMenu>
 									<h:message for="i0_shopListLArticle_shopListLArticle_status" styleClass="errorLabel" />
 								</td>
@@ -207,10 +207,10 @@
 	<table style="width: 100%">
 		<tr>
 			<td style="text-align: right;">
-				<h:commandButton id="validateAction2" rendered="#{!jsfCtrl.displaySubActions()}" styleClass="btn_medium" value="#{hh:label('labels', 'boutons.valider')}"
+				<h:commandButton id="validateAction2" rendered="#{!jsfCtrl.displaySubActions()}" styleClass="btn_medium" value="#{jsfCtrl.getXhtmlLabel('labels', 'boutons.valider')}"
 					action="#{jsfCtrl.validate}"  onclick="if (actionClicked) { alert('Traitement en cours. Veuillez patienter...');return false;} else { actionClicked = true; return true; }" />
 				<h:outputText value=" "/>
-				<h:commandButton id="cancelAction2" immediate="true" styleClass="btn_medium" value="#{hh:label('labels', 'boutons.annuler')}"
+				<h:commandButton id="cancelAction2" immediate="true" styleClass="btn_medium" value="#{jsfCtrl.getXhtmlLabel('labels', 'boutons.annuler')}"
 					action="#{jsfCtrl.cancel}" onclick="return checkDirtyState(this);" />
 			</td>
 		</tr>

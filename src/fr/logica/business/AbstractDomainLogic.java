@@ -1,9 +1,11 @@
 package fr.logica.business;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;
 
@@ -28,6 +30,7 @@ import fr.logica.reflect.DomainUtils;
 import fr.logica.ui.Message;
 import fr.logica.ui.Message.Severity;
 
+@SuppressWarnings("unused")
 public abstract class AbstractDomainLogic<E extends Entity> {
 
     /** Logger */
@@ -124,7 +127,7 @@ public abstract class AbstractDomainLogic<E extends Entity> {
 	            String varLabel = internalUiVarCaption(bean, varName, action, ctx);
 	
 	            if (null == varLabel) {
-	                varLabel = MessageUtils.getInstance().getVarTitle(bean.name(), varName);
+	                varLabel = MessageUtils.getInstance(ctx).getVarTitle(bean.name(), varName);
 	            }
 	            ctx.getMessages().add(new Message(varLabel + " : Vous devez indiquer une valeur.", Severity.ERROR));
 	            errors = true;
@@ -142,7 +145,7 @@ public abstract class AbstractDomainLogic<E extends Entity> {
 	 				}
 	 			}
 	 			if (!isDefinedValue) {
-	 				ctx.getMessages().add(new Message(MessageUtils.getInstance().getMessage(
+	 				ctx.getMessages().add(new Message(MessageUtils.getInstance(ctx).getMessage(
 	 						"uiControlerModel.fieldhasNotAllowedValue",
 	 						new Object[] { (Object) field.getDisplayText() }), Severity.ERROR));
 	 				errors = true;
@@ -877,6 +880,32 @@ public abstract class AbstractDomainLogic<E extends Entity> {
      */
 	public abstract boolean uiListPrepare(DbQuery query, E entity, Action action, String linkName, Entity linkedEntity, RequestContext ctx);
 
+	public final void internalUiListPrepare(DbQuery query, String criteria, Action action, String linkName, Entity linkedEntity, RequestContext ctx) {
+		try {
+			if (!uiListPrepare(query, criteria, action, linkName, linkedEntity, ctx)) {
+				defaultUiListPrepare(query, criteria, action);
+			}
+		} catch (FunctionalException fEx) {
+			ctx.getMessages().addAll(fEx.getMessages()); 
+			throw fEx; 
+		}
+	}
+
+    /**
+     * Allows modifications on a list page query before execution.
+     * 
+     * @param query
+     *            The list page query.
+     * @param criteria
+     *            Criteria Search string.
+     * @param ctx
+     *            Current applicative context.
+     * 
+     * @return <code>true</code> if default query preparation should be skipped, <code>false</code> if query should still be prepared with user
+     *         input in Criteria object.
+     */
+	public abstract boolean uiListPrepare(DbQuery query, String criteria, Action action, String linkName, Entity linkedEntity, RequestContext ctx);
+
     public final void internalUiListPrepare(DbQuery query, Entity parentEntity, String linkName, RequestContext ctx) {
 		try {
 	        uiListPrepare(query, parentEntity, linkName, ctx);
@@ -978,6 +1007,40 @@ public abstract class AbstractDomainLogic<E extends Entity> {
 		}
 	}
 
+	private void defaultUiListPrepare(DbQuery query, String criteria, Action action) {
+		if (criteria == null) {
+			// No criteria
+			return;
+		}
+		query.setCaseInsensitiveSearch(true);
+
+		List<? extends DbQuery.Var> columns = query.getOutVars();
+		List<String> colAliases = new ArrayList<String>();
+		List<String> tableAliases = new ArrayList<String>();
+
+		for (DbQuery.Var var : columns) {
+			if (!var.model.isTransient() && var.model.isLookupField()) {
+				colAliases.add(var.name);
+				tableAliases.add(var.tableId);
+			}
+		}
+
+		if (colAliases.isEmpty()) {
+			for (DbQuery.Var var : columns) {
+				if (!var.model.isTransient() && var.model.isAlpha()) {
+					colAliases.add(var.name);
+					tableAliases.add(var.tableId);
+				}
+			}
+		}
+		StringTokenizer st = new StringTokenizer(criteria, " ");
+
+		while (st.hasMoreTokens() && !colAliases.isEmpty()) {
+			String sText = st.nextToken();
+			query.addCondLikeConcat(colAliases, tableAliases, sText, false);
+		}
+	}
+
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public final Map<Key, String> internalUiLinkLoadValues(Entity bean, LinkModel linkModel, DbQuery filterQuery, boolean limitSize,
             RequestContext ctx) {
@@ -1058,19 +1121,19 @@ public abstract class AbstractDomainLogic<E extends Entity> {
      */
     public abstract boolean uiWizardCheckStep(E bean, Action action, String currentStep, String nextStep, RequestContext ctx);
 
-	public ListData internalExtQueryLoad(RequestContext context, String entityName, String queryName) {
+	public final ListData internalExtQueryLoad(RequestContext context, String entityName, String queryName) {
 		return extQueryLoad(context, entityName, queryName);
 	}
 
 	public abstract ListData extQueryLoad(RequestContext context, String entityName, String queryName);
 
-	public E internalExtActionLoad(String domainName, Key primaryKey, Action action, RequestContext context) {
+	public final E internalExtActionLoad(String domainName, Key primaryKey, Action action, RequestContext context) {
 		return extActionLoad(domainName, primaryKey, action, context);
 	}
 
 	public abstract E extActionLoad(String domainName, Key primaryKey, Action action, RequestContext context);
 
-	public void internalExtActionExecute(Request<E> request, RequestContext context) {
+	public final void internalExtActionExecute(Request<E> request, RequestContext context) {
 		extActionExecute(request, context);
 	}
 
@@ -1083,7 +1146,7 @@ public abstract class AbstractDomainLogic<E extends Entity> {
 	 * @param ctx Current applicative context.
 	 * @return An event representation of the entity.
 	 */
-	public ScheduleEvent internalUiSchedulePrepareEvent(E entity, String entityName, RequestContext ctx) {
+	public final ScheduleEvent internalUiSchedulePrepareEvent(E entity, String entityName, RequestContext ctx) {
 		ScheduleEvent event = new ScheduleEvent();
 		event.setPk(entity.getPrimaryKey());
 		event.setTitle(internalDoDescription(entity, ctx));
@@ -1110,7 +1173,7 @@ public abstract class AbstractDomainLogic<E extends Entity> {
 	 */
 	public abstract void uiSchedulePrepareEvent(ScheduleEvent event, E entity, String entityName, RequestContext ctx);
 
-	public String internalUiScheduleEventStartName() {
+	public final String internalUiScheduleEventStartName() {
 		return uiScheduleEventStartName();
 	}
 
@@ -1120,7 +1183,7 @@ public abstract class AbstractDomainLogic<E extends Entity> {
 	 */
 	public abstract String uiScheduleEventStartName();
 	
-	public String internalUiScheduleEventEndName() {
+	public final String internalUiScheduleEventEndName() {
 		return uiScheduleEventEndName();
 	}
 

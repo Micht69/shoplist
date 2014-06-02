@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 
 import fr.logica.application.logic.User;
+import fr.logica.business.context.RequestContext;
 import fr.logica.business.context.SessionContext;
 
 public abstract class AbstractSecurityManager implements Serializable {
@@ -11,9 +12,9 @@ public abstract class AbstractSecurityManager implements Serializable {
 	/** serialUID */
 	private static final long serialVersionUID = -5307524579033289661L;
 
-	public abstract User getUser(String login, String password);
+	public abstract User getUser(String login, String password, RequestContext ctx);
 
-	public abstract List<SecurityFunction> getSecurity(User user);
+	public abstract List<SecurityFunction> getSecurity(User user, RequestContext ctx);
 
 	public abstract boolean disableSecurity();
 
@@ -24,8 +25,8 @@ public abstract class AbstractSecurityManager implements Serializable {
 	public abstract boolean isDisplayActionRendered(String entityName, int action, SessionContext context);
 
 	public abstract boolean isNoDefaultActionRendered(String entityName, int action, SessionContext context);
-	
+
 	public abstract boolean isOptionMenuRendered(String optMenuName, SessionContext ctx);
-	
-	public abstract void initializeAccessRights(SessionContext context);
+
+	public abstract void initializeAccessRights(RequestContext context);
 }

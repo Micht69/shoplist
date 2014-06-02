@@ -48,9 +48,11 @@
 	.header_right {
 		display: none;
 	}
-	
 	.filter-line {
 		display: none;
+	}
+	.globalSearch .filter-line {
+		display: inline;
 	}
 	.ariane {
 		display: none;
@@ -89,7 +91,7 @@
 		font-size: medium;
 	}
 
-	.language_selector select {
-		width: auto;
+	.language_selector input[type=image] {
+		margin-right: 4px;
 	}
 }
