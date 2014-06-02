@@ -40,7 +40,7 @@ public class ShopListModel extends EntityModel implements Serializable {
 
 
 	/** Table name for this entity or REST class name for external entity */
-	public static final String ENTITY_DB_NAME = "list";
+	public static final String ENTITY_DB_NAME = "LIST";
 
 	/** Database schema name. */
 	public static final String DB_SCHEMA_NAME;
