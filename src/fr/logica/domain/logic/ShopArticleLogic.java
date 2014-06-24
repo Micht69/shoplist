@@ -76,7 +76,10 @@ public class ShopArticleLogic extends DefaultLogic<ShopArticle> {
 			for (Key articlePk : keys) {
 				ShopListLArticle lienListeArticle = new ShopListLArticle();
 				lienListeArticle.setListId(liste.getId());
-				lienListeArticle.setArticleId((Integer) articlePk.getValue(ShopArticle.Var.ID));
+				if (articlePk.getValue(ShopArticle.Var.ID) instanceof String)
+					lienListeArticle.setArticleId(Integer.parseInt((String) articlePk.getValue(ShopArticle.Var.ID)));
+				else
+					lienListeArticle.setArticleId((Integer) articlePk.getValue(ShopArticle.Var.ID));
 				lienListeArticle.setQuantity(1);
 				lienListeArticle.setStatus(ShopListLArticle.ValueList.STATUS.BUY);
 				lienListeArticle.persist(ctx);
