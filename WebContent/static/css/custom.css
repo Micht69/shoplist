@@ -32,8 +32,7 @@
 		margin-bottom: 10px;
 	}
 	.content {
-		padding-top: 0px;
-		padding-bottom: 0px;
+		padding: 0px;
 		width: 100%;
 	}
 	.footer { 
@@ -42,6 +41,7 @@
 	}
 	html>body .footer {
 		position: relative;
+		padding: 0px;
 	}
 	.largeImg {
 		width: 100%;
@@ -57,7 +57,10 @@
 	}
 	
 	.filter-line {
-		display: none;
+		display: inline;
+	}
+	.table_container > .actions > table > tbody > tr > td:first-child > span.filter-line > input.filter {
+		width: auto;
 	}
 	.ariane {
 		display: none;
@@ -76,15 +79,20 @@
 	input[type="email"], input[type="tel"], input[type="color"] {
 		width: 95%;
 	}
+	.colFieldSetRight > input, .colFieldSetRight > select, .colFieldSetRight > textarea {
+		width: 95%;
+	}
 	
 	/* icons for actions */
-	.actions input[id="mainForm:validateAction"] {
+	.actions input[id="mainForm:validateAction"],
+	.actions input[id$="buttonSelect"] {
 		background-image: url('../img/icons/validate.png');
 		background-position-x: center;
 		font-size: 0px;
 		width: 60px;
 	}
-	.actions input[id="mainForm:cancelAction"] {
+	.actions input[id="mainForm:cancelAction"],
+	.actions input[id$="buttonCancel"] {
 		background-image: url('../img/icons/cancel.png');
 		background-position-x: center;
 		font-size: 0px;

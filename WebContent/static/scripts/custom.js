@@ -18,3 +18,14 @@ function doPageCustomize(pageName) {
  */
 function doListCustomize(queryName, pageName) {
 }
+
+/**
+ * Disable fixed list header
+ */
+function initList(listName) {
+	$('#datatable-div-header-' + listName).remove();
+	$('#datatable-div-data-' + listName).css('visibility', 'visible');
+	$('td[class="first"]').click(function(event) {
+		event.stopPropagation();
+	});
+}
