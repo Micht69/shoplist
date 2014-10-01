@@ -4,31 +4,31 @@
 <h:body>
 <ui:composition>
 	<ui:fragment rendered="#{sessionCtrl.isListRendered('SHOP_LIST')}">
-		<li>
+		<li id="SHOP_LISTS">
 			<h:commandLink onclick="return checkDirtyState(this);" alt="menuLink" action="#{jsfCtrl.prepareView('shopList', 'SHOP_LIST', 'SHOP_LIST_LIST')}" actionListener="#{jsfCtrl.reset}">
 				<h:outputText value="#{jsfCtrl.getXhtmlLabel('genLabels', 'menuopt.SHOP_LISTS')}" />
 			</h:commandLink>
 		</li>
 	</ui:fragment>
 	<ui:fragment rendered="#{sessionCtrl.isListRendered('SHOP_ARTICLE')}">
-		<li>
+		<li id="SHOP_ARTICLES">
 			<h:commandLink onclick="return checkDirtyState(this);" alt="menuLink" action="#{jsfCtrl.prepareView('shopArticle', 'SHOP_ARTICLE', 'SHOP_ARTICLE_LIST')}" actionListener="#{jsfCtrl.reset}">
 				<h:outputText value="#{jsfCtrl.getXhtmlLabel('genLabels', 'menuopt.SHOP_ARTICLES')}" />
 			</h:commandLink>
 		</li>
 	</ui:fragment>
-	<li class="ui-menu-item">
-		<a id="173" href="#" class="ui-corner-all"><span><h:outputText value="#{jsfCtrl.getXhtmlLabel('genLabels', 'menu.SHOP_ADMIN')}" /></span></a>
+	<li class="ui-menu-item" id="menu-SHOP_ADMIN">
+		<a id="109" href="#" class="ui-corner-all"><span><h:outputText value="#{jsfCtrl.getXhtmlLabel('genLabels', 'menu.SHOP_ADMIN')}" /></span></a>
 		<ul>
 		<ui:fragment rendered="#{sessionCtrl.isListRendered('SHOP_SHELF')}">
-			<li>
+			<li id="SHOP_SHELFS">
 				<h:commandLink onclick="return checkDirtyState(this);" alt="menuLink" action="#{jsfCtrl.prepareView('shopShelf', 'SHOP_SHELF', 'SHOP_SHELF_LIST')}" actionListener="#{jsfCtrl.reset}">
 					<h:outputText value="#{jsfCtrl.getXhtmlLabel('genLabels', 'menuopt.SHOP_SHELFS')}" />
 				</h:commandLink>
 			</li>
 		</ui:fragment>
 		<ui:fragment rendered="#{sessionCtrl.isListRendered('SHOP_USER')}">
-			<li>
+			<li id="SHOP_USERS">
 				<h:commandLink onclick="return checkDirtyState(this);" alt="menuLink" action="#{jsfCtrl.prepareView('shopUser', 'SHOP_USER', 'SHOP_USER_LIST')}" actionListener="#{jsfCtrl.reset}">
 					<h:outputText value="#{jsfCtrl.getXhtmlLabel('genLabels', 'menuopt.SHOP_USERS')}" />
 				</h:commandLink>

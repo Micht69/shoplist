@@ -3,30 +3,36 @@
 				xmlns:logica="http://java.sun.com/jsf/composite/logica" xmlns:hh="http://cgi.com/jsf/html"
 				template="/templates/generic.xhtml">
 
-<ui:define name="title">Application - <h:outputText value="SHOPLIST" /></ui:define>
+<ui:define name="title"><h:outputText value="Shopping List" /></ui:define>
 <ui:define name="body">
 
-<div class="actions">
-	<table style="width: 100%">
-		<tr>
-			<td style="text-align: right;">
-				<h:commandButton styleClass="btn_medium" value="#{labels['action.login']}" action="#{sessionCtrl.login}" />
-			</td>
-		</tr>
-	</table>
-</div>
-<div class="form_container login">
-	<div class="form_title">
-			<h:outputText styleClass="page_title" value="#{labels['login.title']}" />
-	</div><!-- form_title -->
-	<h:panelGrid columns="3" columnClasses="colFieldSetLeft, colFieldSetMid, colFieldSetRight">
-		<h:outputText value="#{labels['login.login']}" />
-		<h:outputText value=":" />
-		<h:inputText value="#{sessionCtrl.form.login}" label="Login" style="width: 160px;" autocomplete="off" autocorrect="off" autocapitalize="off" />
-		<h:outputText value="#{labels['login.password']}" />
-		<h:outputText value=":" />
-		<h:inputSecret value="#{sessionCtrl.form.password}" label="Mot de passe" style="width: 160px;" autocorrect="off" autocapitalize="off" />
- 	</h:panelGrid>
+<div style="margin-top: 50px;">
+	<div class="actions" style="text-align: right; padding-bottom: 10px;">
+		<h:commandButton styleClass="btn_medium" value="#{labels['action.login']}" action="#{sessionCtrl.login}" />
+	</div>
+	<div class="form_container login">
+		<div class="form_title">
+				<h:outputText styleClass="page_title" value="#{labels['login.title']}" />
+		</div><!-- form_title -->
+		<div class="group">
+			<div class="col col-1">
+				<div class="col-label" style="width: calc(50% - 12px);">
+					<h:outputText value="#{labels['login.login']}" />
+				</div>
+				<div class="col-value" style="width: calc(50% - 12px);">
+					<h:inputText value="#{sessionCtrl.form.login}" label="Login" style="width: 160px;" autocomplete="off" autocorrect="off" autocapitalize="off" />
+				</div>
+			</div>
+			<div class="col col-1">
+				<div class="col-label" style="width: calc(50% - 12px);">
+					<h:outputText value="#{labels['login.password']}" />
+				</div>
+				<div class="col-value" style="width: calc(50% - 12px);">
+					<h:inputSecret value="#{sessionCtrl.form.password}" label="Password" style="width: 160px;" autocorrect="off" autocapitalize="off" />
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
 
 </ui:define>

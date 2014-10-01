@@ -22,11 +22,13 @@ import fr.logica.business.MessageUtils;
 import fr.logica.business.context.RequestContext;
 import fr.logica.business.context.SessionContext;
 import fr.logica.business.controller.Request;
+import fr.logica.jsf.utils.FacesMessagesUtils;
 import fr.logica.jsf.utils.JSFBeanUtils;
 import fr.logica.jsf.webflow.View;
 import fr.logica.security.AbstractSecurityManager;
 import fr.logica.security.SecurityUtils;
 
+@SuppressWarnings({ "unchecked", "rawtypes" })
 public class SessionController implements Serializable {
 
 	/** serialUID */
@@ -77,11 +79,11 @@ public class SessionController implements Serializable {
 		if (password == null || "".equals(password)) {
 			ctx.addMessage(null, new FacesMessage(javax.faces.application.FacesMessage.SEVERITY_ERROR, "Veuillez renseigner le mot de passe",
 					null));
-			return null;
+			return "/index/login.jsf?faces-redirect=true";
 		}
 
+		RequestContext requestContext = new RequestContext(context);
 		try {
-			RequestContext requestContext = new RequestContext(context);
 			User user = sm.getUser(login, password, requestContext);
 
 			if (user != null) {
@@ -103,12 +105,15 @@ public class SessionController implements Serializable {
 				}
 				return getDefaultPage();
 			} else {
+				// Display user messages
+				FacesMessagesUtils.displayMessages(ctx, requestContext);
+				// Add login error message
 				ctx.addMessage(null, new FacesMessage(javax.faces.application.FacesMessage.SEVERITY_ERROR,
 						"Utilisateur / Mot de passe incorrect",
 						null));
 			}
 		} finally {
-			context.close();
+			requestContext.close();
 		}
 		// On reste sur la page de login.
 		return "/index/login.jsf?faces-redirect=true";
@@ -123,9 +128,10 @@ public class SessionController implements Serializable {
 	}
 
 	/**
-	 * Retourne le lien vers la page d'aide. On peut ajouter #truc en fonction de la page courante pour aller à une ancre directement.
+	 * Get the link to help page.<br/>
+	 * We can add #something with current page to go direct to a specific anchor.
 	 * 
-	 * @return
+	 * @return link to help page
 	 */
 	public String getHelp(String conversationId) {
 		String url = "static/aide.html";

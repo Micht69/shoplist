@@ -8,7 +8,6 @@ import java.util.Map;
 import fr.logica.business.Action.Input;
 import fr.logica.business.Action.Persistence;
 import fr.logica.business.Action.UserInterface;
-import fr.logica.business.EntityField.Memory;
 import fr.logica.business.context.RequestContext;
 import fr.logica.business.controller.Request;
 import fr.logica.business.controller.Response;
@@ -16,6 +15,7 @@ import fr.logica.business.data.ListData;
 import fr.logica.business.data.ScheduleEvent;
 import fr.logica.db.DbQuery;
 import fr.logica.db.DbQuery.Var;
+import fr.logica.db.DbQuery.Visibility;
 import fr.logica.reflect.DomainUtils;
 
 public abstract class DomainLogic<E extends Entity> extends AbstractDomainLogic<E> {
@@ -150,7 +150,7 @@ public abstract class DomainLogic<E extends Entity> extends AbstractDomainLogic<
 
 	@Override
 	public boolean uiListColumnIsVisible(DbQuery query, LinkModel link, String varName, RequestContext ctx) {
-		return true;
+		return query.getOutVar(varName).visibility == Visibility.VISIBLE;
 	}
 
 	@Override
@@ -187,9 +187,6 @@ public abstract class DomainLogic<E extends Entity> extends AbstractDomainLogic<
 			if (action.getPersistence() != Persistence.INSERT && action.getPersistence() != Persistence.NONE) {
 				return true;
 			}
-		}
-		if (bean.getModel().getField(varName).getMemory() != Memory.NO) {
-			return true;
 		}
 		return false;
 	}

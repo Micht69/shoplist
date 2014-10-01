@@ -23,13 +23,13 @@ public class ApplicationController implements Serializable {
 	}
 
 	@PreDestroy
-	public void finalize() {
+	public void finalizeController() {
 		// Close connections
 		for (ConnectionObject conn : getListConnections()) {
 			conn.close();
 		}
 		// Close context
-		getContext().finalize();
+		getContext().finalizeContext();
 	}
 
 	public ApplicationContext getContext() {

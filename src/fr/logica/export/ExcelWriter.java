@@ -11,13 +11,12 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 
-import fr.logica.business.context.RequestContext;
 import fr.logica.business.MessageUtils;
+import fr.logica.business.context.RequestContext;
 import fr.logica.business.data.ColumnData;
 import fr.logica.business.data.ListData;
 import fr.logica.db.DbQuery;
 import fr.logica.db.DbQuery.Var;
-import fr.logica.db.DbQuery.Visibility;
 
 /**
  * Utility class used to handle Excel export.
@@ -30,10 +29,14 @@ public class ExcelWriter {
 	/**
 	 * Export query results to an Excel file.
 	 * 
-	 * @param file Destination file.
-	 * @param query Executed query.
-	 * @param results Results to export.
-	 * @throws IOException Exception thrown is an error occurred during writing workbook or closing the file output stream.
+	 * @param file
+	 *            Destination file.
+	 * @param query
+	 *            Executed query.
+	 * @param data
+	 *            Results to export.
+	 * @throws IOException
+	 *             Exception thrown is an error occurred during writing workbook or closing the file output stream.
 	 * @see #writeFile(File, Workbook)
 	 */
 	public void export(File file, DbQuery query, ListData data, RequestContext ctx) throws IOException {
@@ -49,8 +52,7 @@ public class ExcelWriter {
 
 		for (Var v : query.getOutVars()) {
 			ColumnData columnData = data.getColumns().get(v.tableId + "_" + v.name);
-
-			if (v.visibility == Visibility.INVISIBLE || !columnData.isVisible()) {
+			if (!columnData.isVisible()) {
 				continue;
 			}
 			String header = columnData.getTitle();
@@ -75,7 +77,7 @@ public class ExcelWriter {
 			for (Var var : query.getOutVars()) {
 				ColumnData columnData = data.getColumns().get(var.tableId + "_" + var.name);
 
-				if (var.visibility == Visibility.INVISIBLE || !columnData.isVisible()) {
+				if (!columnData.isVisible()) {
 					continue;
 				}
 				cell = row.createCell(j++);
@@ -104,9 +106,12 @@ public class ExcelWriter {
 	/**
 	 * Write Excel workbook in the given file.
 	 * 
-	 * @param file File in which workbook is written.
-	 * @param workbook Excel workbook to write.
-	 * @throws IOException Exception thrown is an error occurred during writing workbook or closing the file output stream.
+	 * @param file
+	 *            File in which workbook is written.
+	 * @param workbook
+	 *            Excel workbook to write.
+	 * @throws IOException
+	 *             Exception thrown is an error occurred during writing workbook or closing the file output stream.
 	 */
 	private void writeFile(File file, Workbook workbook) throws IOException {
 		FileOutputStream fos = null;

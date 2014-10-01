@@ -12,9 +12,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.faces.component.UIComponent;
-import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
+import javax.faces.context.PartialResponseWriter;
 import javax.faces.context.ResponseWriter;
+import javax.faces.event.PhaseId;
 import javax.faces.render.FacesRenderer;
 import javax.faces.render.Renderer;
 
@@ -25,48 +26,56 @@ import fr.logica.jsf.components.schedule.HtmlSchedule.PropertyKeys;
 public class ScheduleRenderer extends Renderer {
 
 	private static final String EVENT_KEY = "event-";
+	private static final String AJAX_EVENT_ID_KEY = "ajax-event-id";
+	private static final String AJAX_EVENT_START_KEY = "ajax-event-start";
+	private static final String AJAX_EVENT_END_KEY = "ajax-event-end";
 	public static final String RENDERER_TYPE = "cgi.faces.Schedule";
 
 	@Override
 	@SuppressWarnings("unchecked")
 	public void decode(FacesContext context, UIComponent component) {
-		ExternalContext external = context.getExternalContext();
+		Map<String, String> params = context.getExternalContext().getRequestParameterMap();
 		HtmlSchedule schedule = (HtmlSchedule) component;
-		String clientId = schedule.getClientId(context);
-		Map<String, Object> scheduleParams = getParameters(clientId, external.getRequestParameterMap());
-		schedule.setSubmittedView((String) scheduleParams.get(PropertyKeys.view.toString()));
-		schedule.setSubmittedDate((String) scheduleParams.get(PropertyKeys.date.toString()));
-		schedule.setSubmittedSelectedEvent((String) scheduleParams.get(PropertyKeys.selectedEvent.toString()));
 
-		if (!schedule.isReadonly()) {
-			List<ScheduleEvent> events = parseEvents(schedule, (Map<String, ScheduleEvent>) scheduleParams.get(PropertyKeys.value.toString()));
-			schedule.setSubmittedValue(events);
-		}
-	}
+		if (!schedule.isReadonly() && schedule.isScheduleRequest(context)) {
+			String clientId = schedule.getClientId(context);
+			String eventId = params.get(clientId + "-" + AJAX_EVENT_ID_KEY);
+			ScheduleEvent scheduleEvent = findEvent(schedule, eventId);
 
-	private List<ScheduleEvent> parseEvents(HtmlSchedule schedule, Map<String, ScheduleEvent> submittedEvents) {
-
-		if (null == submittedEvents) {
-			return null;
-		}
-		List<ScheduleEvent> existingEvents = (List<ScheduleEvent>) schedule.getValue();
-		List<ScheduleEvent> events = new ArrayList<ScheduleEvent>(existingEvents.size());
-
-		for (ScheduleEvent event : existingEvents) {
-			ScheduleEvent submittedEvent = submittedEvents.get(event.getId());
-
-			if (null != submittedEvent) {
-				event.setStart(submittedEvent.getStart());
-				event.setEnd(submittedEvent.getEnd());
+			if (scheduleEvent != null) {
+				ScheduleEvent ajaxEvent = new ScheduleEvent();
+				ajaxEvent.setPk(scheduleEvent.getPk());
+				ajaxEvent.setStart(new Date(Long.valueOf(params.get(clientId + "-" + AJAX_EVENT_START_KEY))));
+				ajaxEvent.setEnd(new Date(Long.valueOf(params.get(clientId + "-" + AJAX_EVENT_END_KEY))));
+				HtmlScheduleEvent event = new HtmlScheduleEvent(schedule, ajaxEvent);
+				event.setPhaseId(PhaseId.INVOKE_APPLICATION);
+				schedule.queueEvent(event);
 			}
-			events.add(event);
+		} else {
+			Map<String, Object> scheduleParams = getParameters(context, schedule, params);
+			schedule.setSubmittedView((String) scheduleParams.get(PropertyKeys.view.toString()));
+			schedule.setSubmittedDate((String) scheduleParams.get(PropertyKeys.date.toString()));
+			schedule.setSubmittedValue((List<ScheduleEvent>) scheduleParams.get(PropertyKeys.value.toString()));
 		}
-		return events;
 	}
 
-	private Map<String, Object> getParameters(String clientId, Map<String, String> requestParams) {
+	private ScheduleEvent findEvent(HtmlSchedule schedule, String eventId) {
+		List<ScheduleEvent> existingEvents = schedule.getEvents();
+
+		if (existingEvents != null && !existingEvents.isEmpty()) {
+			for (ScheduleEvent event : schedule.getEvents()) {
+				if (event.getId().equals(eventId)) {
+					return event;
+				}
+			}
+		}
+		return null;
+	}
+
+	private Map<String, Object> getParameters(FacesContext context, HtmlSchedule schedule, Map<String, String> requestParams) {
 		Map<String, Object> params = new HashMap<String, Object>();
-		Map<String, ScheduleEvent> events = new HashMap<String, ScheduleEvent>();
+		List<ScheduleEvent> events = new ArrayList<ScheduleEvent>();
+		String clientId = schedule.getClientId(context);
 		int idLength = clientId.length() + 1;
 
 		for (Entry<String, String> entry : requestParams.entrySet()) {
@@ -75,11 +84,10 @@ public class ScheduleRenderer extends Renderer {
 				String key = entry.getKey().substring(idLength);
 
 				if (key.startsWith(EVENT_KEY)) {
-					ScheduleEvent event = new ScheduleEvent();
-					int dashIndex = entry.getValue().indexOf('-');
-					event.setStart(new Date(Long.valueOf(entry.getValue().substring(0, dashIndex))));
-					event.setEnd(new Date(Long.valueOf(entry.getValue().substring(dashIndex + 1))));
-					events.put(event.getId(), event);
+					ScheduleEvent event = findEvent(schedule, entry.getValue());
+					if (event != null) {
+						events.add(event);
+					}
 				} else {
 					params.put(key, entry.getValue());
 				}
@@ -95,8 +103,25 @@ public class ScheduleRenderer extends Renderer {
 	@Override
 	public void encodeEnd(FacesContext context, UIComponent component) throws IOException {
 		HtmlSchedule schedule = (HtmlSchedule) component;
-		ResponseWriter writer = context.getResponseWriter();
 		String clientId = schedule.getClientId(context);
+
+		if (schedule.isScheduleRequest(context)) {
+			/*
+			 * During an Ajax request concerning this component, only events are rendered to improve bandwith consumption, the component will be
+			 * updated by Javascript. So it is necessary to close the current update tag before writing our stuff and to open a new update tag.
+			 */
+			PartialResponseWriter writer = context.getPartialViewContext().getPartialResponseWriter();
+			writer.endUpdate();
+			Map<String, String> attributes = new HashMap<String, String>();
+			attributes.put("id", component.getId());
+			writer.startExtension(attributes);
+			String events = renderEvents(context, schedule);
+			writer.writeText(events, null);
+			writer.endExtension();
+			writer.startUpdate(clientId);
+			return;
+		}
+		ResponseWriter writer = context.getResponseWriter();
 
 		// Container
 		writer.writeText("\n", null);
@@ -115,24 +140,37 @@ public class ScheduleRenderer extends Renderer {
 		encodeScript(context, schedule);
 
 		// Hidden fields to keep state
-		encodeInput(writer, schedule, clientId, PropertyKeys.date.toString(), (schedule.getDate() != null) ? schedule.getDate().getTime() : null);
-		encodeInput(writer, schedule, clientId, PropertyKeys.selectedEvent.toString(), (schedule.getSelectedEvent() != null) ? schedule
-				.getSelectedEvent().getId() : null);
-		encodeInput(writer, schedule, clientId, PropertyKeys.view.toString(), schedule.getView());
+		encodeInput(writer, clientId, PropertyKeys.date.toString(), (schedule.getDate() != null) ? schedule.getDate().getTime() : null, null);
+		encodeInput(writer, clientId, PropertyKeys.view.toString(), schedule.getView(), null);
+
+		List<ScheduleEvent> selectedEvents = schedule.getValue();
+
+		if (selectedEvents != null && !selectedEvents.isEmpty()) {
+			int i = 0;
+			for (ScheduleEvent event : selectedEvents) {
+				encodeInput(writer, clientId, String.valueOf(i++), event.getId(), "fc-event-selected");
+			}
+		}
 
 		// End of container
 		writer.endElement("div");
 	}
 
-	private void encodeInput(ResponseWriter writer, HtmlSchedule schedule, String clientId, String property, Object value) throws IOException {
+	private void encodeInput(ResponseWriter writer, String clientId, String property, Object value, String styleClass)
+			throws IOException {
+
 		writer.writeText("\t", null);
 		writer.startElement("input", null);
 		writer.writeAttribute("type", "hidden", null);
 		writer.writeAttribute("id", clientId + "-" + property, null);
 		writer.writeAttribute("name", clientId + "-" + property, null);
 
-		if (null != value) {
+		if (value != null) {
 			writer.writeAttribute("value", value, null);
+		}
+
+		if (styleClass != null) {
+			writer.writeAttribute("class", styleClass, null);
 		}
 		writer.endElement("input");
 		writer.writeText("\n", null);
@@ -142,7 +180,7 @@ public class ScheduleRenderer extends Renderer {
 		ResponseWriter writer = context.getResponseWriter();
 		String clientId = schedule.getClientId(context);
 		String escapedClientId = getEscapedClientId(clientId);
-		String filterId = escapedClientId.replace("schedule", "globalFilter");
+		String filterId = escapedClientId.replace("schedule", "globalFilter_schedule");
 
 		writer.startElement("script", null);
 		writer.writeAttribute("type", "text/javascript", null);
@@ -156,12 +194,10 @@ public class ScheduleRenderer extends Renderer {
 				+ renderOption(PropertyKeys.firstHour.toString(), schedule.getFirstHour(), "\n\t")
 				+ renderOption(PropertyKeys.minTime.toString(), schedule.getMinTime(), "\n\t")
 				+ renderOption(PropertyKeys.maxTime.toString(), schedule.getMaxTime(), "\n\t")
-				+ renderStringOption(PropertyKeys.onchange.toString(), schedule.getOnchange(), "\n\t")
 				+ renderOption(PropertyKeys.showWeekends.toString(), schedule.getShowWeekends(), "\n\t")
 				+ renderOption(PropertyKeys.slotMinutes.toString(), schedule.getSlotMinutes(), "\n\t")
 				+ renderDate(schedule.getDate(), "\n\t")
-				// TODO bazint schedule Gérer la locale.
-				+ "\n" + renderEvents(context, schedule)
+				+ "\n" + renderEvents(context, schedule) + ","
 				+ "\n\t" + "viewDisplay : function(view) {"
 				+ "\n\t\t" + "$('#" + escapedClientId + "-view').val(view.name);"
 				+ "\n\t\t" + "$('#" + escapedClientId + "-date').val($('#" + escapedClientId + "').fullCalendar('getDate').getTime());"
@@ -188,25 +224,25 @@ public class ScheduleRenderer extends Renderer {
 
 		for (int i = 0; i < c.length; i++) {
 			switch (c[i]) {
-				case '"' :
-					sb.append("\\\"");
-					break;
-				case '\\' :
-					sb.append("\\\\");
-					break;
-				case '\'' :
-					sb.append("\\\'");
-					break;
-				default :
-					if (Character.isWhitespace(c[i])) {
-						sb.append(" ");
-					} else {
-						sb.append(c[i]);
-					}
-					break;
+			case '"':
+				sb.append("\\\"");
+				break;
+			case '\\':
+				sb.append("\\\\");
+				break;
+			case '\'':
+				sb.append("\\\'");
+				break;
+			default:
+				if (Character.isWhitespace(c[i])) {
+					sb.append(" ");
+				} else {
+					sb.append(c[i]);
+				}
+				break;
 			}
 		}
-		return sb.toString(); 
+		return sb.toString();
 	}
 
 	private String renderFunctionOption(String name, String value, String prefix, String functionStart, String functionEnd, boolean render) {
@@ -236,7 +272,7 @@ public class ScheduleRenderer extends Renderer {
 	}
 
 	private String renderEvents(FacesContext context, HtmlSchedule schedule) {
-		List<ScheduleEvent> events = (List<ScheduleEvent>) schedule.getValue();
+		List<ScheduleEvent> events = schedule.getEvents();
 		String str = "";
 
 		if (null != events && !events.isEmpty()) {
@@ -257,7 +293,7 @@ public class ScheduleRenderer extends Renderer {
 				str += renderStringOption("textColor", event.getTextColor(), " ");
 				str = str.substring(0, str.length() - 1) + "},";
 			}
-			str = str.substring(0, str.length() - 1) + "\n\t" + "],";
+			str = str.substring(0, str.length() - 1) + "\n\t" + "]";
 		}
 		return str;
 	}

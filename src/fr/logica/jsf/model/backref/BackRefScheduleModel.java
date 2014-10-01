@@ -6,9 +6,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 import fr.logica.business.Action;
 import fr.logica.business.Action.Input;
 import fr.logica.business.Entity;
+import fr.logica.business.FunctionalException;
 import fr.logica.business.Key;
 import fr.logica.business.context.RequestContext;
 import fr.logica.business.controller.BusinessController;
@@ -17,7 +20,10 @@ import fr.logica.business.data.Row;
 import fr.logica.business.data.ScheduleEvent;
 import fr.logica.jsf.components.schedule.ScheduleView;
 import fr.logica.jsf.controller.ViewController;
+import fr.logica.jsf.utils.FacesMessagesUtils;
 import fr.logica.reflect.DomainUtils;
+import fr.logica.ui.Message;
+import fr.logica.ui.Message.Severity;
 
 /**
  * List model to display a back reference into a schedule.
@@ -27,15 +33,18 @@ public class BackRefScheduleModel extends BackRefListModel implements Serializab
 	/** serialUID */
 	private static final long serialVersionUID = 8323608159115549555L;
 
+	/** Logger */
+	private static final Logger LOGGER = Logger.getLogger(BackRefScheduleModel.class);
+
 	/**
 	 * The initial date to display or current selected date.
 	 */
 	private Date selectedDate;
 
 	/**
-	 * The selected event.
+	 * Selected events.
 	 */
-	private ScheduleEvent selectedEvent;
+	private List<ScheduleEvent> selectedEvents;
 
 	/**
 	 * The initial view to display or current selected view.
@@ -71,10 +80,40 @@ public class BackRefScheduleModel extends BackRefListModel implements Serializab
 	@Override
 	public List<Key> getSelected() {
 		List<Key> keys = new ArrayList<Key>();
-		if (null != getSelectedEvent()) {
-			keys.add(getSelectedEvent().getPk());
+		if (selectedEvents != null && !selectedEvents.isEmpty()) {
+			for (ScheduleEvent event : selectedEvents) {
+				keys.add(event.getPk());
+			}
 		}
 		return keys;
+	}
+
+	public void update(ScheduleEvent event) {
+		RequestContext context = null;
+		try {
+			context = new RequestContext(viewCtrl.getSessionCtrl().getContext());
+			new BusinessController().updateEvent(entityName, event, context);
+
+			// No exception, commit
+			context.getDbConnection().commit();
+
+			loadData(context);
+		} catch (FunctionalException e) {
+			for (Message m : e.getMessages()) {
+				LOGGER.error(m);
+				context.getMessages().add(m);
+			}
+			LOGGER.error("", e);
+		} catch (Exception e) {
+			LOGGER.error(e.getMessage(), e);
+			context.getMessages().add(new Message(FacesMessagesUtils.getTechnicalMessage(e), Severity.ERROR));
+		} finally {
+			if (context != null) {
+				// Close request context potential database connection
+				context.close();
+			}
+		}
+		viewCtrl.displayMessages(context);
 	}
 
 	@Override
@@ -93,8 +132,7 @@ public class BackRefScheduleModel extends BackRefListModel implements Serializab
 				request.setContext(new RequestContext(viewCtrl.getSessionCtrl().getContext()));
 				Entity newEvent = DomainUtils.newDomain(entityName);
 				// et un peu de BusinessController...
-				String keyName = newEvent.getModel().getLinkModel(linkName).getKeyName();
-				newEvent.setForeignKey(keyName, entity.getPrimaryKey());
+				newEvent.setForeignKey(linkName, entity.getPrimaryKey());
 				// Bref ce serait peut-être plus élégant de faire des méthodes spécifiques dans ViewController et BusinessController.
 				new BusinessController().initEventCreation(newEvent, defaultAction, getSelectedDate(), request.getContext());
 				request.setEntity(newEvent);
@@ -117,12 +155,12 @@ public class BackRefScheduleModel extends BackRefListModel implements Serializab
 		this.selectedDate = selectedDate;
 	}
 
-	public ScheduleEvent getSelectedEvent() {
-		return selectedEvent;
+	public List<ScheduleEvent> getSelectedEvents() {
+		return selectedEvents;
 	}
 
-	public void setSelectedEvent(ScheduleEvent selectedEvent) {
-		this.selectedEvent = selectedEvent;
+	public void setSelectedEvents(List<ScheduleEvent> selectedEvents) {
+		this.selectedEvents = selectedEvents;
 	}
 
 	public ScheduleView getSelectedView() {

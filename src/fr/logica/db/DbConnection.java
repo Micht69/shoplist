@@ -18,7 +18,7 @@ public class DbConnection {
 	private static final Logger LOGGER = Logger.getLogger(DbConnection.class);
 
 	public enum Type {
-		ORACLE, MySQL, PostgreSQL, DB2
+		ORACLE, MySQL, PostgreSQL, DB2, SQLSERVER
 	}
 
 	public static final String CONTEXT_ROOT = "java:comp/env";
@@ -70,6 +70,8 @@ public class DbConnection {
 				DbConnection.dbType = Type.PostgreSQL;
 			} else if (driverName.contains("DB2") || driverName.contains("IBM")) {
 				DbConnection.dbType = Type.DB2;
+			} else if (driverName.contains("MICROSOFT")) {
+				DbConnection.dbType = Type.SQLSERVER;
 			} else {
 				throw new TechnicalException("Driver type not supported : " + driverName);
 			}

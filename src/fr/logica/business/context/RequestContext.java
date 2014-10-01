@@ -36,7 +36,7 @@ public class RequestContext implements Serializable {
 	private SessionContext sessionContext;
 
 	/** Database connection. Lazy opening. */
-	private DbConnection dbConnection;
+	private transient DbConnection dbConnection;
 
 	/** File attached to the Request. If a File object goes up to the UI layer of the application, it should start a download of this file. */
 	private File attachment = null;
@@ -55,6 +55,7 @@ public class RequestContext implements Serializable {
 	public void close() {
 		if (dbConnection != null) {
 			dbConnection.close();
+			dbConnection = null; 
 		}
 	}
 
@@ -67,9 +68,16 @@ public class RequestContext implements Serializable {
 	}
 
 	/**
-	 * Lazy opening on DbConnection
+	 * @return true if a DbConnection object is associated to this request
+	 */
+	public boolean hasDbConnection() {
+		return dbConnection != null;
+	}
+
+	/**
+	 * Always return a DbConnection. If needed, a new DbConnection is created.
 	 * 
-	 * @return
+	 * @return never null
 	 */
 	public DbConnection getDbConnection() {
 		if (dbConnection == null) {
@@ -156,9 +164,10 @@ public class RequestContext implements Serializable {
 	}
 
 	/**
-	 * Return an unmodifiable map with custom data, to modify it use putCustomData() or removeCustomData()
+	 * Return an <b>unmodifiable</b> map with custom data to modify it use <br/>
+	 * {@link #putCustomData(String, Object)} or {@link #removeCustomData(String)}
 	 * 
-	 * @return
+	 * @return an unmodifiable map with custom data
 	 */
 	public Map<String, Object> getCustomData() {
 		Map<String, Object> customAttributes = new HashMap<String, Object>();

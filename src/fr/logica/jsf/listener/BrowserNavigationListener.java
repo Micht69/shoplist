@@ -1,11 +1,15 @@
 package fr.logica.jsf.listener;
 
+import java.util.Locale;
+
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.event.PhaseEvent;
 import javax.faces.event.PhaseId;
 import javax.faces.event.PhaseListener;
 import javax.servlet.http.HttpServletResponse;
+
+import fr.logica.business.MessageUtils;
 
 public class BrowserNavigationListener implements PhaseListener {
 
@@ -35,7 +39,7 @@ public class BrowserNavigationListener implements PhaseListener {
 			facesContext.getExternalContext().getSessionMap().remove(EXPIRED_VIEW_TOKEN);
 			facesContext.addMessage(null,
 					new FacesMessage(javax.faces.application.FacesMessage.SEVERITY_ERROR,
-							"The view you're trying to reach has expired",
+							MessageUtils.getInstance(Locale.getDefault()).getMessage("error.viewExpired", (Object[]) null),
 							null));
 		}
 	}

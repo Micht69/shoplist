@@ -12,24 +12,23 @@ KEYCODE_RIGHT_ARROW = 39;
 
 /* Debug logs */
 cgi.DEBUG_ENABLED = false;
+if (cgi.DEBUG_ENABLED) {
+	cgi.DEBUG_ENABLED = window.console && console.debug;
+}
 cgi.debug = function() {
 	if (cgi.DEBUG_ENABLED) {
-		var a = arguments;
-		/* AWFULLY UGLY. But console.log.apply is implementation-dependent... */
-		if (a.length == 1)
-			console.log(a[0]);
-		else if (a.length == 2)
-			console.log(a[0], a[1]);
-		else if (a.length == 3)
-			console.log(a[0], a[1], a[2]);
-		else if (a.length == 4)
-			console.log(a[0], a[1], a[2], a[3]);
-		else if (a.length == 5)
-			console.log(a[0], a[1], a[2], a[3], a[4]);
-		else
-			for (arg in a)
-				console.log(arg);
+		var args = Array.prototype.slice.call(arguments);
+		console.debug(args.join(" "));
 	}
+};
+cgi.log = function() {
+	if (window.console && console.log) {
+		var args = Array.prototype.slice.call(arguments);
+		console.log(args.join(" "));
+	}
+};
+cgi.isString = function(o) {
+	return typeof o == "string" || (typeof o == "object" && o.constructor === String);
 };
 
 /* Adding string.trim() on Internet Explorer <9 */
@@ -101,7 +100,7 @@ $(document).ready(function() {
 				contentTable = block.children('.table_container');
 			} else {
 				block = contentImage.parents('.form_container').first();
-				contentTable = block.children('table');
+				contentTable = block.children('.group');
 			}
 
 			if (contentTable.length) {
@@ -130,7 +129,6 @@ $(document).ready(function() {
 		};
 	});
 
-	$('.actionContent').click(function() {this.closeOpen();});
 	$('.actionContent').parent().click(function() {$(this).children('.actionContent')[0].closeOpen();});
 
 	// Gestion des champs "disabled"
@@ -315,6 +313,15 @@ $(document).ready(function() {
 		this.value = this.value.replace(/[^0-9\.]/g,'');
 	});
 	$('.linklist-filter').trigger('keyup');
+	
+	// FIX IE8 bug to validate search on Enter key
+	if ($.browser.msie && ($.browser.version == "8.0" || $.browser.version == "7.0")) {
+		$("#criteresBody input[type=text]").keypress(function(e) {
+			if (e.which === KEYCODE_ENTER) {
+				$("#criteresBody input[type=submit]").click();
+			}
+		});
+	}
 });
 Array.prototype.contains = function(obj) {
 	var i = this.length;
@@ -352,10 +359,10 @@ function doTextareaControlChange(textarea) {
 	v = v.replace(/\n/g, '<br>\n');
 
 	// Edit div
-	txt.parents(".colFieldSetRight:first").find(".textareacontrol2").html(v);
+	txt.parents(".col-value:first").find(".textareacontrol2").html(v);
 
 	// count chars
-	txt.parents(".colFieldSetRight:first").find(".textarealength").html(txt.val().length + ' ');
+	txt.parents(".col-value:first").find(".textarealength").html(txt.val().length + ' ');
 }
 function textareaResizeToContent($parent) {
 	var $elements = (undefined !== $parent) ? $parent.find('textarea') : $('textarea');
@@ -541,29 +548,42 @@ var padding = 0;
 function initList(listName) {
 	// Compute list height
 	var listResultsContainer = $('.list_results_container').first();
+	var $header = $('#datatable-div-header-' + listName);
+	var $data = $('#datatable-div-data-' + listName);
+	var listHeaderHeight = $header.height();
 	var newListHeight;
 
-	if (!listResultsContainer.attr('style')) {
-		var windowHeight = $(window).height();
-		var documentHeight = $(document).height();
-		var overflow = documentHeight - windowHeight;
-
-		newListHeight = listResultsContainer.outerHeight(true) - overflow - 20; // FIXME Why 20 as magic number ?
-		listResultsContainer.height(newListHeight);
-	} else {
-		newListHeight = listResultsContainer.height();
+	if (listResultsContainer.attr('style')) {
+		// Reset height previously computed
+		listResultsContainer.height('auto');
 	}
+	var windowHeight = $(window).height();
+	var documentHeight = $(document).height();
+	var overflow = documentHeight - windowHeight;
+	cgi.debug("windowHeight="+windowHeight+" / documentHeight="+documentHeight+" / overflow="+overflow);
+	if (overflow == 0) {
+		// No scroll
+		newListHeight = 'auto';
+	} else {
+		newListHeight = listResultsContainer.outerHeight(true) - overflow - listHeaderHeight;
+	}
+	cgi.debug("Computed list height :",newListHeight);
+	listResultsContainer.height(newListHeight);
 	
 	// Adjust with list headers
-	var listHeaderHeight = $('#datatable-div-header-' + listName).height();
-	$('#datatable-div-data-' + listName).height(newListHeight - listHeaderHeight);
+	if (cgi.isString(newListHeight)) {
+		$data.height(newListHeight);
+	} else {
+		$data.height(newListHeight - listHeaderHeight);
+	}
 
 	// Compute columns width
 	datatableAlignColumns(listName);
 	
 	// Has list headers height changed ?
-	if (listHeaderHeight != $('#datatable-div-header-' + listName).height()) {
-		$('#datatable-div-data-' + listName).height(newListHeight - $('#datatable-div-header-' + listName).height());
+	var newListHeaderHeight = $header.height();
+	if (!cgi.isString(newListHeight) && listHeaderHeight != newListHeaderHeight) {
+		$data.height(newListHeight - newListHeaderHeight);
 	}
 
 	$('td[class="first"]').click(function(event) {
@@ -572,32 +592,34 @@ function initList(listName) {
 }
 
 function datatableAlignColumns(listName, forceAlignment) {
-	if (!$('#datatable-div-header-' + listName).is(':visible')) {
+	var $header = $('#datatable-div-header-' + listName);
+	if (!$header.is(':visible')) {
 		return; // Do not touch non visible tables (in tabs for instance)
 	}
-	if ($('#datatable-div-header-' + listName).data('initialized') && !forceAlignment) {
+	if ($header.data('initialized') && !forceAlignment) {
 		return; // Initialize only once 
 	}
-	var headers = $('#datatable-div-header-' + listName + ' col');
-	var cols = $('#datatable-div-data-' + listName + ' col');
+	var $data = $('#datatable-div-data-' + listName);
+	var headers = $header.find('col');
+	var cols = $data.find('col');
 
-	$('#datatable-div-data-' + listName + ' table tr th').each(function(index) {
+	$data.find('table tr th').each(function(index) {
 		if (index == 0 || index == (headers.size() - 1)) {
 			// First column with checkbox is set with CSS, last column just fills end of line
 			return true;
 		}
 		var innerWidth = $(this).innerWidth()+1;
-		var width = $(this).width();
+//		var width = $(this).width();
 
 		$(cols[index]).width(innerWidth);
 		$(headers[index]).width(innerWidth);
 	});
-	$('#datatable-div-data-' + listName + ' thead').css('visibility', 'hidden');
-	var headerHeight = $('#datatable-div-data-' + listName + ' thead').innerHeight() + 1;
-	$('#datatable-div-data-' + listName + ' table').css('margin-top', -headerHeight);
-	$('#datatable-div-header-' + listName).css('visibility', 'visible');
-	$('#datatable-div-data-' + listName).css('visibility', 'visible');
-	$('#datatable-div-header-' + listName).data('initialized', true);
+	$data.find('thead').css('visibility', 'hidden');
+	var headerHeight = $data.find('thead').innerHeight() + 1;
+	$data.find('table').css('margin-top', - headerHeight);
+	$header.css('visibility', 'visible');
+	$data.css('visibility', 'visible');
+	$header.data('initialized', true);
 }
 
 function initTreeTable(listName) {
@@ -735,7 +757,7 @@ logAjaxEvent = function(data) {
 	} else if (data.status == "success") {
 		cgi.debug("Success of Ajax call on", data.source, "with code [", data.responseCode, "]");
 	} else {
-		console.log("Unknown status", data.status, "of Ajax call on", data.source);
+		cgi.log("Unknown status", data.status, "of Ajax call on", data.source);
 	}
 };
 

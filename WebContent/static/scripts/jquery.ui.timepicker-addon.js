@@ -1633,6 +1633,10 @@
 		    } else if (onselect) {
 		        tp_inst._defaults.onSelect = onselect;
 		    }
+
+		    if (tp_inst._defaults.timeOnly && name === 'onSelect') {
+		    	return target;
+		    }
 		}
 		if (value === undefined) {
 			return this._base_optionDatepicker.call($.datepicker, target, name);

@@ -1,8 +1,10 @@
 package fr.logica.jsf.model.link;
 
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import fr.logica.business.Action.Input;
 import fr.logica.business.Action.UserInterface;
@@ -27,7 +29,6 @@ public class LinkComboModel extends DataModel {
 
 	/** Link between reference entity and combo entity */
 	private String linkName;
-	private String keyName;
 
 	/** Filter used to load combo elements */
 	private String filterName;
@@ -49,12 +50,11 @@ public class LinkComboModel extends DataModel {
 		this.entityName = entityName;
 		this.filterName = filterName;
 		this.linkName = linkName;
-		this.keyName = entity.getModel().getLinkModel(linkName).getKeyName();
 		if (viewCtrl.getCurrentView().getAction().getInput() == Input.QUERY) {
 			isCriteriaTemplate = Boolean.TRUE;
 		}
 		if (store.get(SELECTED_VALUE) != null) {
-			sourceEntity.setForeignKey(sourceEntity.getModel().getLinkModel(linkName).getKeyName(),
+			sourceEntity.setForeignKey(sourceEntity.getModel().getLinkModel(linkName).getLinkName(),
 					new Key(entityName, store.get(SELECTED_VALUE)));
 		}
 		loadData(viewCtrl.getContext());
@@ -66,7 +66,7 @@ public class LinkComboModel extends DataModel {
 		this.data = bc.getLinkComboData(sourceEntity, entityName, linkName, filterName, viewCtrl.getCurrentView()
 				.getAction(),
 				context);
-		Key foreignKey = sourceEntity.getForeignKey(keyName);
+		Key foreignKey = sourceEntity.getForeignKey(linkName);
 		if (foreignKey.isFull()) {
 			this.selectedValue = foreignKey.getEncodedValue();
 		} else {
@@ -82,7 +82,7 @@ public class LinkComboModel extends DataModel {
 	@Override
 	public void validateView(View currentView) {
 		if (!readonly) {
-			sourceEntity.setForeignKey(keyName, new Key(entityName, selectedValue));
+			sourceEntity.setForeignKey(linkName, new Key(entityName, selectedValue));
 		}
 	}
 
@@ -95,10 +95,33 @@ public class LinkComboModel extends DataModel {
 
 	/** Values displayed in the combobox */
 	public Map<String, String> getComboValues() {
+		// Combos are "reversed", labels are the keys and keys are values. This is the JSF2 way to ensure unicity of labels.
 		Map<String, String> map = new LinkedHashMap<String, String>();
+		// Handle labels that appear more than once
+		Set<String> existingLabels = new HashSet<String>();
 		if (data != null) {
 			for (Entry<Key, String> e : data.getComboValues().entrySet()) {
-				map.put(e.getValue(), e.getKey().getEncodedValue());
+				if (map.containsKey(e.getValue())) {
+					// This label already exists in map, flag it as a
+					existingLabels.add(e.getValue());
+					// Get existing label value
+					String existingKey = map.get(e.getValue());
+					// Build a new unique label
+					String replacementLabel = e.getValue() + " (" + existingKey + ")";
+					// Remove from map and put new unique label inside
+					map.remove(e.getValue());
+					map.put(replacementLabel, existingKey);
+					// Add the new label
+					String uniqueLabel = e.getValue() + " (" + e.getKey().getEncodedValue() + ")";
+					map.put(uniqueLabel, e.getKey().getEncodedValue());
+				} else if (existingLabels.contains(e.getValue())) {
+					// Label already used, make it unique !
+					String uniqueLabel = e.getValue() + " (" + e.getKey().getEncodedValue() + ")";
+					map.put(uniqueLabel, e.getKey().getEncodedValue());
+				} else {
+					// Already unique label, just put it into the map
+					map.put(e.getValue(), e.getKey().getEncodedValue());
+				}
 			}
 		}
 		return map;
@@ -111,7 +134,7 @@ public class LinkComboModel extends DataModel {
 	public void setSelectedValue(String selectedValue) {
 		this.selectedValue = selectedValue;
 		if (isCriteriaTemplate) {
-			sourceEntity.setForeignKey(keyName, new Key(entityName, selectedValue));
+			sourceEntity.setForeignKey(linkName, new Key(entityName, selectedValue));
 		}
 	}
 

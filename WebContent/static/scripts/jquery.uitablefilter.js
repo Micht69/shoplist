@@ -20,7 +20,7 @@
 (function($) {
   $.uiTableFilter = function(jq, phrase, column, ifHidden){
     var new_hidden = false;
-    if( this.last_phrase === phrase ) return false;
+    if(this.last_phrase === phrase || this.last_phrase === '' && phrase === '') return false;
 
     var phrase_length = phrase.length;
     var words = phrase.toLowerCase().split(" ");

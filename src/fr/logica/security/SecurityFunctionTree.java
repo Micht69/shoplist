@@ -9,16 +9,27 @@ public abstract class SecurityFunctionTree {
 	
 	private static List<SecurityFunctionNode> elements = new ArrayList<SecurityFunctionNode>();
 	
+	private static Map<Integer, SecurityFunctionNode> mapSfn = new HashMap<Integer, SecurityFunctionNode>();
+	
 	static {
-		Map<Integer, SecurityFunctionNode> mapSfn = new HashMap<Integer, SecurityFunctionNode>();
-		
+		insertMenu();
+		insertEntities1to1000();
+	}
+	
+	public static void insertMenu() {
 		mapSfn.put(0, new SecurityFunctionNode());
-		mapSfn.get(0).getSf().setMenu("SHOP_LISTS");
+		mapSfn.get(0).getSf().setMenuOption("SHOP_LISTS");
 		elements.add(mapSfn.get(0));
+		mapSfn.put(1, new SecurityFunctionNode());
+		mapSfn.get(1).getSf().setQuery("SHOP_LIST");
+		mapSfn.get(0).getChilds().add(mapSfn.get(1));
 
 		mapSfn.put(0, new SecurityFunctionNode());
-		mapSfn.get(0).getSf().setMenu("SHOP_ARTICLES");
+		mapSfn.get(0).getSf().setMenuOption("SHOP_ARTICLES");
 		elements.add(mapSfn.get(0));
+		mapSfn.put(1, new SecurityFunctionNode());
+		mapSfn.get(1).getSf().setQuery("SHOP_ARTICLE");
+		mapSfn.get(0).getChilds().add(mapSfn.get(1));
 
 		mapSfn.put(0, new SecurityFunctionNode());
 		mapSfn.get(0).getSf().setMenu("SHOP_ADMIN");
@@ -37,130 +48,30 @@ public abstract class SecurityFunctionTree {
 		mapSfn.get(1).getChilds().add(mapSfn.get(2));
 
 
+	}
+	
+	public static void insertEntities1to1000() {
 		mapSfn.put(0, new SecurityFunctionNode());
 		elements.add(mapSfn.get(0));
 
+		insertNewEntity("shopArticle", 0, 2, 4, 5, 50);
+		insertNewEntity("shopList", 0, 2, 4, 5, 50);
+		insertNewEntity("shopListLArticle", 0, 51, 70, 2, 20, 60);
+		insertNewEntity("shopShelf", 0, 2, 4, 5);
+		insertNewEntity("shopUser", 0, 2, 4, 5);
+	}
+	
+	private static void insertNewEntity(String entityName, int... actions) {
 		mapSfn.put(1, new SecurityFunctionNode());
-		mapSfn.get(1).getSf().setEntite("shopArticle");
+		mapSfn.get(1).getSf().setEntite(entityName);
 		mapSfn.get(0).getChilds().add(mapSfn.get(1));
-		mapSfn.put(2, new SecurityFunctionNode());
-		mapSfn.get(2).getSf().setEntite("shopArticle");
-		mapSfn.get(2).getSf().setAction(0);
-		mapSfn.get(1).getChilds().add(mapSfn.get(2));
-		mapSfn.put(2, new SecurityFunctionNode());
-		mapSfn.get(2).getSf().setEntite("shopArticle");
-		mapSfn.get(2).getSf().setAction(2);
-		mapSfn.get(1).getChilds().add(mapSfn.get(2));
-		mapSfn.put(2, new SecurityFunctionNode());
-		mapSfn.get(2).getSf().setEntite("shopArticle");
-		mapSfn.get(2).getSf().setAction(4);
-		mapSfn.get(1).getChilds().add(mapSfn.get(2));
-		mapSfn.put(2, new SecurityFunctionNode());
-		mapSfn.get(2).getSf().setEntite("shopArticle");
-		mapSfn.get(2).getSf().setAction(5);
-		mapSfn.get(1).getChilds().add(mapSfn.get(2));
-		mapSfn.put(2, new SecurityFunctionNode());
-		mapSfn.get(2).getSf().setEntite("shopArticle");
-		mapSfn.get(2).getSf().setAction(50);
-		mapSfn.get(1).getChilds().add(mapSfn.get(2));
-
 		
-		mapSfn.put(1, new SecurityFunctionNode());
-		mapSfn.get(1).getSf().setEntite("shopList");
-		mapSfn.get(0).getChilds().add(mapSfn.get(1));
-		mapSfn.put(2, new SecurityFunctionNode());
-		mapSfn.get(2).getSf().setEntite("shopList");
-		mapSfn.get(2).getSf().setAction(0);
-		mapSfn.get(1).getChilds().add(mapSfn.get(2));
-		mapSfn.put(2, new SecurityFunctionNode());
-		mapSfn.get(2).getSf().setEntite("shopList");
-		mapSfn.get(2).getSf().setAction(2);
-		mapSfn.get(1).getChilds().add(mapSfn.get(2));
-		mapSfn.put(2, new SecurityFunctionNode());
-		mapSfn.get(2).getSf().setEntite("shopList");
-		mapSfn.get(2).getSf().setAction(4);
-		mapSfn.get(1).getChilds().add(mapSfn.get(2));
-		mapSfn.put(2, new SecurityFunctionNode());
-		mapSfn.get(2).getSf().setEntite("shopList");
-		mapSfn.get(2).getSf().setAction(5);
-		mapSfn.get(1).getChilds().add(mapSfn.get(2));
-		mapSfn.put(2, new SecurityFunctionNode());
-		mapSfn.get(2).getSf().setEntite("shopList");
-		mapSfn.get(2).getSf().setAction(50);
-		mapSfn.get(1).getChilds().add(mapSfn.get(2));
-
-		
-		mapSfn.put(1, new SecurityFunctionNode());
-		mapSfn.get(1).getSf().setEntite("shopListLArticle");
-		mapSfn.get(0).getChilds().add(mapSfn.get(1));
-		mapSfn.put(2, new SecurityFunctionNode());
-		mapSfn.get(2).getSf().setEntite("shopListLArticle");
-		mapSfn.get(2).getSf().setAction(0);
-		mapSfn.get(1).getChilds().add(mapSfn.get(2));
-		mapSfn.put(2, new SecurityFunctionNode());
-		mapSfn.get(2).getSf().setEntite("shopListLArticle");
-		mapSfn.get(2).getSf().setAction(51);
-		mapSfn.get(1).getChilds().add(mapSfn.get(2));
-		mapSfn.put(2, new SecurityFunctionNode());
-		mapSfn.get(2).getSf().setEntite("shopListLArticle");
-		mapSfn.get(2).getSf().setAction(70);
-		mapSfn.get(1).getChilds().add(mapSfn.get(2));
-		mapSfn.put(2, new SecurityFunctionNode());
-		mapSfn.get(2).getSf().setEntite("shopListLArticle");
-		mapSfn.get(2).getSf().setAction(2);
-		mapSfn.get(1).getChilds().add(mapSfn.get(2));
-		mapSfn.put(2, new SecurityFunctionNode());
-		mapSfn.get(2).getSf().setEntite("shopListLArticle");
-		mapSfn.get(2).getSf().setAction(20);
-		mapSfn.get(1).getChilds().add(mapSfn.get(2));
-		mapSfn.put(2, new SecurityFunctionNode());
-		mapSfn.get(2).getSf().setEntite("shopListLArticle");
-		mapSfn.get(2).getSf().setAction(60);
-		mapSfn.get(1).getChilds().add(mapSfn.get(2));
-
-		
-		mapSfn.put(1, new SecurityFunctionNode());
-		mapSfn.get(1).getSf().setEntite("shopShelf");
-		mapSfn.get(0).getChilds().add(mapSfn.get(1));
-		mapSfn.put(2, new SecurityFunctionNode());
-		mapSfn.get(2).getSf().setEntite("shopShelf");
-		mapSfn.get(2).getSf().setAction(0);
-		mapSfn.get(1).getChilds().add(mapSfn.get(2));
-		mapSfn.put(2, new SecurityFunctionNode());
-		mapSfn.get(2).getSf().setEntite("shopShelf");
-		mapSfn.get(2).getSf().setAction(2);
-		mapSfn.get(1).getChilds().add(mapSfn.get(2));
-		mapSfn.put(2, new SecurityFunctionNode());
-		mapSfn.get(2).getSf().setEntite("shopShelf");
-		mapSfn.get(2).getSf().setAction(4);
-		mapSfn.get(1).getChilds().add(mapSfn.get(2));
-		mapSfn.put(2, new SecurityFunctionNode());
-		mapSfn.get(2).getSf().setEntite("shopShelf");
-		mapSfn.get(2).getSf().setAction(5);
-		mapSfn.get(1).getChilds().add(mapSfn.get(2));
-
-		
-		mapSfn.put(1, new SecurityFunctionNode());
-		mapSfn.get(1).getSf().setEntite("shopUser");
-		mapSfn.get(0).getChilds().add(mapSfn.get(1));
-		mapSfn.put(2, new SecurityFunctionNode());
-		mapSfn.get(2).getSf().setEntite("shopUser");
-		mapSfn.get(2).getSf().setAction(0);
-		mapSfn.get(1).getChilds().add(mapSfn.get(2));
-		mapSfn.put(2, new SecurityFunctionNode());
-		mapSfn.get(2).getSf().setEntite("shopUser");
-		mapSfn.get(2).getSf().setAction(2);
-		mapSfn.get(1).getChilds().add(mapSfn.get(2));
-		mapSfn.put(2, new SecurityFunctionNode());
-		mapSfn.get(2).getSf().setEntite("shopUser");
-		mapSfn.get(2).getSf().setAction(4);
-		mapSfn.get(1).getChilds().add(mapSfn.get(2));
-		mapSfn.put(2, new SecurityFunctionNode());
-		mapSfn.get(2).getSf().setEntite("shopUser");
-		mapSfn.get(2).getSf().setAction(5);
-		mapSfn.get(1).getChilds().add(mapSfn.get(2));
-
-		
+		for(int action : actions) {
+			mapSfn.put(2, new SecurityFunctionNode());
+			mapSfn.get(2).getSf().setEntite(entityName);
+			mapSfn.get(2).getSf().setAction(action);
+			mapSfn.get(1).getChilds().add(mapSfn.get(2));
+		}
 	}
 	
 	public static List<SecurityFunctionNode> getElements() {
@@ -168,4 +79,5 @@ public abstract class SecurityFunctionTree {
 	}
 
 }
+
 

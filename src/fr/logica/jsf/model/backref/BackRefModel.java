@@ -120,21 +120,21 @@ public class BackRefModel extends DataModel {
 	}
 
 	/**
-	 * Shortcut method to detach current element. No persistence.
+	 * Shortcut method to detach current element. Persistence in database.
 	 * 
 	 * @return Page to display for detach action.
 	 */
 	public String detach() {
-		return prepareAction(Action.getDetachLinkAction());
+		return prepareAction(Action.getDetachBackRefAction());
 	}
 
 	/**
-	 * Shortcut method to attach a new element. No persistence.
+	 * Shortcut method to attach a new element. Persistence in database.
 	 * 
 	 * @return Page to display for attach action.
 	 */
 	public String attach() {
-		return prepareAction(Action.getAttachLinkAction(filterName));
+		return prepareAction(Action.getAttachBackRefAction(filterName));
 	}
 
 	public Entity getSourceEntity() {

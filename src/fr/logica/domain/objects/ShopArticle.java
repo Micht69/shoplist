@@ -1,46 +1,67 @@
 package fr.logica.domain.objects;
 
 import java.io.Serializable;
-
 import java.util.HashSet;
 import java.util.Set;
 
-
+import fr.logica.business.Action.*;
 import fr.logica.business.Entity;
+import fr.logica.business.EntityField.SqlTypes;
 import fr.logica.business.Key;
+import fr.logica.business.KeyModel;
 import fr.logica.business.context.RequestContext;
 import fr.logica.db.DB;
-import fr.logica.domain.models.ShopArticleModel;
+import fr.logica.domain.annotations.*;
+import fr.logica.domain.constants.ShopArticleConstants;
 
 /**
  * Entity ShopArticle definition
  * 
  * @author CGI
  */
+@EntityDef(dbName = "ARTICLE", primaryKey = { "id" })
+@Links({
+	@Link(name = "shopArticleLShelf", targetEntity = "shopShelf", fields = { "shelf" })
+})
+@Actions({
+	@Action(code = 0, input = Input.NONE, persistence = Persistence.INSERT),
+	@Action(code = 2, persistence = Persistence.UPDATE),
+	@Action(code = 4, persistence = Persistence.DELETE, ui = UserInterface.READONLY),
+	@Action(code = 5, persistence = Persistence.NONE, ui = UserInterface.READONLY),
+	@Action(code = 50, pageName = "SHOP_ARTICLE_CREATE", input = Input.NONE, persistence = Persistence.INSERT)
+})
 public class ShopArticle extends Entity implements Serializable {
 	/** serialVersionUID */
 	public static final long serialVersionUID = 1L;
-	
 
 	/** ID */
-	private Integer id ;
+	@EntityField(sqlName = "ID", sqlType = SqlTypes.INTEGER, sqlSize = 10, isMandatory = true, isAutoIncrementField = true)
+	private Integer id;
 
 	/** Nom */
-	private String name ;
+	@EntityField(sqlName = "NAME", sqlType = SqlTypes.VARCHAR2, sqlSize = 128, isMandatory = true, isLookupField = true)
+	private String name;
 
 	/** Description */
-	private String descr ;
+	@EntityField(sqlName = "DESCR", sqlType = SqlTypes.VARCHAR2, sqlSize = 500)
+	private String descr;
 
 	/** Rayon */
-	private String shelf ;
+	@EntityField(sqlName = "SHELF", sqlType = SqlTypes.VARCHAR2, sqlSize = 10, isMandatory = true)
+	private String shelf;
 
 	/** Ean13 */
-	private String ean13 ;
+	@EntityField(sqlName = "EAN13", sqlType = SqlTypes.VARCHAR2, sqlSize = 13)
+	private String ean13;
 
 	/** Description */
-	private String internalCaption ;
+	@EntityField(sqlName = "W$_DESC", sqlType = SqlTypes.VARCHAR2, sqlSize = 128, memory = fr.logica.business.EntityField.Memory.SQL, sqlExpr = ":tableAlias.NAME")
+	private String internalCaption;
 
-
+	/**
+	 * Initialize a new ShopArticle.<br/>
+	 * <b>The fields with initial value will be populated.</b>
+	 */
 	public ShopArticle() {
 		// Default constructor
 		super();
@@ -56,38 +77,34 @@ public class ShopArticle extends Entity implements Serializable {
 	 */
 	public ShopArticle(Integer id) {
 		super();
-		Key primaryKey = ShopArticleModel.buildPrimaryKey(id);
+		Key primaryKey = buildPrimaryKey(id);
 		setPrimaryKey(primaryKey);
 	}
 	
 	/**
-	 * Load a bean from database based on its primary key
-	 * <b>This method does not call the logic method dbPostLoad().</b>
-	 * @param id ID
-	 * @param ctx Current context with open database connection.
-	 * @return	<code>true</code> if the bean has been loaded, <code>false</code> if no entity was found.  
+	 * Initialize a new ShopArticle from an existing ShopArticle.<br/>
+	 * <b>All fields value are copied.</b>
 	 */
-	public boolean find(Integer id, RequestContext ctx) {
-		Key primaryKey = ShopArticleModel.buildPrimaryKey(id);
-		if (!primaryKey.isFull()) {
-			return false;
-		}
-		ShopArticle dbInstance = DB.get(NAME, primaryKey, ctx);
-		if (dbInstance != null) {
-			syncFromBean(dbInstance);
-			return true; 
-		}
-		return false; 
-	}
-	
 	public ShopArticle(ShopArticle pShopArticle) {
 		super(pShopArticle);
+	}
+
+	/**
+	 * Generate a primary key for the entity
+	 */
+	public static synchronized Key buildPrimaryKey(Integer id) {
+		KeyModel pkModel = new KeyModel(ShopArticleConstants.ENTITY_NAME);
+		// FIXME : Récupérer la PK ...
+		Key key = new Key(pkModel);
+		key.setValue("id", id);
+
+		return key;
 	}
 
 	/** Entity name */
 	@Override
 	public String name() {
-		return "shopArticle";
+		return ShopArticleConstants.ENTITY_NAME;
 	}
 
 	/** Entity description */
@@ -104,7 +121,7 @@ public class ShopArticle extends Entity implements Serializable {
 	public Integer getId() {
 		return this.id;
 	}
- 
+
 	/**
 	 * Set the value from field Id.
 	 *
@@ -113,8 +130,6 @@ public class ShopArticle extends Entity implements Serializable {
 	public void setId(final Integer id) {
 		this.id = id;
 	}
-	
-
 
 	/**
 	 * Get the value from field Name.
@@ -124,7 +139,7 @@ public class ShopArticle extends Entity implements Serializable {
 	public String getName() {
 		return this.name;
 	}
- 
+
 	/**
 	 * Set the value from field Name.
 	 *
@@ -133,8 +148,6 @@ public class ShopArticle extends Entity implements Serializable {
 	public void setName(final String name) {
 		this.name = name;
 	}
-	
-
 
 	/**
 	 * Get the value from field Descr.
@@ -144,7 +157,7 @@ public class ShopArticle extends Entity implements Serializable {
 	public String getDescr() {
 		return this.descr;
 	}
- 
+
 	/**
 	 * Set the value from field Descr.
 	 *
@@ -153,8 +166,6 @@ public class ShopArticle extends Entity implements Serializable {
 	public void setDescr(final String descr) {
 		this.descr = descr;
 	}
-	
-
 
 	/**
 	 * Get the value from field Shelf.
@@ -164,7 +175,7 @@ public class ShopArticle extends Entity implements Serializable {
 	public String getShelf() {
 		return this.shelf;
 	}
- 
+
 	/**
 	 * Set the value from field Shelf.
 	 *
@@ -173,8 +184,6 @@ public class ShopArticle extends Entity implements Serializable {
 	public void setShelf(final String shelf) {
 		this.shelf = shelf;
 	}
-	
-
 
 	/**
 	 * Get the value from field Ean13.
@@ -184,7 +193,7 @@ public class ShopArticle extends Entity implements Serializable {
 	public String getEan13() {
 		return this.ean13;
 	}
- 
+
 	/**
 	 * Set the value from field Ean13.
 	 *
@@ -193,8 +202,6 @@ public class ShopArticle extends Entity implements Serializable {
 	public void setEan13(final String ean13) {
 		this.ean13 = ean13;
 	}
-	
-
 
 	/**
 	 * Gets the value from field InternalCaption. This getter respects real Java naming convention. 
@@ -222,7 +229,7 @@ public class ShopArticle extends Entity implements Serializable {
 	public String getInternalCaption() {
 		return this.internalCaption;
 	}
- 
+
 	/**
 	 * Set the value from field InternalCaption.
 	 *
@@ -231,23 +238,6 @@ public class ShopArticle extends Entity implements Serializable {
 	public void setInternalCaption(final String internalCaption) {
 		this.internalCaption = internalCaption;
 	}
-	
-
-
-	/** Holder for the var names */
-	public interface Var {
-		/** Var ID */
-		String ID = "id";
-		/** Var NAME */
-		String NAME = "name";
-		/** Var DESCR */
-		String DESCR = "descr";
-		/** Var SHELF */
-		String SHELF = "shelf";
-		/** Var EAN13 */
-		String EAN13 = "ean13";
-	}
-	
 
 	/**
 	 * Instance of ShopShelf matching the link ShopArticleLShelf based on foreign key values. <br/>
@@ -257,7 +247,7 @@ public class ShopArticle extends Entity implements Serializable {
 	 * @return Instance of ShopShelf matching the link pays if any, null otherwise.
 	 */
 	public ShopShelf getRef_ShopArticleRShelf(RequestContext ctx) {
-		return (ShopShelf) DB.getRef(this, ShopArticleModel.LINK_SHOP_ARTICLE_L_SHELF, ctx);
+		return (ShopShelf) DB.getRef(this, ShopArticleConstants.Links.LINK_SHOP_ARTICLE_L_SHELF, ctx);
 	}
 	
 	/**
@@ -272,7 +262,7 @@ public class ShopArticle extends Entity implements Serializable {
 		if (pShopShelf != null) {
 			primaryKey = pShopShelf.getPrimaryKey();
 		}
-		setForeignKey(getModel().getLinkModel(ShopArticleModel.LINK_SHOP_ARTICLE_L_SHELF).getKeyName(), primaryKey);
+		setForeignKey(ShopArticleConstants.Links.LINK_SHOP_ARTICLE_L_SHELF, primaryKey);
 	}
 
 	/**
@@ -289,29 +279,12 @@ public class ShopArticle extends Entity implements Serializable {
 			// Do not get linked entities if PK is incomplete
 			return s;
 		}
-		for (Entity e : DB.getLinkedEntities(this, ShopArticleModel.LINK_SHOP_LIST_L_ARTICLE_L_ARTICLE, ctx)) {
+		for (Entity e : DB.getLinkedEntities(this, ShopArticleConstants.Links.LINK_SHOP_LIST_L_ARTICLE_L_ARTICLE, ctx)) {
 			s.add((ShopListLArticle) e);
 		}
 		return s;
 	}
 
-
-	/** Holder for the action names */
-	public interface Action {
-		/** Créer. */
-		int ACTION_0 = 0;
-		/** Modifier. */
-		int ACTION_2 = 2;
-		/** Supprimer. */
-		int ACTION_4 = 4;
-		/** Afficher. */
-		int ACTION_5 = 5;
-		/** Importer depuis EAN13. */
-		int ACTION_50 = 50;
-    }
-
-	/** Nom de l'entité. */
-	public static final String NAME = "shopArticle";
 	
 	/**
 	 * Clones the current bean.

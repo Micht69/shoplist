@@ -24,7 +24,7 @@ public class Action implements Serializable, Cloneable {
 	private Process process;
 
 	public Action(Integer code, String queryName, String pageName, Integer next, Input input,
-			Persistence persistence, UserInterface ui, Process process, Integer... subActions) {
+			Persistence persistence, UserInterface ui, Process process) {
 		this.code = code;
 		this.queryName = queryName;
 		this.pageName = pageName;
@@ -34,9 +34,14 @@ public class Action implements Serializable, Cloneable {
 		this.ui = ui;
 		this.process = process;
 		this.subActions = new HashSet<Integer>();
-		this.subActions.addAll(Arrays.asList(subActions));
 		this.subActionCode = null;
 		setTypeAttributeForCompatibility();
+	}
+	
+	public Action(Integer code, String queryName, String pageName, Integer next, Input input,
+			Persistence persistence, UserInterface ui, Process process, Integer... subActions) {
+		this(code, queryName, pageName, next, input, persistence, ui, process);
+		this.subActions.addAll(Arrays.asList(subActions));
 	}
 
 	public Action(Action a) {

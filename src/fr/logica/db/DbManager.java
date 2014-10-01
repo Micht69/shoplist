@@ -1,4 +1,3 @@
-
 package fr.logica.db;
 
 import java.lang.reflect.Field;
@@ -30,6 +29,7 @@ import fr.logica.business.DomainLogic;
 import fr.logica.business.Entity;
 import fr.logica.business.EntityField;
 import fr.logica.business.EntityField.Memory;
+import fr.logica.business.EntityField.SqlTypes;
 import fr.logica.business.FileContainer;
 import fr.logica.business.Key;
 import fr.logica.business.TechnicalException;
@@ -37,7 +37,6 @@ import fr.logica.business.context.RequestContext;
 import fr.logica.business.data.ListCategoryData;
 import fr.logica.business.data.ListData;
 import fr.logica.business.data.Row;
-import fr.logica.db.DbQuery.Var;
 import fr.logica.reflect.DomainUtils;
 
 
@@ -61,8 +60,7 @@ public class DbManager {
 
 	/** Initialize a DbManager by executing the query and getting the result set from the database. */
 	protected void init(RequestContext ctx, String sql, Object[] parms, int resultsetType, int resultsetConcurrency) {
-	
-	
+
 		/* create a PreparedStatement from the SQL query */
 		try {
 			ps = ctx.getDbConnection().getCnx().prepareStatement(sql, resultsetType, resultsetConcurrency);
@@ -106,7 +104,6 @@ public class DbManager {
 		} catch (SQLException e) {
 			throw new DbException("Init DbManager: Get ResultSet failed.", e);
 		}
-	
 	}
 
 	/** Internal constructor with every parameter */
@@ -202,7 +199,7 @@ public class DbManager {
 	 * 
 	 * @param entityName
 	 *            Entity (=table) name
-	 * @param name
+	 * @param columnName
 	 *            Variable (=column) name
 	 * @return the alias used by the query to identify the column selected. The alias can be hashed if it's longer than 30 characters.
 	 */
@@ -215,7 +212,7 @@ public class DbManager {
 	 * 
 	 * @param entityName
 	 *            Entity (=table) name
-	 * @param name
+	 * @param columnName
 	 *            Variable (=column) name
 	 * @return The index of alias name in the query. This should be used to get data from result set instead of accessing RS via names.
 	 */
@@ -224,7 +221,32 @@ public class DbManager {
 	}
 
 	/**
-	 * @param columnName
+	 * @param columnIndex
+	 *            column to get the value from
+	 * @return Boolean value of the column columnName
+	 */
+	public Boolean getBoolean(int columnIndex) {
+		try {
+			return rs.getBoolean(columnIndex);
+		} catch (SQLException e) {
+			LOGGER.error(e.getMessage(), e);
+			return null;
+		}
+	}
+
+	/** @deprecated Use getBoolean(int columnIndex) instead. Get index with getColumnIndex method. */
+	@Deprecated
+	public Boolean getBoolean(String columnName) {
+		try {
+			return rs.getBoolean(columnName);
+		} catch (SQLException e) {
+			LOGGER.error(e.getMessage(), e);
+			return null;
+		}
+	}
+
+	/**
+	 * @param columnIndex
 	 *            column to get the value from
 	 * @return String value of the column columnName
 	 */
@@ -496,7 +518,7 @@ public class DbManager {
 			String sqlName = var.tableId + "_" + var.model.getSqlName();
 			int index = dbQuery.getIndex(sqlName);
 			try {
-				if ("INTEGER".equals(var.model.getSqlType())) {
+				if (var.model.getSqlType() == SqlTypes.INTEGER) {
 					rsResult = rs.getInt(index);
 					if (rs.wasNull()) {
 						rsResult = null;
@@ -504,27 +526,27 @@ public class DbManager {
 					if (var.model.hasDefinedValues()) {
 						rsResultDisplay = var.model.getDefinedLabel(rsResult, ctx.getSessionContext().getLocale());
 					}
-				} else if ("BOOLEAN".equals(var.model.getSqlType())) {
+				} else if (var.model.getSqlType() == SqlTypes.BOOLEAN) {
 					rsResult = rs.getBoolean(index);
 					if (var.model.hasDefinedValues()) {
 						rsResultDisplay = var.model.getDefinedLabel(rsResult, ctx.getSessionContext().getLocale());
 					}
-				} else if ("VARCHAR2".equals(var.model.getSqlType()) || "CHAR".equals(var.model.getSqlType())) {
+				} else if (var.model.getSqlType() == SqlTypes.VARCHAR2 || var.model.getSqlType() == SqlTypes.CHAR) {
 					rsResult = rs.getString(index);
 					if (var.model.hasDefinedValues()) {
 						rsResultDisplay = var.model.getDefinedLabel(rsResult, ctx.getSessionContext().getLocale());
 					}
-				} else if ("DATE".equals(var.model.getSqlType())) {
+				} else if (var.model.getSqlType() == SqlTypes.DATE) {
 					rsResult = rs.getDate(index);
 					if (rsResult != null) {
 						rsResultDisplay = defaultDateFormatter.format(rsResult);
 					}
-				} else if ("TIME".equals(var.model.getSqlType())) {
+				} else if (var.model.getSqlType() == SqlTypes.TIME) {
 					rsResult = rs.getTime(index);
 					if (rsResult != null) {
 						rsResultDisplay = defaultTimeFormatter.format(rsResult);
 					}
-				} else if ("TIMESTAMP".equals(var.model.getSqlType())) {
+				} else if (var.model.getSqlType() == SqlTypes.TIMESTAMP) {
 					try {
 						rsResult = rs.getTimestamp(index);
 					} catch (SQLException ex) {
@@ -540,7 +562,7 @@ public class DbManager {
 					if (rsResult != null) {
 						rsResultDisplay = defaultTimestampFormatter.format(rsResult);
 					}
-				} else if ("DECIMAL".equals(var.model.getSqlType())) {
+				} else if (var.model.getSqlType() == SqlTypes.DECIMAL) {
 					rsResult = rs.getBigDecimal(index);
 				} else {
 					LOGGER.warn("Type non géré !!! : " + var.model.getSqlType());
@@ -603,8 +625,8 @@ public class DbManager {
 	 * 
 	 * @return Map <champ,typeSql>
 	 */
-	public Map<String, String> getTypeDonnes(DbQuery dbquery) {
-		Map<String, String> map = new HashMap<String, String>();
+	public Map<String, SqlTypes> getTypeDonnes(DbQuery dbquery) {
+		Map<String, SqlTypes> map = new HashMap<String, SqlTypes>();
 		// Pour chaque variable sélectionnée, on récupère le nom et le type SQL.
 		for (DbQuery.Var var : dbQuery.getOutVars()) {
 			String sqlName = var.model.getSqlName();
@@ -627,7 +649,7 @@ public class DbManager {
 
 				if (byte[].class.getName().equals(className)) {
 					rsResult = (index == null ? rs.getBlob(dbName) : rs.getBlob(index));
-				} else if ("CLOB".equals(eField.getSqlType())) {
+				} else if (eField.getSqlType() == SqlTypes.CLOB) {
 					rsResult = (index == null ? rs.getClob(dbName) : rs.getClob(index));
 				} else {
 					rsResult = (index == null ? rs.getObject(dbName) : rs.getObject(index));
@@ -637,7 +659,7 @@ public class DbManager {
 					// Null values are processed here
 					method.invoke(entity, (Object) null);
 
-					if ("BLOB".equals(eField.getSqlType()) || "CLOB".equals(eField.getSqlType())) {
+					if (eField.getSqlType() == SqlTypes.BLOB || eField.getSqlType() == SqlTypes.CLOB) {
 						method = entity.getClass().getDeclaredMethod(methodName + "Container", FileContainer.class);
 						FileContainer container = new FileContainer();
 						container.setNull(true);
@@ -667,7 +689,7 @@ public class DbManager {
 						method.invoke(entity, Boolean.FALSE);
 					}
 
-				} else if ("BLOB".equals(eField.getSqlType()) || "CLOB".equals(eField.getSqlType())) {
+				} else if (eField.getSqlType() == SqlTypes.BLOB || eField.getSqlType() == SqlTypes.CLOB) {
 					method = entity.getClass().getDeclaredMethod(methodName + "Container", FileContainer.class);
 					FileContainer container = new FileContainer();
 					method.invoke(entity, container);
@@ -709,9 +731,8 @@ public class DbManager {
 				if (eField.isTransient()) {
 					// Skip Memory Vars from all types
 					continue;
-				}
-
-				if ("BOOLEAN".equals(eField.getSqlType())) {
+				} 
+				if (eField.getSqlType() == SqlTypes.BOOLEAN) {
 					Boolean bResult = null;
 					if (result instanceof String) {
 						// On regarde si le champ est un booleen
@@ -728,12 +749,12 @@ public class DbManager {
 						continue;
 					}
 					// FIXME : Time et Timestamp OK ?
-				} else if (result instanceof java.util.Date && !(result instanceof Time) && !"TIMESTAMP".equals(eField.getSqlType())) {
+				} else if (result instanceof java.util.Date && !(result instanceof Time) && eField.getSqlType() != SqlTypes.TIMESTAMP) {
 					java.util.Date date = (java.util.Date) result;
 					result = new java.sql.Date(date.getTime());
 				} else if (result instanceof Geometry) {
 					result = ((Geometry) result).toText();
-				} else if (null == result && ("BLOB".equals(eField.getSqlType()) || "CLOB".equals(eField.getSqlType()))) {
+				} else if (null == result && (eField.getSqlType() == SqlTypes.BLOB || eField.getSqlType() == SqlTypes.CLOB)) {
 					FileContainer container = (FileContainer) entity.invokeGetter(field.getName() + "Container");
 					if (null != container && !container.isNull()) {
 						/* BLOB data exists but has not been loaded, so update is skipped. */

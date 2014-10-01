@@ -5,8 +5,6 @@
 package fr.logica.jsf.exception;
 
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -24,6 +22,7 @@ import javax.faces.event.ExceptionQueuedEventContext;
 
 import org.apache.log4j.Logger;
 
+import fr.logica.application.logic.ApplicationLogic;
 import fr.logica.business.FunctionalException;
 
 /**
@@ -127,11 +126,9 @@ public class LogicaExceptionHandler extends ExceptionHandlerWrapper {
 
 		// Traitement réel de l'erreur
 		try {
-			StringWriter sw = new StringWriter();
-			th.printStackTrace(new PrintWriter(sw, true));
-			String exceptionAsString = sw.toString().replaceAll("\n", "<br />").replaceAll("Caused by:", "<br />Caused by:");
+			String description = new ApplicationLogic().getExceptionHtmlDescription(th);
 			requestMap.put("currentView", th.getMessage());
-			requestMap.put(REQUEST_MAP_EXCEPTION_KEY, th + exceptionAsString);
+			requestMap.put(REQUEST_MAP_EXCEPTION_KEY, description);
 
 			if (fc.getViewRoot() == null) {
 				UIViewRoot root = new UIViewRoot();

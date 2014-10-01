@@ -5,18 +5,15 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
-import java.sql.Timestamp;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 
+import fr.logica.business.EntityField.SqlTypes;
 import fr.logica.business.context.RequestContext;
 import fr.logica.db.DB;
 import fr.logica.utils.Diff;
@@ -27,32 +24,50 @@ public abstract class Entity implements Cloneable {
 	@SuppressWarnings("unused")
 	private static final Logger LOGGER = Logger.getLogger(Entity.class);
 
+	/** Links and related entity currently loaded by user */
 	private Links links = new Links(getModel(), false);
+	/** BackRefs and related entity currently loaded by user */
 	private Links backRefs = new Links(getModel(), true);
 
-	/**
-	 * Copy of Primary Key with "initial" values, just after we got the bean out of database
-	 */
+	/** Copy of Primary Key with "initial" values, just after we got the bean out of database */
 	private Key initialKey = null;
 
+	/** Entity name */
 	public abstract String name();
 
+	/** Entity caption for this instance */
 	public abstract String description();
 
+	/** Cache for all reflexive access on getters / setters to avoid lookups */
+	private static Map<String, Map<String, Method>> reflectCache = new HashMap<String, Map<String, Method>>();
+
+	/** Default constructor */
 	public Entity() {
 		// Default constructor
 	}
 
+	/** Copy constructor - Uses reflexivity */
 	public Entity(Entity e) {
 		for (String f : getModel().getFields()) {
 			invokeSetter(f, e.invokeGetter(f));
 		}
 	}
 
+	/**
+	 * Gets entity metadata (field names, field mandatory, database definition, business actions, etc. 
+	 * @return	EntityModel class loaded from bean annotations
+	 */
 	public EntityModel getModel() {
 		return EntityManager.getEntityModel(name());
 	}
 
+	/** 
+	 * Returns non final fields of this entity. Useful for reflexive calls on all fields
+	 * @return	List of non final java.lang.reflect.Field objects 
+	 * 
+	 * @deprecated use getModel().getFields() instead
+	 */
+	@Deprecated
 	public List<Field> getAllFields() {
 		Field[] fields = this.getClass().getDeclaredFields();
 		List<Field> fList = new ArrayList<Field>();
@@ -65,6 +80,13 @@ public abstract class Entity implements Cloneable {
 		return fList;
 	}
 
+	/** 
+	 * Returns non memory, non final fields of this entity. Useful for reflexive calls on all fields
+	 * @return	List of non final java.lang.reflect.Field objects 
+	 * 
+	 * @deprecated use getModel().getFields() instead coupled with Entity field metadata
+	 */
+	@Deprecated
 	public List<Field> getFields() {
 		Field[] fields = this.getClass().getDeclaredFields();
 		List<Field> fList = new ArrayList<Field>();
@@ -113,6 +135,10 @@ public abstract class Entity implements Cloneable {
 		return dump;
 	}
 
+	/**
+	 * Returns current instance primary key
+	 * @return	Key object based on this entity key model with values
+	 */
 	public final Key getPrimaryKey() {
 		KeyModel km = getModel().getKeyModel();
 		Key key = new Key(km);
@@ -128,22 +154,22 @@ public abstract class Entity implements Cloneable {
 		return key;
 	}
 
-	public final Key getForeignKey(String keyName) {
-		String refEntityName = null;
-		for (String linkName : getModel().getLinkNames()) {
-			if (getModel().getLinkModel(linkName).getKeyName().equals(keyName)) {
-				refEntityName = getModel().getLinkModel(linkName).getRefEntityName();
-			}
+	public final Key getForeignKey(String linkName) {
+		LinkModel linkModel = getModel().getLinkModel(linkName);
+		if (linkModel == null) {
+			linkModel = getModel().getBackRefModel(linkName);
 		}
-		if (refEntityName == null) {
+		if (linkModel == null) {
 			return null;
 		}
 
+		String refEntityName = linkModel.getRefEntityName();
+
 		Key key = new Key(refEntityName);
-		for (int i = 0; i < getModel().getForeignKeyModel(keyName).getFields().size(); i++) {
+		for (int i = 0; i < linkModel.getFields().size(); i++) {
 			Object value = null;
 			try {
-				value = invokeGetter(getModel().getForeignKeyModel(keyName).getFields().get(i));
+				value = invokeGetter(linkModel.getFields().get(i));
 			} catch (Exception e) {
 				value = null;
 			}
@@ -160,8 +186,8 @@ public abstract class Entity implements Cloneable {
 	 * @param key
 	 *            La nouvelle clé primaire valorisée que l'on va référencer avec notre clé étrangère.
 	 */
-	public void setForeignKey(String keyName, Key key) {
-		ForeignKeyModel fk = getModel().getForeignKeyModel(keyName);
+	public void setForeignKey(String linkName, Key key) {
+		LinkModel fk = getModel().getLinkModel(linkName);
 		for (int i = 0; i < fk.getFields().size(); i++) {
 			Object value = null;
 			if (key != null) {
@@ -183,105 +209,54 @@ public abstract class Entity implements Cloneable {
 	}
 
 	public void invokeSetter(String fieldName, Object value) {
-		Object val;
-		Field f;
 		try {
-			f = this.getClass().getDeclaredField(fieldName);
+			String methodName = "set" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
+			if (reflectCache.get(name()) == null) {
+				reflectCache.put(name(), new HashMap<String, Method>());
+			}
+			if (reflectCache.get(name()).get(methodName) == null) {
+				reflectCache.get(name()).put(methodName,
+						this.getClass().getMethod(methodName, this.getClass().getDeclaredField(fieldName).getType()));
+			}
+			reflectCache.get(name()).get(methodName).invoke(this, value);
 		} catch (SecurityException e) {
-			throw new TechnicalException("Impossible de fixer la valeur " + value + " à " + fieldName, e);
-		} catch (NoSuchFieldException e) {
-			throw new TechnicalException("Impossible de fixer la valeur " + value + " à " + fieldName, e);
-		}
-		if (Integer.class.equals(f.getGenericType()) && value instanceof String) {
-			if ("null".equals(value)) {
-				val = null;
-			} else {
-				try {
-					val = Integer.parseInt((String) value);
-				} catch (NumberFormatException ex) {
-					throw new TechnicalException("Impossible de convertir " + value + " en un entier pour l'assigner à " + fieldName);
-				}
-			}
-		} else if (Long.class.equals(f.getGenericType()) && value instanceof String) {
-			if ("null".equals(value)) {
-				val = null;
-			} else {
-				try {
-					val = Long.parseLong((String) value);
-				} catch (NumberFormatException ex) {
-					throw new TechnicalException("Impossible de convertir " + value + " en un Long pour l'assigner à " + fieldName);
-				}
-			}
-		} else if (Timestamp.class.equals(f.getGenericType()) && value instanceof Date) {
-			val = new Timestamp(((Date) value).getTime());
-		} else if (Date.class.equals(f.getGenericType()) && value instanceof String) {
-			if ("null".equals(value)) {
-				val = null;
-			} else {
-				try {
-					SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-					val = sdf.parse((String) value);
-				} catch (ParseException e) {
-					throw new TechnicalException("Impossible de convertir " + value + " en une Date pour l'assigner à " + fieldName);
-				}
-			}
-		} else if (Boolean.class.equals(f.getGenericType()) && value instanceof String) {
-			val = Boolean.valueOf((String) value);
-		} else {
-			val = value;
-		}
-		String methodName = "set" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
-		Method method = null;
-		if (val != null) {
-			try {
-				method = this.getClass().getMethod(methodName, f.getType());
-			} catch (SecurityException e) {
-				throw new TechnicalException("Impossible de fixer la valeur " + value + " à " + fieldName, e);
-			} catch (NoSuchMethodException e) {
-				throw new TechnicalException("Impossible de fixer la valeur " + value + " à " + fieldName, e);
-			}
-		} else {
-			for (int i = 0; i < this.getClass().getDeclaredMethods().length; i++) {
-				Method m = this.getClass().getDeclaredMethods()[i];
-				if (methodName.equals(m.getName())) {
-					method = m;
-				}
-			}
-		}
-		try {
-			method.invoke(this, val);
-		} catch (SecurityException e) {
-			throw new TechnicalException("Impossible de fixer la valeur " + value + " à " + fieldName, e);
+			throw new TechnicalException("Unable to set value " + value + " in field " + fieldName, e);
+		} catch (NoSuchMethodException e) {
+			throw new TechnicalException("Unable to set value " + value + " in field " + fieldName, e);
 		} catch (IllegalArgumentException e) {
-			throw new TechnicalException("Impossible de fixer la valeur " + value + " à " + fieldName, e);
+			throw new TechnicalException("Unable to set value " + value + " in field " + fieldName, e);
 		} catch (IllegalAccessException e) {
-			throw new TechnicalException("Impossible de fixer la valeur " + value + " à " + fieldName, e);
+			throw new TechnicalException("Unable to set value " + value + " in field " + fieldName, e);
 		} catch (InvocationTargetException e) {
-			throw new TechnicalException("Impossible de fixer la valeur " + value + " à " + fieldName, e);
+			throw new TechnicalException("Unable to set value " + value + " in field " + fieldName, e);
+		} catch (NoSuchFieldException e) {
+			throw new TechnicalException("Unable to set value " + value + " in field " + fieldName, e);
 		}
 	}
 
 	public Object invokeGetter(String fieldName) {
-		String methodName = "get" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
-		Object result = null;
 		try {
-			Method method = this.getClass().getMethod(methodName);
-
-			result = method.invoke(this);
+			String methodName = "get" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
+			if (reflectCache.get(name()) == null) {
+				reflectCache.put(name(), new HashMap<String, Method>());
+			}
+			if (reflectCache.get(name()).get(methodName) == null) {
+				reflectCache.get(name()).put(methodName, this.getClass().getMethod(methodName));
+			}
+			return reflectCache.get(name()).get(methodName).invoke(this);
 		} catch (SecurityException e) {
-			throw new TechnicalException("Impossible d'invoquer la methode " + methodName, e);
+			throw new TechnicalException("Unable to get value from field " + fieldName, e);
 		} catch (IllegalArgumentException e) {
-			throw new TechnicalException("Impossible d'invoquer la methode " + methodName, e);
+			throw new TechnicalException("Unable to get value from field " + fieldName, e);
 		} catch (IllegalAccessException e) {
-			throw new TechnicalException("Impossible d'invoquer la methode " + methodName, e);
+			throw new TechnicalException("Unable to get value from field " + fieldName, e);
 		} catch (InvocationTargetException e) {
-			throw new TechnicalException("Impossible d'invoquer la methode " + methodName, e);
+			throw new TechnicalException("Unable to get value from field " + fieldName, e);
 		} catch (NoSuchMethodException e) {
-			throw new TechnicalException("Impossible d'invoquer la methode " + methodName, e);
+			throw new TechnicalException("Unable to get value from field " + fieldName, e);
 		}
-		return result;
 	}
-	
+
 	public Links getLinks() {
 		return links;
 	}
@@ -317,56 +292,6 @@ public abstract class Entity implements Cloneable {
 	}
 
 	/**
-	 * Inserts the current bean in database
-	 * 
-	 * @param ctx
-	 *            Current context with opened database connection
-	 */
-	public void insert(RequestContext ctx) {
-		DB.insert(this, ctx);
-	}
-
-	/**
-	 * Persists the current bean in database
-	 * 
-	 * @param ctx
-	 *            Current context with opened database connection
-	 */
-	public void persist(RequestContext ctx) {
-		DB.persist(this, ctx);
-	}
-
-	/**
-	 * Removes the current bean in database
-	 * 
-	 * @param ctx
-	 *            Current context with opened database connection
-	 */
-	public void remove(RequestContext ctx) {
-		DB.remove(this, ctx);
-	}
-
-	/**
-	 * Finds and loads bean from database based on its current primary key.
-	 * 
-	 * @param ctx
-	 *            Current context with opened database connection
-	 * @return <code>true</code> if the bean has been found and loaded, <code>false</code> if primary key is not full or if no matching bean has
-	 *         been found.
-	 */
-	public boolean find(RequestContext ctx) {
-		if (!getPrimaryKey().isFull()) {
-			return false;
-		}
-		Entity dbInstance = DB.get(name(), getPrimaryKey(), ctx);
-		if (dbInstance != null) {
-			syncFromBean(dbInstance);
-			return true;
-		}
-		return false;
-	}
-
-	/**
 	 * Compares the current instance to corresponding data in database. This method will access database using context ctx and compare all fields
 	 * stored in database. BLOB and CLOB fields are ignored. transient variables are ignored.
 	 * 
@@ -391,7 +316,7 @@ public abstract class Entity implements Cloneable {
 			if (fieldMetadata.isTransient()) {
 				continue; // We don't care about transient data
 			}
-			if ("BLOB".equals(fieldMetadata.getSqlType())) {
+			if (SqlTypes.BLOB == fieldMetadata.getSqlType()) {
 				continue; // We don't care about BLOBs
 			}
 			Object obj = invokeGetter(fieldName);
@@ -427,7 +352,7 @@ public abstract class Entity implements Cloneable {
 			Object thatValue = that.invokeGetter(fieldName);
 			if (thisValue == null && thatValue != null || thisValue != null && !thisValue.equals(thatValue)) {
 				String label = MessageUtils.getInstance(ctx).getGenLabel(this.getModel().name() + "." + fieldName);
-				if ("BLOB".equals(fieldMetadata.getSqlType()) || "CLOB".equals(fieldMetadata.getSqlType())) {
+				if (SqlTypes.BLOB == fieldMetadata.getSqlType() || SqlTypes.CLOB == fieldMetadata.getSqlType()) {
 					result.put(fieldName, new Diff(label));
 				} else {
 					result.put(fieldName, new Diff(label, thisValue, thatValue));

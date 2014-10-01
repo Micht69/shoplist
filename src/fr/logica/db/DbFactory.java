@@ -2,8 +2,8 @@ package fr.logica.db;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
+import fr.logica.application.ApplicationDescriptor;
 import fr.logica.business.Constants;
 import fr.logica.business.TechnicalException;
 import fr.logica.business.context.RequestContext;
@@ -20,17 +20,13 @@ public class DbFactory {
 		QUERY_MAIN_ENTITY = new HashMap<String, String>();
 	}
 
-	@SuppressWarnings("unchecked")
 	private static void initialize() {
 		if (DbConnection.getDbType() == null) {
 			// dbType is not set yet, we'll initialize later
 			return;
 		}
-		Class<?> appDescriptor;
 		try {
-			appDescriptor = Class.forName("fr.logica.application.ApplicationDescriptor");
-			Set<String> domains = (Set<String>) appDescriptor.getMethod("getDomains").invoke(appDescriptor);
-			for (String domain : domains) {
+			for (String domain : ApplicationDescriptor.getDomains()) {
 				String className = Constants.QUERIES_PACKAGE + "." + domain.substring(0, 1).toUpperCase() + domain.substring(1)
 						+ Constants.EXTENSION_QUERY;
 
@@ -48,9 +44,6 @@ public class DbFactory {
 	/**
 	 * Creates a new query.
 	 * 
-	 * @param ctx Current context.
-	 * @param entityName Domain object's name to query.
-	 * @param queryName Name of the query to execute.
 	 * @return a new DbQuery object.
 	 */
 	public DbEntity createDbEntity() {
@@ -101,6 +94,17 @@ public class DbFactory {
 	}
 
 	/**
+	 * Creates a new default query.
+	 * 
+	 * @param ctx Current context.
+	 * @param entityName Domain object's name to query.
+	 * @return a new DbQuery object.
+	 */
+	public synchronized DbQuery getQuery(RequestContext ctx, String entityName) {
+		return getDbQuery(ctx, entityName, DomainUtils.createDbName(entityName));
+	}
+
+	/**
 	 * Creates a new query.
 	 * 
 	 * @param ctx Current context.
@@ -108,10 +112,6 @@ public class DbFactory {
 	 * @param queryName Name of the query to execute.
 	 * @return a new DbQuery object.
 	 */
-	public synchronized DbQuery getQuery(RequestContext ctx, String entityName) {
-		return getDbQuery(ctx, entityName, DomainUtils.createDbName(entityName));
-	}
-
 	public synchronized DbQuery getDbQuery(RequestContext ctx, String entityName, String queryName) {
 		if (entityName == null || "".equals(entityName)) {
 			return null;

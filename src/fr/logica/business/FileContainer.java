@@ -28,7 +28,7 @@ public class FileContainer implements Serializable {
 	/** File content. */
 	private byte[] content;
 
-	// FIXME remove this var. test the var content instead
+	/** Is the content null ? (not link to content size to avoid loading content if not needed) */
 	private boolean isNull;
 
 	public String getName() {

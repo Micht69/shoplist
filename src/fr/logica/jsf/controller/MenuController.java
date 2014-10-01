@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.faces.context.FacesContext;
+
 import fr.logica.business.context.RequestContext;
 import fr.logica.business.controller.BusinessController;
 import fr.logica.ui.UiManager;
@@ -20,6 +22,10 @@ public class MenuController implements Serializable {
 	private SessionController sessionCtrl;
 
 	public void executeMenuQueries() {
+		if ("true".equals(FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("javax.faces.partial.ajax"))) {
+			// Ajax call, no need to initialize
+			return;
+		}
 		Map<String, String[]> menuQueries = UiManager.getMenuQueries();
 		RequestContext context = null;
 		try {

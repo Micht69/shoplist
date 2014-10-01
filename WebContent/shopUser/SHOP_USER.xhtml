@@ -17,12 +17,12 @@
 		<tr>
 			<td width="1%" style="text-align: left; white-space: nowrap;">
 				<div id="advanced-actions">
-	    			<h:panelGroup rendered="#{commentCtrl.commentsEnabled}">
+					<h:panelGroup rendered="#{commentCtrl.commentsEnabled}">
 						<h:commandLink id="commentAction" styleClass="btn_comment" value="#{commentCtrl.commentsCount('shopUser', jsfCtrl.entity.primaryKey.encodedValue)}" title="#{jsfCtrl.getXhtmlLabel('labels', 'boutons.comment')}" onclick="commentPage();">
 							<f:ajax event="click" execute="@none" render="comment-list" />
 						</h:commandLink>
-	    				<ui:include src="../includes/comment.xhtml" />
-	    			</h:panelGroup>
+						<ui:include src="../includes/comment.xhtml" />
+					</h:panelGroup>
 					<h:outputText value=" "/>
 					<h:commandButton id="printAction" styleClass="btn_print" image="../static/img/buttons/print.png" title="#{jsfCtrl.getXhtmlLabel('labels', 'boutons.print')}" onclick="window.print(); return false;" />
 					<h:outputText value=" "/>
@@ -39,102 +39,66 @@
 	</table>
 	</div>
 	<h:panelGroup id="i0_shopUser" rendered="#{jsfCtrl.uiGroupPanel('', 'shopUser', 'shopUser').visible}" layout="none">
-		<table class="group_table">
-			<tr>
-				<td class="group_table_col_1">
-					<ui:fragment rendered="#{jsfCtrl.isVisible('shopUser.login')}">
-						<table class="#{!jsfCtrl.isValid('mainForm:shopUser_shopUser_login') ? 'error' : ''}">
-							<tr>
-								<td class="colFieldSetLeft">
-									<h:outputLabel id="i1_shopUser_shopUser_login" escape="false" value="#{jsfCtrl.getLabel('shopUser.login', 'shopUser.shopUser.login')}" title="#{jsfCtrl.getXhtmlLabel('tooltips', 'shopUser.shopUser.login')}"/>
-									<h:outputLabel value="*" styleClass="mandatory_label" rendered="#{jsfCtrl.isMandatory('shopUser.login')}"/>
-								</td>
-								<td class="colFieldSetMid">
-									<h:outputLabel value=":" />
-								</td>
-								<td class="colFieldSetRight">
-									<h:inputText style=""  disabled="#{jsfCtrl.readonly('','shopUser','login')}" id="i0_shopUser_shopUser_login" value="#{jsfCtrl.entity.login}" label="#{jsfCtrl.getLabel('shopUser.login', 'shopUser.login')}" maxlength="10" onkeypress="markAsDirty(this)">
-										<f:validateRequired disabled="#{param['skipRequired'] == true}" />
-										<f:validateLength maximum="10" />
-									</h:inputText>
-									<h:message for="i0_shopUser_shopUser_login" styleClass="errorLabel" />
-								</td>
-							</tr>
-						</table>
-					</ui:fragment>
-				</td>
-			</tr>
-			<tr>
-				<td class="group_table_col_1">
-					<ui:fragment rendered="#{jsfCtrl.isVisible('shopUser.name')}">
-						<table class="#{!jsfCtrl.isValid('mainForm:shopUser_shopUser_name') ? 'error' : ''}">
-							<tr>
-								<td class="colFieldSetLeft">
-									<h:outputLabel id="i1_shopUser_shopUser_name" escape="false" value="#{jsfCtrl.getLabel('shopUser.name', 'shopUser.shopUser.name')}" title="#{jsfCtrl.getXhtmlLabel('tooltips', 'shopUser.shopUser.name')}"/>
-									<h:outputLabel value="*" styleClass="mandatory_label" rendered="#{jsfCtrl.isMandatory('shopUser.name')}"/>
-								</td>
-								<td class="colFieldSetMid">
-									<h:outputLabel value=":" />
-								</td>
-								<td class="colFieldSetRight">
-									<h:inputText style=""  disabled="#{jsfCtrl.readonly('','shopUser','name')}" id="i0_shopUser_shopUser_name" value="#{jsfCtrl.entity.name}" label="#{jsfCtrl.getLabel('shopUser.name', 'shopUser.name')}" maxlength="100" onkeypress="markAsDirty(this)">
-										<f:validateRequired disabled="#{param['skipRequired'] == true}" />
-										<f:validateLength maximum="100" />
-									</h:inputText>
-									<h:message for="i0_shopUser_shopUser_name" styleClass="errorLabel" />
-								</td>
-							</tr>
-						</table>
-					</ui:fragment>
-				</td>
-			</tr>
-			<tr>
-				<td class="group_table_col_1">
-					<ui:fragment rendered="#{jsfCtrl.isVisible('shopUser.password')}">
-						<table class="#{!jsfCtrl.isValid('mainForm:shopUser_shopUser_password') ? 'error' : ''}">
-							<tr>
-								<td class="colFieldSetLeft">
-									<h:outputLabel id="i1_shopUser_shopUser_password" escape="false" value="#{jsfCtrl.getLabel('shopUser.password', 'shopUser.shopUser.password')}" title="#{jsfCtrl.getXhtmlLabel('tooltips', 'shopUser.shopUser.password')}"/>
-									<h:outputLabel value="*" styleClass="mandatory_label" rendered="#{jsfCtrl.isMandatory('shopUser.password')}"/>
-								</td>
-								<td class="colFieldSetMid">
-									<h:outputLabel value=":" />
-								</td>
-								<td class="colFieldSetRight">
-									<h:inputSecret disabled="#{jsfCtrl.readonly('shopUser.password')}" id="i0_shopUser_shopUser_password" value="#{jsfCtrl.entity.password}" label="#{jsfCtrl.getLabel('shopUser.password', 'shopUser.password')}" onkeypress="markAsDirty(this)">
-									</h:inputSecret>
-									<h:message for="i0_shopUser_shopUser_password" styleClass="errorLabel" />
-								</td>
-							</tr>
-						</table>
-					</ui:fragment>
-				</td>
-			</tr>
-			<tr>
-				<td class="group_table_col_1">
-					<ui:fragment rendered="#{jsfCtrl.isVisible('shopUser.profile')}">
-						<table class="#{!jsfCtrl.isValid('mainForm:shopUser_shopUser_profile') ? 'error' : ''}">
-							<tr>
-								<td class="colFieldSetLeft">
-									<h:outputLabel id="i1_shopUser_shopUser_profile" escape="false" value="#{jsfCtrl.getLabel('shopUser.profile', 'shopUser.shopUser.profile')}" title="#{jsfCtrl.getXhtmlLabel('tooltips', 'shopUser.shopUser.profile')}"/>
-									<h:outputLabel value="*" styleClass="mandatory_label" rendered="#{jsfCtrl.isMandatory('shopUser.profile')}"/>
-								</td>
-								<td class="colFieldSetMid">
-									<h:outputLabel value=":" />
-								</td>
-								<td class="colFieldSetRight">
-									<h:selectOneMenu disabledClass="disabledCombo" disabled="#{jsfCtrl.readonly('shopUser.profile')}" id="i0_shopUser_shopUser_profile" value="#{jsfCtrl.entity.profile}" label="#{jsfCtrl.getLabel('shopUser.profile', 'shopUser.profile')}"  onchange="markAsDirty(this)">
-									
-										<f:selectItems value="#{jsfCtrl.enumValues(jsfCtrl.entity,'profile')}" />
-									</h:selectOneMenu>
-									<h:message for="i0_shopUser_shopUser_profile" styleClass="errorLabel" />
-								</td>
-							</tr>
-						</table>
-					</ui:fragment>
-				</td>
-			</tr>
-		</table>
+		<div class="group">
+			<div class="col col-1">
+				<ui:fragment rendered="#{jsfCtrl.isVisible('shopUser.login')}">
+					<div class="col-label">
+						<h:outputLabel id="i1_shopUser_shopUser_login" escape="false" value="#{jsfCtrl.getLabel('shopUser.login', 'shopUser.shopUser.login')}" title="#{jsfCtrl.getXhtmlLabel('tooltips', 'shopUser.shopUser.login')}"/>
+						<h:outputLabel value="*" styleClass="mandatory_label" rendered="#{jsfCtrl.isMandatory('shopUser.login')}"/>
+					</div>
+					<div class="col-value">
+						<h:inputText style=""  disabled="#{jsfCtrl.readonly('','shopUser','login')}" id="i0_shopUser_shopUser_login" value="#{jsfCtrl.entity.login}" label="#{jsfCtrl.getLabel('shopUser.login', 'shopUser.login')}" maxlength="10" onkeypress="markAsDirty(this)">
+							<f:validateRequired disabled="#{param['skipRequired'] == true}" />
+							<f:validateLength maximum="10" />
+						</h:inputText>
+						<h:message for="i0_shopUser_shopUser_login" styleClass="errorLabel" />
+					</div>
+				</ui:fragment>
+			</div>
+			<div class="col col-1">
+				<ui:fragment rendered="#{jsfCtrl.isVisible('shopUser.name')}">
+					<div class="col-label">
+						<h:outputLabel id="i1_shopUser_shopUser_name" escape="false" value="#{jsfCtrl.getLabel('shopUser.name', 'shopUser.shopUser.name')}" title="#{jsfCtrl.getXhtmlLabel('tooltips', 'shopUser.shopUser.name')}"/>
+						<h:outputLabel value="*" styleClass="mandatory_label" rendered="#{jsfCtrl.isMandatory('shopUser.name')}"/>
+					</div>
+					<div class="col-value">
+						<h:inputText style=""  disabled="#{jsfCtrl.readonly('','shopUser','name')}" id="i0_shopUser_shopUser_name" value="#{jsfCtrl.entity.name}" label="#{jsfCtrl.getLabel('shopUser.name', 'shopUser.name')}" maxlength="100" onkeypress="markAsDirty(this)">
+							<f:validateRequired disabled="#{param['skipRequired'] == true}" />
+							<f:validateLength maximum="100" />
+						</h:inputText>
+						<h:message for="i0_shopUser_shopUser_name" styleClass="errorLabel" />
+					</div>
+				</ui:fragment>
+			</div>
+			<div class="col col-1">
+				<ui:fragment rendered="#{jsfCtrl.isVisible('shopUser.password')}">
+					<div class="col-label">
+						<h:outputLabel id="i1_shopUser_shopUser_password" escape="false" value="#{jsfCtrl.getLabel('shopUser.password', 'shopUser.shopUser.password')}" title="#{jsfCtrl.getXhtmlLabel('tooltips', 'shopUser.shopUser.password')}"/>
+						<h:outputLabel value="*" styleClass="mandatory_label" rendered="#{jsfCtrl.isMandatory('shopUser.password')}"/>
+					</div>
+					<div class="col-value">
+						<h:inputSecret disabled="#{jsfCtrl.readonly('shopUser.password')}" id="i0_shopUser_shopUser_password" value="#{jsfCtrl.entity.password}" label="#{jsfCtrl.getLabel('shopUser.password', 'shopUser.password')}" onkeypress="markAsDirty(this)">
+						</h:inputSecret>
+						<h:message for="i0_shopUser_shopUser_password" styleClass="errorLabel" />
+					</div>
+				</ui:fragment>
+			</div>
+			<div class="col col-1">
+				<ui:fragment rendered="#{jsfCtrl.isVisible('shopUser.profile')}">
+					<div class="col-label">
+						<h:outputLabel id="i1_shopUser_shopUser_profile" escape="false" value="#{jsfCtrl.getLabel('shopUser.profile', 'shopUser.shopUser.profile')}" title="#{jsfCtrl.getXhtmlLabel('tooltips', 'shopUser.shopUser.profile')}"/>
+						<h:outputLabel value="*" styleClass="mandatory_label" rendered="#{jsfCtrl.isMandatory('shopUser.profile')}"/>
+					</div>
+					<div class="col-value">
+						<h:selectOneMenu disabledClass="disabledCombo" disabled="#{jsfCtrl.readonly('shopUser.profile')}" id="i0_shopUser_shopUser_profile" value="#{jsfCtrl.entity.profile}" label="#{jsfCtrl.getLabel('shopUser.profile', 'shopUser.profile')}"  onchange="markAsDirty(this)">
+						
+							<f:selectItems value="#{jsfCtrl.enumValues(jsfCtrl.entity,'profile')}" />
+						</h:selectOneMenu>
+						<h:message for="i0_shopUser_shopUser_profile" styleClass="errorLabel" />
+					</div>
+				</ui:fragment>
+			</div>
+		</div>
 	</h:panelGroup>
 	<div class="actions bottomActions">
 	<table style="width: 100%">

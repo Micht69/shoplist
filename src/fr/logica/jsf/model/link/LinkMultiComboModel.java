@@ -2,10 +2,12 @@ package fr.logica.jsf.model.link;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import fr.logica.business.Action;
 import fr.logica.business.Action.UserInterface;
@@ -33,9 +35,6 @@ public class LinkMultiComboModel extends DataModel {
 	/** Links between reference entity and multi combo deepest entity */
 	private List<String> linkNames;
 
-	/** Foreign key name for each link */
-	private Map<String, String> keyNames;
-
 	/** Combo data for each link */
 	private Map<String, ComboData> data;
 
@@ -50,13 +49,10 @@ public class LinkMultiComboModel extends DataModel {
 		this.linkNames = new ArrayList<String>();
 		this.data = new HashMap<String, ComboData>();
 		this.selectedValue = new HashMap<String, String>();
-		this.keyNames = new HashMap<String, String>();
 
 		for (String linkName : multiCombolinkName.split("#")) {
 			linkNames.add(linkName);
-			String keyName = sourceEntity.getModel().getLinkModel(linkName).getKeyName();
-			keyNames.put(linkName, keyName);
-			Key fk = sourceEntity.getForeignKey(keyName);
+			Key fk = sourceEntity.getForeignKey(linkName);
 			if (fk.isFull()) {
 				this.selectedValue.put(linkName, fk.getEncodedValue());
 			}
@@ -78,23 +74,22 @@ public class LinkMultiComboModel extends DataModel {
 			data.put(rootLinkName, bc.getLinkComboData(sourceEntity, entityName, rootLinkName, null, action, context));
 		}
 
-		Key fk = sourceEntity.getForeignKey(keyNames.get(linkNames.get(0)));
-		sourceEntity.setForeignKey(keyNames.get(linkNames.get(0)), null);
+		Key fk = sourceEntity.getForeignKey(linkNames.get(0));
+		sourceEntity.setForeignKey(linkNames.get(0), null);
 		for (int i = nbLinks - 1; i > 0; i--) {
 			// load every combo when parent combo has a selected value
 			String linkName = linkNames.get(i - 1);
 			if (selectedValue.get(linkNames.get(i)) != null) {
-				String keyName = keyNames.get(linkNames.get(i));
-				KeyModel fkModel = sourceEntity.getForeignKey(keyName).getModel();
+				KeyModel fkModel = sourceEntity.getForeignKey(linkNames.get(i)).getModel();
 				Key foreignKey = new Key(fkModel);
 				foreignKey.setEncodedValue(selectedValue.get(linkNames.get(i)));
-				sourceEntity.setForeignKey(keyNames.get(linkNames.get(i)), foreignKey);
+				sourceEntity.setForeignKey(linkNames.get(i), foreignKey);
 				data.put(linkName, bc.getLinkComboData(sourceEntity, entityName, linkName, null, action, context));
 			} else {
 				data.put(linkName, null);
 			}
 		}
-		sourceEntity.setForeignKey(keyNames.get(linkNames.get(0)), fk);
+		sourceEntity.setForeignKey(linkNames.get(0), fk);
 
 		if (linkNames.get(linkNames.size() - 1).equals(viewCtrl.getCurrentView().getLinkName())
 				|| viewCtrl.getCurrentView().getAction().getUi() == UserInterface.READONLY) {
@@ -106,17 +101,16 @@ public class LinkMultiComboModel extends DataModel {
 
 	public void updateKey(String linkName) {
 		// Clear all fields from foreign key
-		sourceEntity.setForeignKey(keyNames.get(linkNames.get(0)), null);
+		sourceEntity.setForeignKey(linkNames.get(0), null);
 
 		Key fk = null;
-		String keyName = keyNames.get(linkName);
-		KeyModel fkModel = sourceEntity.getForeignKey(keyName).getModel();
+		KeyModel fkModel = sourceEntity.getForeignKey(linkName).getModel();
 		if (selectedValue.get(linkName) != null) {
 			fk = new Key(fkModel);
 			fk.setEncodedValue(selectedValue.get(linkName));
 		}
 		// Set foreign key selected via combo
-		sourceEntity.setForeignKey(keyName, fk);
+		sourceEntity.setForeignKey(linkName, fk);
 
 		// After updating a combo, clear all sub-combos
 		boolean parentChanged = false;
@@ -138,10 +132,33 @@ public class LinkMultiComboModel extends DataModel {
 
 	/** Values displayed in comboboxes */
 	public Map<String, String> getComboValues(String linkName) {
+		// Combos are "reversed", labels are the keys and keys are values. This is the JSF2 way to ensure unicity of labels.
 		Map<String, String> map = new LinkedHashMap<String, String>();
+		// Handle labels that appear more than once
+		Set<String> existingLabels = new HashSet<String>();
 		if (data.get(linkName) != null) {
 			for (Entry<Key, String> e : data.get(linkName).getComboValues().entrySet()) {
-				map.put(e.getValue(), e.getKey().getEncodedValue());
+				if (map.containsKey(e.getValue())) {
+					// This label already exists in map, flag it as a
+					existingLabels.add(e.getValue());
+					// Get existing label value
+					String existingKey = map.get(e.getValue());
+					// Build a new unique label
+					String replacementLabel = e.getValue() + " (" + existingKey + ")";
+					// Remove from map and put new unique label inside
+					map.remove(e.getValue());
+					map.put(replacementLabel, existingKey);
+					// Add the new label
+					String uniqueLabel = e.getValue() + " (" + e.getKey().getEncodedValue() + ")";
+					map.put(uniqueLabel, e.getKey().getEncodedValue());
+				} else if (existingLabels.contains(e.getValue())) {
+					// Label already used, make it unique !
+					String uniqueLabel = e.getValue() + " (" + e.getKey().getEncodedValue() + ")";
+					map.put(uniqueLabel, e.getKey().getEncodedValue());
+				} else {
+					// Already unique label, just put it into the map
+					map.put(e.getValue(), e.getKey().getEncodedValue());
+				}
 			}
 		}
 		return map;

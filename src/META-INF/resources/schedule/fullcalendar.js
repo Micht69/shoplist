@@ -5297,39 +5297,53 @@ $.fullCalendar.setDefaults({
 	theme: true,
 
 	dayClick: function(date, allDay, jsEvent, view) {
-		saveEventData(this, 'date', date.getTime(), false);
+		saveEventData(this, 'date', date.getTime());
 	},
 
 	eventClick: function(event, jsEvent, view) {
-		saveEventData(this, 'selectedEvent', event.id, false);
-		var schedule = $(this).parents(".fc");
-		schedule.find('.fc-event').removeClass('fc-event-selected');
+		var $fcEvent = $(this);
+		var $schedule = $fcEvent.parents(".fc");
+		var count = $schedule.data('count') || 0;
 
-		if (jsEvent && jsEvent.currentTarget) {
-			$(jsEvent.currentTarget).addClass('fc-event-selected');
+		if ($fcEvent.hasClass('fc-event-selected')) {
+			$fcEvent.removeClass('fc-event-selected');
+			$schedule.parent().find('input[value="' + event.id + '"]').remove();
+			$fcEvent.find('.fc-event-head').find('.ui-icon-check').remove();
+
+		} else {
+			$fcEvent.addClass('fc-event-selected');
+			saveEventData(this, 'event-' + (++count), event.id, 'fc-event-selected');
+			$fcEvent.find('.fc-event-head').append('<div class="ui-icon ui-icon-check"></div>');
+			$schedule.data('count', count);
 		}
 
-		if (!schedule.data('fullCalendar').options.editable) {
-			var id = schedule.attr('id');
+		if (!$schedule.data('fullCalendar').options.editable) {
+			var id = $schedule.attr('id');
 			var linkName = id.substring(id.indexOf('schedule_') + 9, id.lastIndexOf('_'));
 			var entityName = id.substr(id.lastIndexOf('_') + 1);
 			launchLinkAction(linkName, entityName, 5, 5, event.id);
 		} else {
-			$(this).parents('.schedule').parent().parent().find('.actions').find('input[type="submit"]').attr('disabled', false);
+			var isEnabled = $schedule.parent().find('input.fc-event-selected').length > 0;
+			$schedule.parent().parent().parent().find('.listButtons').find('input[type="submit"]').attr('disabled', !isEnabled);
 		}
 	},
 
 	eventDrop: function(event, dayDelta, minuteDelta, allDay, revertFunc, jsEvent, ui, view) {
-		saveEventData(this, 'event-' + event.id, event.start.getTime() + '-' + event.end.getTime(), true);
+		scheduleAjaxCall(this, event, jsEvent);
 	},
 
 	eventResize: function(event, dayDelta, minuteDelta, revertFunc, jsEvent, ui, view) {
-		saveEventData(jsEvent.target, 'event-' + event.id, event.start.getTime() + '-' + event.end.getTime(), true);
+		scheduleAjaxCall(this, event, jsEvent);
 	},
 
 	eventRender: function(event, element, view) {
 		if (event.filtered) {
 			return false;
+		}
+		var $schedule = element.parents(".fc");
+		if ($schedule.parent().find('input[value="' + event.id + '"]').length > 0) {
+			element.addClass('fc-event-selected');
+			element.find('.fc-event-head').append('<div class="ui-icon ui-icon-check"></div>');
 		}
 	}
 
@@ -5345,28 +5359,51 @@ function scheduleDayClick(ui, date, linkName, entityName) {
 	$('input[id$="' + scheduleName + '_launchAction"]').click();
 }
 
-function saveEventData(ui, key, value, change) {
+function saveEventData(ui, key, value, styleClass) {
 	var schedule = $(ui).parents(".fc");
 	var container = schedule.parent();
-	var id = container.attr('id');
-	id = id.substring(0, id.length - 10);
+	var id = schedule.attr('id');
 	var key2 = key.replaceAll(':', '\\:');
 
 	var input = $('#' + id.replaceAll(':', '\\:') + '-' + key2);
 
 	if (input.length == 0) {
 		input = $('<input type="hidden" id="' + id + '-' + key + '" name="' + id + '-' + key + '" />');
+		if (styleClass) {
+			input.addClass(styleClass);
+		}
 		container.append(input);
 	}
 	input.val(value);
+}
 
-	if (change) {
-		var onchange = schedule.data('fullCalendar').options.onchange;
+function handleScheduleAjaxEvent(data) {
+	if (data.status === "success") {
+		var $schedule = $(data.source);
+		var xml = data.responseXML;
 
-		if (onchange) {
-			eval(onchange);
+		if ($schedule.length > 0 && xml) {
+			var xmlEvents = xml.getElementsByTagName('extension')[0];
+			var scheduleId = xmlEvents.getAttribute('id');
+			var events = eval(xmlEvents.firstChild.nodeValue);
+			$schedule.fullCalendar('removeEvents');
+			$schedule.fullCalendar('addEventSource', events);
+			filterEvents($('#mainForm\\:globalFilter_' + scheduleId).val(), scheduleId);
 		}
 	}
+};
+
+function scheduleAjaxCall(domElement, event, jsEvent) {
+	var scheduleId = $(domElement).parents(".fc").attr("id");
+	var ajaxOptions = {
+			execute: scheduleId,
+			render: "mainForm:messages " + scheduleId,
+			onevent: handleScheduleAjaxEvent
+	};
+	ajaxOptions[scheduleId + '-ajax-event-id'] = event.id;
+	ajaxOptions[scheduleId + '-ajax-event-start'] = event.start.getTime();
+	ajaxOptions[scheduleId + '-ajax-event-end'] = event.end.getTime();
+	jsf.ajax.request(scheduleId, jsEvent, ajaxOptions);
 }
 
 function filterEvents(filter, scheduleId) {

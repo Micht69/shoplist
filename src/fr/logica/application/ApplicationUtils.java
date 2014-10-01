@@ -5,7 +5,7 @@ import org.apache.log4j.Logger;
 import fr.logica.business.context.ApplicationContext;
 
 /**
- * Utility class used to retrieve {@link ApplicationLogic}.
+ * Utility class used to retrieve the {@link AbstractApplicationLogic} instance.
  */
 public class ApplicationUtils {
 

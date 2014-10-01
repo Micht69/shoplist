@@ -1,24 +1,24 @@
 
 /* The mainForm immediately starts with a table to set elements in one column. No top-padding on the first block, following paddings are set in the skin */
-#mainForm > .inner-content > .group_table > tbody > tr:first-child > td {
+#mainForm > .inner-content > .group:first-child {
 	padding-top: 0px;
 }
 
 /* Block titles */
-.group_table .form_container > .form_title,
+.group .form_container > .form_title,
 .mainTable_container > .table_title,
 .lineTitle,
 .jw-widget .jw-header, .jw-widget .jw-footer {
 	cursor: pointer;
 }
 
-.group_table .form_container > .form_title,
+.group .form_container > .form_title,
 form > .form_container > .form_title,
 .mainTable_container > .table_title {
 	cursor: default;
 }
 
-.group_table .form_container > .form_title > img.actionContent,
+.group .form_container > .form_title > img.actionContent,
 form > .form_container > .form_title > img.actionContent,
 .mainTable_container > .table_title > img.actionContent {
 	vertical-align: bottom;
@@ -26,8 +26,8 @@ form > .form_container > .form_title > img.actionContent,
 }
 
 .form_container,
-.group_table .form_container > .group_table,
-form > .form_container > .group_table,
+.group .form_container > .group,
+form > .form_container > .group,
 .mainTable_container > .table_container {
 	border-top: 0;
 	padding: 9px 0;
@@ -41,7 +41,7 @@ form > .form_container {
 	padding: 0;
 }
 
-.form_container .group_table > tbody > tr:last-child > td {
+.form_container .group:last-child {
 	padding-bottom: 9px;
 }
 
@@ -70,19 +70,19 @@ input.dateTime ~ img {
 	display: none;
 }
 
-.colFieldSetRight a ~ a {
+.col-value a ~ a {
 	margin-left: 7px;
 }
 
-.colFieldSetRight a:last-child {
+.col-value a:last-child {
 	margin-left: 2px;
 }
 
-.colFieldSetRight a:only-child {
+.col-value a:only-child {
 	margin-left: 0;
 }
 
-.colFieldSetRight a.ui-slider-handle {
+.col-value a.ui-slider-handle {
 	margin-left: -.6em;
 }
 
@@ -124,136 +124,146 @@ button.btn_large {
 	        border-radius: 0 4px 4px 0;
 }
 
-.group_table,
-.group_table table {
+.group,
+.group .col {
 	width: 100%;
 	border-collapse: collapse;
 }
 
-.group_table > tbody > tr > td {
+.group > .col {
 	padding-bottom: 4px;
 	vertical-align: top;
 }
 
-.group_table_col_2 {
-	width: 50%;
+.group .col-1,
+.group .col-2 {
+	display: inline-block;
 }
 
-.colFieldSetLeft,
-.colFieldSetMid,
-.colFieldSetRight {
+.group .col-1 {
+	width: 100%;
+}
+
+.group .col-2 {
+	width: 49%;
+	width: calc(50% - 2px);
+}
+
+.col-label,
+.col-value {
 	height: auto;
 	padding-top: 10px;
 	vertical-align: middle;
+	display: inline-block;
 }
 
-.colFieldSetLeft {
-	width: 20%;
-}
-.group_table_col_2 .colFieldSetLeft {
-	width: 40%;
+.col-label {
+	width: 17%;
+	width: calc(20% - 12px);
 }
 
-.colFieldSetMid {
-	display: none;
-	line-height: 20px;
+.col-2 .col-label {
+	width: 37%;
+	width: calc(40% - 12px);
 }
 
-.colFieldSetRight {
-	width: 80%;
+.col-value {
+	width: 77%;
+	width: calc(80% - 12px);
 	white-space: nowrap;
 }
 
-.group_table_col_2 .colFieldSetRight {
-	width: 60%;
+.col-2 .col-value {
+	width: 57%;
+	width: calc(60% - 12px);
 }
 
-.colFieldSetRight .errorLabel {
+.col-value .errorLabel {
 	white-space: normal;
 }
 
-.colFieldSetRight > input,
-.colFieldSetRight > textarea {
+.col-value > input,
+.col-value > textarea {
 	width: 432px;
 }
 
-.colFieldSetRight .ui-slider {
+.col-value .ui-slider {
 	width: 398px;
 }
 
-.group_table_col_2 .colFieldSetRight > input,
-.group_table_col_2 .colFieldSetRight > textarea {
+.col-2 .col-value > input,
+.col-2 .col-value > textarea {
 	width: 216px;
 }
 
-.group_table_col_2 .colFieldSetRight .ui-slider {
+.col-2 .col-value .ui-slider {
 	width: 194px;
 }
 
-.colFieldSetRight > .quickSearch input,
-.colFieldSetRight > .quickSearch textarea {
+.col-value > .quickSearch input,
+.col-value > .quickSearch textarea {
 	width: 384px;
 }
-.group_table_col_2 .colFieldSetRight > .quickSearch input,
-.group_table_col_2 .colFieldSetRight > .quickSearch textarea {
+.col-2 .col-value > .quickSearch input,
+.col-2 .col-value > .quickSearch textarea {
 	width: 168px;
 }
 
-.colFieldSetRight > select {
+.col-value > select {
 	width: 446px;
 }
-.group_table_col_2 .colFieldSetRight > select {
+.col-2 .col-value > select {
 	width: 230px;
 }
 
-.colFieldSetRight > input.dateTime {
+.col-value > input.dateTime {
 	width: 336px;
 }
-.group_table_col_2 .colFieldSetRight > input.dateTime {
+.col-2 .col-value > input.dateTime {
 	width: 168px;
 }
 
-.colFieldSetRight > input[type="checkbox"] {
+.col-value > input[type="checkbox"] {
 	width: auto;
 }
 
-.colFieldSetRight .td_radio > input[type="checkbox"],
-.colFieldSetRight .td_radio > input[type="radio"] {
-    margin-left: 0;
-    margin-right: 0;
-    position: relative;
-    top: 1px;
+.col-value .td_radio > input[type="checkbox"],
+.col-value .td_radio > input[type="radio"] {
+	margin-left: 0;
+	margin-right: 0;
+	position: relative;
+	top: 1px;
 }
 
-.colFieldSetRight .td_radio > input[type="checkbox"] ~ label,
-.colFieldSetRight .td_radio > input[type="radio"] ~ label {
+.col-value .td_radio > input[type="checkbox"] ~ label,
+.col-value .td_radio > input[type="radio"] ~ label {
 	margin-right: 20px;
 }
 
-.colFieldSetRight > span.errorLabel {
+.col-value > span.errorLabel {
 	display: block;
 }
 
-.colFieldSetRight > table {
+.col-value > table {
 	width: auto;
 }
 
-table.error,
-table.error textarea,
-table.error input {
+.error,
+.error textarea,
+.error input {
 	color: #B94A48;
 }
 
-table.error select,
-table.error textarea,
-table.error input {
+.error select,
+.error textarea,
+.error input {
 	border-color: #B94A48;
 	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset;
 }
 
-table.error select:focus,
-table.error textarea:focus,
-table.error input:focus {
+.error select:focus,
+.error textarea:focus,
+.error input:focus {
 	border-color: #953B39;
 	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 6px #D59392;
 }

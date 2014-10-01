@@ -1,45 +1,124 @@
 package fr.logica.business;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import fr.logica.business.Action.Input;
+import fr.logica.business.Action.Persistence;
+import fr.logica.business.Action.Process;
+import fr.logica.business.Action.UserInterface;
+import fr.logica.domain.annotations.EntityDef;
+
 /**
- * Cette classe contient l'ensemble des méta-données d'une Entité. (Nom, champs, types de données, clés, liens, etc.).
+ * This class contains all metadata from an entity (fields, links, ...).<br/>
+ * This class is instanciated on application start using entity annotations.
  * 
- * @author bellangerf
- * 
+ * @author CGI
  */
-public abstract class EntityModel {
+public class EntityModel {
 
-	public abstract String name();
+	/** Table name for this entity or REST class name for external entity */
+	private String dbTableName;
 
-	public abstract String dbName();
+	/** Database schema name. */
+	private String dbSchemaName;
+
+	/** Name for this entity */
+	private String entityName;
+
+	/** Is an associative entity */
+	private boolean isAssociative = false;
+
+	/** Is an external entity */
+	private boolean isExternal = false;
+
+	/** Name of the sequence */
+	private String sequenceName;
+
+	/** PK definition */
+	private KeyModel primaryKeyModel;
+	/** Constraints definitions */
+	// TODO : private Map<String, ForeignKeyModel> constraints;
+	/** Links definitions */
+	private Map<String, LinkModel> links;
+	/** Back-Links definitions */
+	private Map<String, LinkModel> backRefs;
+	/** Entity fields definitions */
+	private Map<String, EntityField> fields;
+	/** Entity autoincrement-fields definitions */
+	private Set<String> autoIncrementFields;
+	/** Entity lookup fields definitions */
+	private Set<String> lookupFields;
+	/** Entity actions definitions */
+	private Map<Integer, Action> actions;
+	
+	public EntityModel() {
+		primaryKeyModel = new KeyModel();
+		primaryKeyModel.setUnique(true);
+		//foreignKeys = new HashMap<String, ForeignKeyModel>();
+		links = new HashMap<String, LinkModel>();
+		backRefs = new HashMap<String, LinkModel>();
+		fields = new HashMap<String, EntityField>();
+		autoIncrementFields = new HashSet<String>();
+		lookupFields = new HashSet<String>();
+		actions = new HashMap<Integer, Action>();
+	}
+	
+	EntityModel(String entityName, EntityDef entityDef) {
+		this();
+		this.entityName = entityName;
+		this.dbTableName = entityDef.dbName();
+		this.dbSchemaName = entityDef.schemaId();
+		this.sequenceName = entityDef.sequenceName();
+		this.isAssociative = entityDef.isAssociative();
+		this.isExternal = entityDef.isExternal();
+		
+		this.primaryKeyModel.setFields(Arrays.asList(entityDef.primaryKey()));
+	}
+
+	/**
+	 * Retreive the name of the entity
+	 */
+	public String name() {
+		return entityName;
+	}
+
+	/**
+	 * Retreive the name of the entity DB table
+	 */
+	public String dbName() {
+		return dbTableName;
+	}
 
 	/**
 	 * Retrieves the database schema where the table is located.
 	 * 
 	 * @return A schema name or an empty string.
 	 */
-	public abstract String getDbSchemaName();
+	public String getDbSchemaName() {
+		return dbSchemaName;
+	}
 
-	public abstract KeyModel getKeyModel();
+	/**
+	 * Retrieves the entity primary key meta model
+	 * 
+	 * @return primary key model
+	 */
+	public KeyModel getKeyModel() {
+		return primaryKeyModel;
+	}
 
 	protected EntityModel getEntityModel() {
 		return EntityManager.getEntityModel(name());
 	}
-
-	/**
-	 * Get a Foreign Key by it's name
-	 * 
-	 * @param keyName
-	 *            : the name of the FK
-	 * @return the ForeignKeyModel
-	 */
-	public abstract ForeignKeyModel getForeignKeyModel(String keyName);
 
 	/**
 	 * Get a Link by it's name
@@ -48,7 +127,9 @@ public abstract class EntityModel {
 	 *            : the name of the link
 	 * @return the LinkModel
 	 */
-	public abstract LinkModel getLinkModel(String linkName);
+	public LinkModel getLinkModel(String linkName) {
+		return links.get(linkName);
+	}
 
 	/**
 	 * Get a Back-Link by it's name
@@ -57,28 +138,39 @@ public abstract class EntityModel {
 	 *            : the name of the back-link
 	 * @return the LinkModel
 	 */
-	public abstract LinkModel getBackRefModel(String linkName);
+	public LinkModel getBackRefModel(String linkName) {
+		return backRefs.get(linkName);
+	}
 
 	/**
 	 * Get all the links (direct and backref) names
 	 * 
 	 * @return a list of link names
 	 */
-	public abstract List<String> getAllLinkNames();
+	public List<String> getAllLinkNames() {
+		List<String> linkNames = new ArrayList<String>();
+		linkNames.addAll(links.keySet());
+		linkNames.addAll(backRefs.keySet());
+		return linkNames;
+	}
 
 	/**
 	 * Get all the links (direct only) names
 	 * 
 	 * @return a list of link names
 	 */
-	public abstract List<String> getLinkNames();
+	public List<String> getLinkNames() {
+		return new ArrayList<String>(links.keySet());
+	}
 
 	/**
 	 * Get all the links (backref only) names
 	 * 
 	 * @return a list of link names
 	 */
-	public abstract List<String> getBackRefNames();
+	public List<String> getBackRefNames() {
+		return new ArrayList<String>(backRefs.keySet());
+	}
 
 	/**
 	 * Get the field definition for the given name
@@ -87,14 +179,18 @@ public abstract class EntityModel {
 	 *            : the name of the field
 	 * @return an EntityField
 	 */
-	public abstract EntityField getField(String name);
+	public EntityField getField(String fieldname) {
+		return fields.get(fieldname);
+	}
 
 	/**
 	 * Get all the fields names
 	 * 
 	 * @return a set of field names
 	 */
-	public abstract Set<String> getFields();
+	public Set<String> getFields() {
+		return fields.keySet();
+	}
 
 	/**
 	 * Check if a field is of type AutoIncrement
@@ -103,14 +199,18 @@ public abstract class EntityModel {
 	 *            : the name of the field
 	 * @return true if AutoIncrement, false otherwise
 	 */
-	public abstract boolean isAutoIncrementField(String name);
+	public boolean isAutoIncrementField(String name) {
+		return autoIncrementFields.contains(name);
+	}
 
 	/**
 	 * Get all the actions for this entity
 	 * 
 	 * @return a Collection of Action
 	 */
-	public abstract Collection<Action> getActions();
+	public Collection<Action> getActions() {
+		return actions.values();
+	}
 
 	/**
 	 * Get an action by it's code
@@ -119,14 +219,18 @@ public abstract class EntityModel {
 	 *            : the code of the action
 	 * @return the Action
 	 */
-	public abstract Action getAction(int code);
+	public Action getAction(int code) {
+		return actions.get(code);
+	}
 
 	/**
 	 * Get fields used by search queries.
 	 * 
 	 * @return A set of field names.
 	 */
-	public abstract Set<String> getLookupFields();
+	public Set<String> getLookupFields() {
+		return lookupFields;
+	}
 
 	public Map<String, Object> enumValues(String enumName, Locale l) {
 		// On utilise une LinkedHashMap uniquement pour le style, parce que personne ne le fait jamais.
@@ -135,21 +239,25 @@ public abstract class EntityModel {
 		// On va utiliser l'ordre pour mettre les valeurs à null en premier, comme ça, on aura l'impression que ce truc marche correctement
 		// lorsque "null" est une valeur possible pour les données. Si la valeur de la variable est "null", le tag JSF selectOneValue va se
 		// placer sur le premier élément de la liste même si c'est le 3° élément qui correspond à la valeur "null".
-		Map<String, Object> map = new LinkedHashMap<String, Object>();
 		String realEnumName = enumName.substring(0, 1).toLowerCase() + enumName.substring(1);
-		for (int i = 0; i < getField(realEnumName).getValues().size(); i++) {
-			if (getField(realEnumName).getValues().get(i) == null) {
-				map.put(MessageUtils.getInstance(l).getGenLabel(getField(realEnumName).getLabels().get(i), null), getField(realEnumName)
-						.getValues().get(i));
+		EntityField entityField = getField(realEnumName);
+
+		int nbDefVal = entityField.nbDefinedValues();
+		Map<String, Object> mapNull = new LinkedHashMap<String, Object>(nbDefVal);
+		Map<String, Object> mapNotNull = new LinkedHashMap<String, Object>(nbDefVal);
+		for (int i = 0; i < nbDefVal; i++) {
+			Object val = entityField.getDefValValue(i);
+			if (val == null) {
+				mapNull.put(MessageUtils.getInstance(l).getGenLabel(entityField.getDefValLabel(i), (Object[]) null), val);
+			} else {
+				mapNotNull.put(MessageUtils.getInstance(l).getGenLabel(entityField.getDefValLabel(i), (Object[]) null), val);
 			}
 		}
-		for (int i = 0; i < getField(realEnumName).getValues().size(); i++) {
-			if (getField(realEnumName).getValues().get(i) != null) {
-				map.put(MessageUtils.getInstance(l).getGenLabel(getField(realEnumName).getLabels().get(i), null), getField(realEnumName)
-						.getValues().get(i));
-			}
-		}
-		return map;
+
+		// Contact maps
+		mapNull.putAll(mapNotNull);
+
+		return mapNull;
 	}
 
 	/**
@@ -158,7 +266,7 @@ public abstract class EntityModel {
 	 * @return true|false
 	 */
 	public boolean isAssociative() {
-		return false;
+		return isAssociative;
 	}
 
 	/**
@@ -181,20 +289,22 @@ public abstract class EntityModel {
 	}
 
 	/**
-	 * Check is the given key is a Strong key<br>
+	 * Check is the given link key is a Strong key<br>
 	 * (ie all fields are mandatory)
 	 * 
-	 * @param keyName
-	 *            : the name of the key
+	 * @param linkName
+	 *            : the name of the link
 	 * @return true if all fields are mandatory, false otherwise
 	 * @throws TechnicalException
-	 *             if the keyName doen't belong to this entity
+	 *             if the linkName doesn't belong to this entity
 	 */
-	public boolean isStrongKey(String keyName) {
-		if (getForeignKeyModel(keyName) == null) {
-			throw new TechnicalException("Key " + keyName + " is not a key of entity " + name());
+	public boolean isStrongKey(String linkName) {
+		// FIXME : Rework this with constraints ?
+		LinkModel linkModel = getLinkModel(linkName);
+		if (linkModel == null) {
+			throw new TechnicalException("Link " + linkName + " is not a link of entity " + name());
 		}
-		for (String field : getForeignKeyModel(keyName).getFields()) {
+		for (String field : linkModel.getFields()) {
 			if (!getField(field).isMandatory()) {
 				return false;
 			}
@@ -202,11 +312,22 @@ public abstract class EntityModel {
 		return true;
 	}
 
+	/**
+	 * Check is the given link is a Virtual<br>
+	 * (ie one of the fields is transient)
+	 * 
+	 * @param linkName
+	 *            : the name of the link
+	 * @return true if one field is transient, false otherwise
+	 * @throws TechnicalException
+	 *             if the linkName doesn't belong to this entity
+	 */
 	public boolean isVirtualLink(String linkName) {
 		LinkModel linkModel = getLinkModel(linkName);
-		ForeignKeyModel keyModel = getForeignKeyModel(linkModel.getKeyName());
-
-		for (String field : keyModel.getFields()) {
+		if (linkModel == null) {
+			throw new TechnicalException("Link " + linkName + " is not a link of entity " + name());
+		}
+		for (String field : linkModel.getFields()) {
 			if (getField(field).isTransient()) {
 				return true;
 			}
@@ -232,7 +353,63 @@ public abstract class EntityModel {
 	}
 
 	public boolean isExternal() {
-		return false;
+		return isExternal;
 	}
 
+	/**
+	 * Returns this entity's sequence name for auto-increment
+	 * @return Sequence name if any, null otherwise
+	 */
+	public String getSequenceName() { 
+		return sequenceName; 
+	}
+
+	/**
+	 * Add a new link to the model (used only for internal init)
+	 */
+	void addNewLink(LinkModel linkModel) {
+		// Create link
+		links.put(linkModel.getLinkName(), linkModel);
+	}
+	/**
+	 * Add a new action to the model (used only for internal init)
+	 */
+	void addNewAction(int code, String queryName, String pageName, int pNext, Input input,
+			Persistence persistence, UserInterface ui, Process process, int[] pSubActions) {
+		Integer next = null;
+		if (pNext != -1)
+			next = Integer.valueOf(pNext);
+		
+		Action action = null;
+		if (pSubActions.length == 0) {
+			action = new Action(code, queryName, pageName, next, input, persistence, ui, process);
+		} else {
+			Integer[] subActions = new Integer[pSubActions.length];
+			for (int i=0; i<pSubActions.length; i++) {
+				subActions[i] = Integer.valueOf(pSubActions[i]);
+			}
+			action = new Action(code, queryName, pageName, next, input, persistence, ui, process, subActions);
+		}
+		actions.put(code, action);
+	}
+	
+	/**
+	 * Add a new field to the model (used only for internal init)
+	 */
+	void addNewField(String fieldName, EntityField field, boolean isLookupField, boolean isAutoIncrementField) {
+		fields.put(fieldName, field);
+		
+		if (isLookupField)
+			lookupFields.add(fieldName);
+		
+		if (isAutoIncrementField)
+			autoIncrementFields.add(fieldName);
+	}
+
+	/**
+	 * Add a new backref to the model (used only for internal init)
+	 */
+	public void addNewBackRef(LinkModel linkModel) {
+		backRefs.put(linkModel.getLinkName(), linkModel);
+	}
 }

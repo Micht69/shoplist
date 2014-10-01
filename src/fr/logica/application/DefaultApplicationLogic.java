@@ -69,9 +69,9 @@ public class DefaultApplicationLogic extends AbstractApplicationLogic {
 	public String getDefaultPage(User user) {
 
 		if (user != null) {
-			return "/index/defaultPage";
+			return "/index/defaultPage.jsf?faces-redirect=true";
 		}
-		return "/index/login";
+		return "/index/login.jsf?faces-redirect=true";
 	}
 	
 	@Override
@@ -217,5 +217,48 @@ public class DefaultApplicationLogic extends AbstractApplicationLogic {
 		}
 		return request;
 	}
+	
+	/** 
+	 * <p>The default implementation of this method provides a middle ground between security and
+	 * debuggability. The description provided gives information only for the root cause. This
+	 * information includes the type and message of the Throwable, and its stack trace going from
+	 * its originating point up to the first class in the fr.logica package.</p>
+	 * @param th 
+	 * 			The exception whose description will be returned
+	 * @return The exception description, in HTML
+	 */
+	@Override
+	public String getExceptionHtmlDescription(Throwable th) {
+		StringBuilder description = new StringBuilder(th.toString());
+        Throwable base = th;
+        while (base.getCause() != null && base.getCause() != base) {
+            base = base.getCause();
+        }
 
+        for (StackTraceElement element : base.getStackTrace()) {
+            description.append("\n<br />\n at ");
+            String line = element.toString();
+            description.append(line);
+            if (element.getClassName().startsWith("fr.logica")) {
+                /* we stop on the first application element */
+                break;
+            }
+        }
+
+		return description.toString();
+	}
+
+	@Override
+	public String formatExceptionToString(Exception e) {
+		StackTraceElement[] stackTrace = e.getStackTrace();
+		String technicalMessage = "An unexpected error occurred: \n";
+		if (e.getMessage() != null) {
+			technicalMessage += e.getMessage() + "\n\n";
+		}
+		technicalMessage += stackTrace[0].toString() + "\n";
+		technicalMessage += stackTrace[1].toString() + "\n";
+		technicalMessage += stackTrace[2].toString() + "\n";
+		technicalMessage += stackTrace[3].toString() + "\n";
+		return technicalMessage;
+	}
 }

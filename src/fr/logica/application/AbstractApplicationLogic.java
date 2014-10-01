@@ -165,4 +165,29 @@ public abstract class AbstractApplicationLogic implements Serializable {
 	 * @return A valid Request with entityName, action and all needed parameters (queryName, keys, page, etc.)
 	 */
 	public abstract Request<?> getPermalinkRequest(Map<String, String> parameters, RequestContext context);
+
+	/**
+	 * Formats unhandled exception thrown by internal framework / domain logic code to display / explain them to the end user. Default formatting
+	 * will display the exception message + 4 firsts elements of stacktrace.
+	 * 
+	 * @param e
+	 *            Exception to format.
+	 * @return A formatted String (with 
+ end of lines) that will be displayed to the end user.
+	 */
+	public abstract String formatExceptionToString(Exception e);
+	
+	/** 
+	 * <p>Returns a String description of the exception to be displayed to the front user.</p>
+	 * <p>It will usually be between the full stack trace of the exception, and a standard message.
+	 * The more information is given, the easier it is to debug the application when the only 
+	 * information the developer gets is a snapshot. However, higher detail also means a higher 
+	 * security risk, as the inner workings of the application are displayed to just about anyone.
+	 * </p>
+	 * <p>The description is in HTML format, with &lt;br /&gt; tags to mark the new lines.</p>
+	 * @param th 
+	 * 			The exception whose description will be returned
+	 * @return The exception description, in HTML
+	 */
+	public abstract String getExceptionHtmlDescription(Throwable th);
 }

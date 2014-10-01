@@ -30,9 +30,6 @@ public class BackRefListModel extends AbstractListModel implements Serializable 
 		this.queryName = queryName;
 		this.linkName = linkName;
 		this.filterName = filterName;
-		if (viewCtrl.getCurrentView().getAction().getPersistence() == Persistence.INSERT) {
-			readonly = true;
-		}
 		loadData(viewCtrl.getContext());
 	}
 
@@ -60,13 +57,22 @@ public class BackRefListModel extends AbstractListModel implements Serializable 
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see fr.logica.jsf.model.DataModel#loadData()
 	 */
 	@Override
 	public void loadData(RequestContext context) {
 		data = new BusinessController().getBackRefListData(entity, entityName, linkName, queryName, criteria, viewCtrl.getCurrentView()
 				.getAction(), context);
+		if (viewCtrl.getCurrentView().getAction().getPersistence() == Persistence.INSERT) {
+			// Current entity is not persisted yet, it can't be linked to anything
+			readonly = true;
+		} else {
+			readonly = data.isReadOnly();
+		}
+		isProtected = data.isProtected();
 	}
 
 	/**
@@ -87,7 +93,9 @@ public class BackRefListModel extends AbstractListModel implements Serializable 
 		return prepareAction(Action.getAttachBackRefAction(filterName));
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see fr.logica.jsf.model.list.AbstractListModel#export()
 	 */
 	@Override
@@ -102,25 +110,4 @@ public class BackRefListModel extends AbstractListModel implements Serializable 
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see fr.logica.jsf.model.DataModel#isProtected()
-	 */
-	@Override
-	public boolean isProtected() {
-		if (data == null)
-			return super.isProtected();
-		else
-			return data.isProtected();
-	}
-
-	/* (non-Javadoc)
-	 * @see fr.logica.jsf.model.DataModel#isReadonly()
-	 */
-	@Override
-	public boolean isReadonly() {
-		if (data == null)
-			return super.isReadonly();
-		else
-			return data.isReadOnly();
-	}
 }

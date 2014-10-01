@@ -105,6 +105,9 @@ public final class Constants {
 	/** Absolute maximum for the number of row, impossible for the user to bypass. Not applicable to custom code. */
 	public static final int MAX_ROW_ABSOLUTE = 9999;
 	
+	/** Limit in Excel due to XLS format */
+	public static final int MAX_ROW_EXCEL_EXPORT = 65535;
+	
 	public static final int AUTOCOMPLETE_MAX_ROW = 20;
 	public static final int EVENT_CREATE_DEFAULT_DURATION = 2;
 

@@ -26,12 +26,12 @@ import fr.logica.business.Constants;
 import fr.logica.business.Entity;
 import fr.logica.business.EntityField;
 import fr.logica.business.EntityField.Memory;
+import fr.logica.business.EntityField.SqlTypes;
 import fr.logica.business.EntityModel;
 import fr.logica.business.Key;
 import fr.logica.business.KeyModel;
 import fr.logica.business.LinkModel;
 import fr.logica.business.TechnicalException;
-import fr.logica.db.DbQuery;
 import fr.logica.db.DbConnection.Type;
 import fr.logica.reflect.DomainUtils;
 
@@ -42,7 +42,12 @@ public class DbQuery implements Cloneable {
 
 	/** Join type. */
 	public enum Join {
-		STRICT, LOOSE, NONE;
+		/** Inner join. */
+		STRICT,
+		/** Outer join. */
+		LOOSE,
+		/** Cartesian product. */
+		NONE;
 	}
 
 	/** Operators. */
@@ -90,6 +95,11 @@ public class DbQuery implements Cloneable {
 			}
 		}
 
+		/**
+		 * Returns the variable alias.
+		 * 
+		 * @return {@code tableId + _ + name}.
+		 */
 		public String getColumnAlias() {
 			if (alias != null) {
 				return alias;
@@ -149,11 +159,11 @@ public class DbQuery implements Cloneable {
 	public static final String DESC = "DESC";
 
 	/** Type SQL devant recevoir un UPPER */
-	private static final List<String> STRING_SQL_TYPES = new ArrayList<String>();
+	public static final List<SqlTypes> STRING_SQL_TYPES = new ArrayList<SqlTypes>();
 	static {
-		STRING_SQL_TYPES.add("VARCHAR2");
-		STRING_SQL_TYPES.add("VARCHAR");
-		STRING_SQL_TYPES.add("CHAR");
+		STRING_SQL_TYPES.add(SqlTypes.VARCHAR2);
+		STRING_SQL_TYPES.add(SqlTypes.VARCHAR);
+		STRING_SQL_TYPES.add(SqlTypes.CHAR);
 	}
 	/** Logger */
 	private static final Logger LOGGER = Logger.getLogger(DbQuery.class);
@@ -190,8 +200,7 @@ public class DbQuery implements Cloneable {
 	/**
 	 * Returns the index of the alias
 	 * 
-	 * @param name
-	 *            The alias from we want the index
+	 * @param name The alias from we want the index
 	 * @return The index of alias name in the query. This should be used to get data from result set instead of accessing RS via names.
 	 */
 	public int getIndex(String name) {
@@ -210,10 +219,8 @@ public class DbQuery implements Cloneable {
 	 * Gets the column alias created by the query to identify in a unique way the selected value. This alias can be passed to the getIndex()
 	 * method in order to get the resultSet index.
 	 * 
-	 * @param entityName
-	 *            Entity (=table) name
-	 * @param name
-	 *            Variable (=column) name
+	 * @param entityName Entity (=table) name
+	 * @param name Variable (=column) name
 	 * @return the alias used by the query to identify the column selected. The alias can be hashed if it's longer than 30 characters.
 	 */
 	public String getColumnAlias(String entityName, String name) {
@@ -384,8 +391,7 @@ public class DbQuery implements Cloneable {
 	/**
 	 * Please, notice my incredible pun on the method name. If name > 30 characters, we'll create an hashed unique alias out of it.
 	 * 
-	 * @param name
-	 *            The maybe too long name.
+	 * @param name The maybe too long name.
 	 * @return A name that makes less than 30 characters. 30 is the limit because it's the smallest maximum of all known databases.
 	 */
 	public String aliash(String name) {
@@ -411,12 +417,20 @@ public class DbQuery implements Cloneable {
 		indexes.clear();
 		int index = 1;
 		String query;
+		boolean sortDone = false; // SQL Server only, sort must be done in the row_number partition
 		if (count) {
 			query = "SELECT COUNT(1) FROM (SELECT ";
 		} else if (maxRownum > 0 && DbConnection.getDbType() == Type.DB2) {
 			query = "SELECT * FROM (SELECT ";
 		} else if (maxRownum > 0 && DbConnection.getDbType() == Type.ORACLE) {
 			query = "SELECT * FROM (SELECT sub.*, rownum as ROWNUM_ROWNUM FROM ( SELECT ";
+		} else if (maxRownum > 0 && DbConnection.getDbType() == Type.SQLSERVER) {
+			String orderBy = "ORDER BY (SELECT NULL)";
+			sortDone = true;
+			if (sortVars.size() > 0) {
+				orderBy = "ORDER BY " + getOrderByClause();
+			}
+			query = "SELECT * FROM (SELECT sub.*, ROW_NUMBER() OVER (" + orderBy + ") AS ROWNUM FROM ( SELECT ";
 		} else {
 			query = "SELECT ";
 		}
@@ -542,7 +556,7 @@ public class DbQuery implements Cloneable {
 
 		// **** order by
 
-		if (!count && sortVars.size() > 0) {
+		if (!sortDone && !count && sortVars.size() > 0) {
 			query = query.concat(" ORDER BY " + getOrderByClause());
 		}
 
@@ -557,6 +571,8 @@ public class DbQuery implements Cloneable {
 			if (DbConnection.getDbType() == Type.ORACLE) {
 				/* the mixing of ROWNUM and ROWNUM_ROWNUM is intentional : the ROWNUM<=X clause is optimized by Oracle for performance */
 				query = query.concat(") sub ) WHERE ROWNUM_ROWNUM > " + minRownum + " AND ROWNUM <= " + maxRownum);
+			} else if (DbConnection.getDbType() == Type.SQLSERVER) {
+				query = query.concat(") sub ) rows WHERE rows.ROWNUM > " + minRownum + " AND rows.ROWNUM <= " + maxRownum);
 			} else if (DbConnection.getDbType() == Type.DB2) {
 				query = query.concat(") AS LIM WHERE LIM.ROWNUM > " + minRownum + " AND LIM.ROWNUM <= " + (minRownum + maxRownum));
 			} else if (DbConnection.getDbType() == Type.PostgreSQL) {
@@ -584,6 +600,10 @@ public class DbQuery implements Cloneable {
 
 	private List<Table> filterTables() {
 		Set<Table> filteredTables = new LinkedHashSet<Table>(tables.size());
+		// When there's a group by clause, do not remove any table
+		if (groupByClause != null && groupByClause.length() > 0) {
+			return tables;
+		}
 
 		for (int i = 0; i < tables.size(); i++) {
 			Table table = tables.get(i);
@@ -614,8 +634,9 @@ public class DbQuery implements Cloneable {
 			Table joinTable = tables.get(j);
 			String joinTableAlias = joinTable.alias;
 			if (null != joinTable.joinCond && joinTable.joinCond.indexOf(alias) > -1) {
-
-				if (whereClause.indexOf(joinTableAlias) > -1 || whereJoin.indexOf(" " + joinTableAlias + ".") > -1) {
+				// It exists a join condition based on this table alias, we need to include it
+				if ((DbConnection.getDbType() != Type.ORACLE) || whereClause.indexOf(joinTableAlias) > -1
+						|| whereJoin.indexOf(" " + joinTableAlias + ".") > -1) {
 					return true;
 				} else if (!stackTables.contains(joinTableAlias)) {
 					stackTables.add(joinTableAlias);
@@ -629,12 +650,9 @@ public class DbQuery implements Cloneable {
 	/**
 	 * Ajout d'une classe
 	 * 
-	 * @param entity
-	 *            Classe à ajouter
-	 * @param tableAlias
-	 *            Alias de table <i>null</i>=Auto (Tnnn)
-	 * @param linkModel
-	 *            lien pour jointure
+	 * @param entity Classe à ajouter
+	 * @param tableAlias Alias de table <i>null</i>=Auto (Tnnn)
+	 * @param linkModel lien pour jointure
 	 */
 	private Table addOneClass(Entity entity, String tableAlias, boolean addOutVars) {
 		// Tester l'alias de table (si fourni)
@@ -677,18 +695,12 @@ public class DbQuery implements Cloneable {
 	 * une jointure de type joinType.<br>
 	 * équivalence 1.2: JOIN_TYPE_STRICT si la clé source du lien de jointure est obligatoire
 	 * 
-	 * @param e1Name
-	 *            Nom de l'entité à ajouter
-	 * @param e1Alias
-	 *            Alias de l'entité à ajouter, <i>null</i>=Alias automatique
-	 * @param linkName
-	 *            Relation d'une classe existante vers l'entité rajoutée, <i>null</i>=Lien automatique
-	 * @param e2Alias
-	 *            Alias de la table liée, <i>null</i>=Alias automatique
-	 * @param joinType
-	 *            type de jointure, cf constantes JOIN_TYPE_xxx
-	 * @param addOutVars
-	 *            Add all entity variables to the select clause.
+	 * @param e1Name Nom de l'entité à ajouter
+	 * @param e1Alias Alias de l'entité à ajouter, <i>null</i>=Alias automatique
+	 * @param linkName Relation d'une classe existante vers l'entité rajoutée, <i>null</i>=Lien automatique
+	 * @param e2Alias Alias de la table liée, <i>null</i>=Alias automatique
+	 * @param joinType type de jointure, cf constantes JOIN_TYPE_xxx
+	 * @param addOutVars Add all entity variables to the select clause.
 	 */
 	public void addEntity(String e1Name, String e1Alias, String linkName, String e2Alias, Join joinType, boolean addOutVars) {
 		// FIXME Add join clauses hability
@@ -783,11 +795,11 @@ public class DbQuery implements Cloneable {
 		KeyModel dstKey = null;
 		boolean bExtJoin = true;
 		if (uniqueLink.getRefEntityName().equals(e1Name)) {
-			srcKey = srcEntity.getModel().getForeignKeyModel(uniqueLink.getKeyName());
+			srcKey = srcEntity.getModel().getLinkModel(uniqueLink.getLinkName());
 			dstKey = e1.getModel().getKeyModel();
 		} else {
 			srcKey = srcEntity.getModel().getKeyModel();
-			dstKey = e1.getModel().getForeignKeyModel(uniqueLink.getKeyName());
+			dstKey = e1.getModel().getLinkModel(uniqueLink.getLinkName());
 		}
 		bExtJoin = (joinType == Join.LOOSE);
 
@@ -841,8 +853,7 @@ public class DbQuery implements Cloneable {
 	/**
 	 * retourne la table dont on connait l'alias utilisé dans la recherche d'une query mère
 	 * 
-	 * @param tableAlias
-	 *            alias de la table
+	 * @param tableAlias alias de la table
 	 */
 	private Table getTable(String tableAlias) {
 		for (Table t : tables) {
@@ -868,10 +879,8 @@ public class DbQuery implements Cloneable {
 	/**
 	 * retourne la table dont on connait le nom et l'alias
 	 * 
-	 * @param entityName
-	 *            nom de l'entité
-	 * @param tableAlias
-	 *            alias de l'entité, null si on ne le connait pas.
+	 * @param entityName nom de l'entité
+	 * @param tableAlias alias de l'entité, null si on ne le connait pas.
 	 */
 	private Table getTable(String className, String tableAlias) {
 		for (Table t : tables) {
@@ -883,27 +892,24 @@ public class DbQuery implements Cloneable {
 	}
 
 	/**
-	 * @param entityName
-	 *            première classe de la requête
-	 * @param tableAlias
-	 *            alias facultatif utilisé pour cette entité
+	 * @param entityName première classe de la requête
+	 * @param tableAlias alias facultatif utilisé pour cette entité
 	 */
 	public DbQuery(String entityName, String tableAlias) {
 		addEntity(entityName, tableAlias, Join.STRICT);
 	}
 
 	/**
-	 * @param entityName
-	 *            première classe de la requête
+	 * @param entityName première classe de la requête
 	 */
 	public DbQuery(String entityName) {
 		addEntity(entityName, null, Join.STRICT);
 	}
 
 	/**
-	 * Ajouter une nouvelle table à la requête
+	 * Add a new entity to the query
 	 * 
-	 * @see #addEntity(String, String, String, String, int)
+	 * @see #addEntity(String, String, String, String, Join)
 	 * @param entityName
 	 * @param entityAlias
 	 * @param joinType
@@ -915,16 +921,11 @@ public class DbQuery implements Cloneable {
 	/**
 	 * Add a new entity to the query
 	 * 
-	 * @param e1Name
-	 *            Name of the entity to add
-	 * @param e1Alias
-	 *            Alias of the new table
-	 * @param linkName
-	 *            Link to use for join with previous tables of th query
-	 * @param e2Alias
-	 *            Alias of the table to use for join
-	 * @param joinType
-	 *            Join type
+	 * @param e1Name Name of the entity to add
+	 * @param e1Alias Alias of the new table
+	 * @param linkName Link to use for join with previous tables of th query
+	 * @param e2Alias Alias of the table to use for join
+	 * @param joinType Join type
 	 */
 	public void addEntity(String e1Name, String e1Alias, String linkName, String e2Alias, Join joinType) {
 		addEntity(e1Name, e1Alias, linkName, e2Alias, joinType, true);
@@ -933,10 +934,8 @@ public class DbQuery implements Cloneable {
 	/**
 	 * Ajout d'une condition égal à une clé Remarque: Les variables à valeurs nulles ne sont pas ajoutées
 	 * 
-	 * @param key
-	 *            clé de comparaison
-	 * @param tableAlias
-	 *            alias
+	 * @param key clé de comparaison
+	 * @param tableAlias alias
 	 */
 
 	public void addCondKey(Key key, String tableAlias) {
@@ -954,12 +953,9 @@ public class DbQuery implements Cloneable {
 	/**
 	 * Ajout d'une condition d'égalité
 	 * 
-	 * @param colAlias
-	 *            nom de variable
-	 * @param tableAlias
-	 *            alias
-	 * @param valeur
-	 *            valeur de comparaison
+	 * @param colAlias nom de variable
+	 * @param tableAlias alias
+	 * @param valeur valeur de comparaison
 	 */
 
 	public void addCondEq(String colAlias, String tableAlias, Object valeur) {
@@ -969,12 +965,9 @@ public class DbQuery implements Cloneable {
 	/**
 	 * Ajout d'une condition de non égalité. Gére le cas des non null si valeur vaut null.
 	 * 
-	 * @param colAlias
-	 *            nom de variable
-	 * @param tableAlias
-	 *            alias
-	 * @param valeur
-	 *            valeur de comparaison
+	 * @param colAlias nom de variable
+	 * @param tableAlias alias
+	 * @param valeur valeur de comparaison
 	 */
 
 	public void addCondNEq(String colAlias, String tableAlias, Object valeur) {
@@ -1012,10 +1005,8 @@ public class DbQuery implements Cloneable {
 	/**
 	 * Ajout d'une condition 'existe dans' subquery
 	 * 
-	 * @param subquery
-	 *            - query de seléction de valeurs
-	 * @param bNot
-	 *            - true=négation (NOT EXISTS)
+	 * @param subquery - query de seléction de valeurs
+	 * @param bNot - true=négation (NOT EXISTS)
 	 */
 	public void addCondExists(DbQuery subquery, boolean bNot) {
 		String rel = "EXISTS";
@@ -1038,14 +1029,10 @@ public class DbQuery implements Cloneable {
 	/**
 	 * Ajout d'une condition sur 'group by' (clause 'having') Pour l'opérateur Between, utilisez addHavingCondBetween
 	 * 
-	 * @param colAlias
-	 *            - alias de la colonne
-	 * @param tableAlias
-	 *            - alias de la table
-	 * @param op
-	 *            - opérateur
-	 * @param valeur
-	 *            - valeur de comparaison
+	 * @param colAlias - alias de la colonne
+	 * @param tableAlias - alias de la table
+	 * @param op - opérateur
+	 * @param valeur - valeur de comparaison
 	 */
 	public void addHavingCond(String colAlias, String tableAlias, SqlOp op, Object valeur) {
 		if (op == SqlOp.OP_BETWEEN) {
@@ -1057,14 +1044,10 @@ public class DbQuery implements Cloneable {
 	/**
 	 * Ajout d'une condition 'between' sur 'group by' (clause 'having')
 	 * 
-	 * @param colAlias
-	 *            - alias de la colonne
-	 * @param tableAlias
-	 *            - alias de la table
-	 * @param valeur1
-	 *            - première valeur de comparaison
-	 * @param valeur2
-	 *            - seconde valeur de comparaison
+	 * @param colAlias - alias de la colonne
+	 * @param tableAlias - alias de la table
+	 * @param valeur1 - première valeur de comparaison
+	 * @param valeur2 - seconde valeur de comparaison
 	 */
 	public void addHavingCondBetween(String colAlias, String tableAlias, Object valeur1, Object valeur2) {
 		addHavingCond(colAlias, tableAlias, SqlOp.OP_BETWEEN, valeur1, valeur2);
@@ -1073,16 +1056,11 @@ public class DbQuery implements Cloneable {
 	/**
 	 * Ajout d'une condition 'between' sur 'group by' (clause 'having')
 	 * 
-	 * @param colAlias
-	 *            - alias de la colonne
-	 * @param tableAlias
-	 *            - alias de la table
-	 * @param op
-	 *            - opérateur
-	 * @param valeur1
-	 *            - première valeur de comparaison
-	 * @param valeur2
-	 *            - seconde valeur de comparaison
+	 * @param colAlias - alias de la colonne
+	 * @param tableAlias - alias de la table
+	 * @param op - opérateur
+	 * @param valeur1 - première valeur de comparaison
+	 * @param valeur2 - seconde valeur de comparaison
 	 */
 	private void addHavingCond(String colAlias, String tableAlias, SqlOp op, Object valeur1, Object valeur2) {
 		if (colAlias == null) {
@@ -1110,7 +1088,7 @@ public class DbQuery implements Cloneable {
 			havingClause = havingClause.concat(" and ");
 		}
 
-		boolean noCase = caseInsensitiveSearch && "VARCHAR2".equals(inVar.model.getSqlType());
+		boolean noCase = caseInsensitiveSearch && STRING_SQL_TYPES.contains(inVar.model.getSqlType());
 		if (noCase) {
 			havingClause = havingClause.concat("UPPER");
 		}
@@ -1144,12 +1122,9 @@ public class DbQuery implements Cloneable {
 	/**
 	 * Ajout une condition IS NULL/IS NOT NULL sur 'group by' (clause 'having')
 	 * 
-	 * @param colAlias
-	 *            Alias de la colonne
-	 * @param tableAlias
-	 *            Alias de la table
-	 * @param notNull
-	 *            vrai pour tester IS NOT NULL, faux pour tester IS NULL
+	 * @param colAlias Alias de la colonne
+	 * @param tableAlias Alias de la table
+	 * @param notNull vrai pour tester IS NOT NULL, faux pour tester IS NULL
 	 */
 	private void addHavingIsNull(String colAlias, String tableAlias, boolean notNull) {
 		String value = SqlOp.OP_ISNULL.val;
@@ -1185,12 +1160,9 @@ public class DbQuery implements Cloneable {
 	/**
 	 * Ajout d'une condition 'inclus dans' liste de valeurs
 	 * 
-	 * @param colAlias
-	 *            nom de variable
-	 * @param tableAlias
-	 *            alias
-	 * @param objs
-	 *            liste de valeurs
+	 * @param colAlias nom de variable
+	 * @param tableAlias alias
+	 * @param objs liste de valeurs
 	 */
 	public void addCondInList(String colAlias, String tableAlias, List<?> objs) {
 		addCondInList(colAlias, tableAlias, objs, false);
@@ -1199,14 +1171,10 @@ public class DbQuery implements Cloneable {
 	/**
 	 * Ajout d'une condition 'inclus dans' liste de valeurs
 	 * 
-	 * @param colAlias
-	 *            nom de variable
-	 * @param tableAlias
-	 *            alias
-	 * @param objs
-	 *            liste de valeurs
-	 * @param bNot
-	 *            true=négation (NOT IN)
+	 * @param colAlias nom de variable
+	 * @param tableAlias alias
+	 * @param objs liste de valeurs
+	 * @param bNot true=négation (NOT IN)
 	 */
 	public void addCondInList(String colAlias, String tableAlias, List<?> objs, boolean bNot) {
 		if (objs == null || objs.size() == 0) {
@@ -1265,7 +1233,6 @@ public class DbQuery implements Cloneable {
 			whereClause = whereClause.concat(" and ");
 		}
 
-		whereClause = whereClause.concat("UPPER(");
 		int nbreConcat = 2 * inVars.size() - 2;
 		for (int k = 0; k < inVars.size(); k++) {
 			Var inVarTmp = inVars.get(k);
@@ -1276,6 +1243,8 @@ public class DbQuery implements Cloneable {
 			} else {
 				columnExpr = inVarTmp.expr;
 			}
+			// We use ifNull function to avoir getting null inside the concat string expression.
+			columnExpr = getIfNullFunction(DbConnection.getDbType()) + "(" + columnExpr + ", '')";
 			if (STRING_SQL_TYPES.contains(inVarTmp.model.getSqlType())) {
 				columnExpr = "UPPER(" + columnExpr + ")";
 			}
@@ -1290,7 +1259,6 @@ public class DbQuery implements Cloneable {
 		for (int p = 0; p < nbreConcat; p++) {
 			whereClause = whereClause.concat(")");
 		}
-		whereClause = whereClause.concat(")");
 
 		String value = paramValue.toUpperCase();
 
@@ -1302,7 +1270,7 @@ public class DbQuery implements Cloneable {
 		}
 
 		whereClause = whereClause.concat(" " + rel + " ?");
-		EntityField varModel = new EntityField("TOYCONCATSEARCH", "VARCHAR2", 8000, 0, Memory.NO, false, false);
+		EntityField varModel = new EntityField("TOYCONCATSEARCH", SqlTypes.VARCHAR2, 8000, 0, Memory.NO, false, false);
 		Var outVar = new Var("TOYCONCATSEARCH", null, null, varModel);
 		bindValues.add(parse(outVar, value));
 	}
@@ -1310,14 +1278,10 @@ public class DbQuery implements Cloneable {
 	/**
 	 * Ajout d'une condition 'inclus dans' le résultat d'une autre query
 	 * 
-	 * @param colAlias
-	 *            nom de variable
-	 * @param tableAlias
-	 *            alias
-	 * @param subQuery
-	 *            query retournant la liste de valeurs
-	 * @param bNot
-	 *            true=négation (NOT IN)
+	 * @param colAlias nom de variable
+	 * @param tableAlias alias
+	 * @param subQuery query retournant la liste de valeurs
+	 * @param bNot true=négation (NOT IN)
 	 */
 
 	public void addCondIn(String colAlias, String tableAlias, DbQuery subQuery, boolean bNot) {
@@ -1344,17 +1308,17 @@ public class DbQuery implements Cloneable {
 		whereClause = whereClause.concat(inVar.tableId + "." + inVar.model.getSqlName() + " " + op + " (");
 		whereClause = whereClause.concat(subQuery.toSelect());
 		whereClause = whereClause.concat(")");
+
+		// And add parameters
+		bindValues.addAll(subQuery.getBindValues());
 	}
 
 	/**
 	 * Ajout d'une condition 'inclus dans' le résultat d'une autre query
 	 * 
-	 * @param colAlias
-	 *            nom de variable
-	 * @param tableAlias
-	 *            alias
-	 * @param subQuery
-	 *            query retournant la liste de valeurs
+	 * @param colAlias nom de variable
+	 * @param tableAlias alias
+	 * @param subQuery query retournant la liste de valeurs
 	 */
 
 	public void addCondIn(String colAlias, String tableAlias, DbQuery subQuery) {
@@ -1364,16 +1328,11 @@ public class DbQuery implements Cloneable {
 	/**
 	 * Ajout d'une condition
 	 * 
-	 * @param colAlias
-	 *            - nom de variable
-	 * @param tableAlias
-	 *            - alias
-	 * @param op
-	 *            - opérateur
-	 * @param valeur1
-	 *            - valeur de comparaison
-	 * @param valeur2
-	 *            - valeur 2 de comparaison
+	 * @param colAlias - nom de variable
+	 * @param tableAlias - alias
+	 * @param op - opérateur
+	 * @param valeur1 - valeur de comparaison
+	 * @param valeur2 - valeur 2 de comparaison
 	 */
 	private void addCond(String colAlias, String tableAlias, SqlOp op, Object valeur1, Object valeur2) {
 		// si la valeur est null et si on peut remplacer l'opérateur...
@@ -1397,7 +1356,7 @@ public class DbQuery implements Cloneable {
 			whereClause = whereClause.concat(" and ");
 		}
 
-		boolean noCase = caseInsensitiveSearch && "VARCHAR2".equals(inVar.model.getSqlType());
+		boolean noCase = caseInsensitiveSearch && STRING_SQL_TYPES.contains(inVar.model.getSqlType());
 		if (noCase) {
 			whereClause = whereClause.concat("UPPER");
 		}
@@ -1431,16 +1390,11 @@ public class DbQuery implements Cloneable {
 	/**
 	 * Add a condition between two columns.
 	 * 
-	 * @param colAlias1
-	 *            First column alias
-	 * @param tableAlias1
-	 *            First column table
-	 * @param operator
-	 *            Sql operator between two columns (equals, greater than, etc.)
-	 * @param colAlias2
-	 *            Second column alias
-	 * @param tableAlias2
-	 *            Second column table
+	 * @param colAlias1 First column alias
+	 * @param tableAlias1 First column table
+	 * @param operator Sql operator between two columns (equals, greater than, etc.)
+	 * @param colAlias2 Second column alias
+	 * @param tableAlias2 Second column table
 	 */
 	public void addCond(String colAlias1, String tableAlias1, SqlOp operator, String colAlias2, String tableAlias2) {
 		Var inVar1 = getInVar(colAlias1, tableAlias1);
@@ -1456,7 +1410,7 @@ public class DbQuery implements Cloneable {
 			whereClause = whereClause.concat(" and ");
 		}
 
-		boolean noCase = caseInsensitiveSearch && "VARCHAR2".equals(inVar1.model.getSqlType()) && "VARCHAR2".equals(inVar2.model.getSqlType());
+		boolean noCase = caseInsensitiveSearch && STRING_SQL_TYPES.contains(inVar1) && STRING_SQL_TYPES.contains(inVar2);
 		if (noCase) {
 			whereClause = whereClause.concat("UPPER");
 		}
@@ -1473,26 +1427,26 @@ public class DbQuery implements Cloneable {
 		Object outValue = value;
 		if (value != null && value instanceof String) {
 			String sValue = (String) value;
-			if (var.model.hasDefinedValues() && var.model.isCode(sValue)) {
+			if (var.model.hasDefinedValues() && var.model.isDefCode(sValue)) {
 
-				if ("BOOLEAN".equals(var.model.getSqlType())) {
+				if (var.model.getSqlType() == SqlTypes.BOOLEAN) {
 					outValue = var.model.getBooleanDefValue(sValue);
 
-				} else if ("INTEGER".equals(var.model.getSqlType())) {
+				} else if (var.model.getSqlType() == SqlTypes.INTEGER) {
 					outValue = Integer.parseInt(var.model.getDefValue(sValue));
 
 				} else {
 					outValue = var.model.getDefValue(sValue);
 				}
 
-			} else if ("INTEGER".equals(var.model.getSqlType())) {
+			} else if (var.model.getSqlType() == SqlTypes.INTEGER) {
 				try {
 					outValue = Integer.parseInt(sValue);
 				} catch (NumberFormatException ex) {
 					throw new TechnicalException("La valeur \"" + sValue + "\" n'est pas correcte. ");
 				}
 
-			} else if ("TIME".equals(var.model.getSqlType())) {
+			} else if (var.model.getSqlType() == SqlTypes.TIME) {
 				AbstractApplicationLogic appLogic = ApplicationUtils.getApplicationLogic();
 				SimpleDateFormat defaultDateTimeFormatter = new SimpleDateFormat(appLogic.getTimeFormat());
 				try {
@@ -1501,7 +1455,7 @@ public class DbQuery implements Cloneable {
 					throw new TechnicalException("La valeur \"" + sValue + "\" n'est pas correcte. ");
 				}
 
-			} else if ("TIMESTAMP".equals(var.model.getSqlType())) {
+			} else if (var.model.getSqlType() == SqlTypes.TIMESTAMP) {
 				AbstractApplicationLogic appLogic = ApplicationUtils.getApplicationLogic();
 				SimpleDateFormat defaultDateTimeFormatter = new SimpleDateFormat(appLogic.getTimestampFormat());
 				try {
@@ -1515,7 +1469,7 @@ public class DbQuery implements Cloneable {
 						throw new TechnicalException("La valeur \"" + sValue + "\" n'est pas correcte. ");
 					}
 				}
-			} else if ("CHAR".equals(var.model.getSqlType()) && sValue.length() > var.model.getSqlSize()) {
+			} else if (var.model.getSqlType() == SqlTypes.CHAR && sValue.length() > var.model.getSqlSize()) {
 				outValue = sValue.substring(0, var.model.getSqlSize());
 			}
 		}
@@ -1527,7 +1481,7 @@ public class DbQuery implements Cloneable {
 
 		if ("*TODAY".equals(value) || "*NOW".equals(value)) {
 
-			if ("DATE".equals(var.model.getSqlType())) {
+			if (var.model.getSqlType() == SqlTypes.DATE) {
 
 				if (DbConnection.getDbType() == Type.ORACLE) {
 					outValue = "SYSDATE";
@@ -1537,7 +1491,7 @@ public class DbQuery implements Cloneable {
 					outValue = "CURRENT_DATE";
 				}
 
-			} else if ("TIME".equals(var.model.getSqlType())) {
+			} else if (var.model.getSqlType() == SqlTypes.TIME) {
 
 				if (DbConnection.getDbType() == Type.ORACLE) {
 					outValue = "SYSDATE";
@@ -1547,7 +1501,7 @@ public class DbQuery implements Cloneable {
 					outValue = "CURRENT_TIME";
 				}
 
-			} else if ("TIMESTAMP".equals(var.model.getSqlType())) {
+			} else if (var.model.getSqlType() == SqlTypes.TIMESTAMP) {
 
 				if (DbConnection.getDbType() == Type.PostgreSQL) {
 					outValue = "clock_timestamp()";
@@ -1562,12 +1516,9 @@ public class DbQuery implements Cloneable {
 	/**
 	 * Ajout d'une condition IS NULL
 	 * 
-	 * @param colAlias
-	 *            nom de variable
-	 * @param tableAlias
-	 *            alias
-	 * @param notNull
-	 *            vrai pour tester IS NOT NULL, faux pour tester IS NULL
+	 * @param colAlias nom de variable
+	 * @param tableAlias alias
+	 * @param notNull vrai pour tester IS NOT NULL, faux pour tester IS NULL
 	 */
 	public void addCondIsNull(String colAlias, String tableAlias, boolean notNull) {
 		String value = SqlOp.OP_ISNULL.val;
@@ -1625,14 +1576,10 @@ public class DbQuery implements Cloneable {
 	/**
 	 * Sort the DbQuery with the given column
 	 * 
-	 * @param column
-	 *            the order column
-	 * @param tableAlias
-	 *            the order table alias
-	 * @param direction
-	 *            the direction for sort
-	 * @param firstInPos
-	 *            true if the sort clause should be applyed before any existing sort clauses
+	 * @param column the order column
+	 * @param tableAlias the order table alias
+	 * @param direction the direction for sort
+	 * @param firstInPos true if the sort clause should be applyed before any existing sort clauses
 	 */
 
 	public void addSortBy(String column, String tableAlias, String direction, boolean firstInPos) {
@@ -1645,10 +1592,8 @@ public class DbQuery implements Cloneable {
 	/**
 	 * check for variable and return Var instance if found
 	 * 
-	 * @param colAlias
-	 *            - nom de la variable
-	 * @param tableAlias
-	 *            - alias de l'entité
+	 * @param colAlias - nom de la variable
+	 * @param tableAlias - alias de l'entité
 	 * @return Var instance if found
 	 */
 	private Var getInVar(String colAlias, String tableAlias) {
@@ -1668,10 +1613,8 @@ public class DbQuery implements Cloneable {
 	/**
 	 * Ajouter une colonne
 	 * 
-	 * @param varName
-	 *            variable
-	 * @param tableAlias
-	 *            alias
+	 * @param varName variable
+	 * @param tableAlias alias
 	 */
 	public void addColumn(String varName, String tableAlias) {
 		addColumn(varName, tableAlias, null, Visibility.VISIBLE);
@@ -1680,10 +1623,8 @@ public class DbQuery implements Cloneable {
 	/**
 	 * Ajouter une colonne à valeur constante.
 	 * 
-	 * @param name
-	 *            Le nom de la colonne
-	 * @param value
-	 *            La valeur de la colonne
+	 * @param name Le nom de la colonne
+	 * @param value La valeur de la colonne
 	 */
 	public void addColumnConst(String name, String value) {
 		Const c = new Const();
@@ -1695,12 +1636,9 @@ public class DbQuery implements Cloneable {
 	/**
 	 * Ajouter une colonne
 	 * 
-	 * @param varName
-	 *            variable de classe
-	 * @param tableAlias
-	 *            alias (facultatif)
-	 * @param as
-	 *            alias de sortie
+	 * @param varName variable de classe
+	 * @param tableAlias alias (facultatif)
+	 * @param as alias de sortie
 	 */
 	public void addColumn(String varName, String tableAlias, String as) {
 		addColumn(varName, tableAlias, as, Visibility.VISIBLE);
@@ -1709,12 +1647,9 @@ public class DbQuery implements Cloneable {
 	/**
 	 * Ajouter une colonne
 	 * 
-	 * @param varName
-	 *            variable de classe
-	 * @param tableAlias
-	 *            alias (facultatif)
-	 * @param v
-	 *            Visibility
+	 * @param varName variable de classe
+	 * @param tableAlias alias (facultatif)
+	 * @param v Visibility
 	 */
 	public void addColumn(String varName, String tableAlias, Visibility v) {
 		addColumn(varName, tableAlias, null, v);
@@ -1724,14 +1659,10 @@ public class DbQuery implements Cloneable {
 	 * Ajouter une colonne<br>
 	 * FIXME select column: 'as name' not managed
 	 * 
-	 * @param varName
-	 *            variable de classe
-	 * @param tableAlias
-	 *            alias (facultatif)
-	 * @param as
-	 *            alias de sortie
-	 * @param v
-	 *            Visibility
+	 * @param varName variable de classe
+	 * @param tableAlias alias (facultatif)
+	 * @param as alias de sortie
+	 * @param v Visibility
 	 */
 	public Var addColumn(String varName, String tableAlias, String as, Visibility v) {
 		Var outVar = findOutVar(varName, tableAlias);
@@ -1758,16 +1689,11 @@ public class DbQuery implements Cloneable {
 	/**
 	 * Ajouter une colonne
 	 * 
-	 * @param varName
-	 *            variable de classe
-	 * @param tableAlias
-	 *            alias (facultatif)
-	 * @param as
-	 *            alias de sortie
-	 * @param v
-	 *            Visibility
-	 * @param expr
-	 *            expression sql
+	 * @param varName variable de classe
+	 * @param tableAlias alias (facultatif)
+	 * @param as alias de sortie
+	 * @param v Visibility
+	 * @param expr expression sql
 	 */
 	public Var addColumn(String varName, String tableAlias, String as, Visibility v, String expr) {
 		Var outVar = addColumn(varName, tableAlias, as, v);
@@ -1785,12 +1711,9 @@ public class DbQuery implements Cloneable {
 	/**
 	 * Supprimer une colonne
 	 * 
-	 * @param varName
-	 *            variable de classe
-	 * @param tableAlias
-	 *            alias (facultatif)
-	 * @param as
-	 *            alias de sortie
+	 * @param varName variable de classe
+	 * @param tableAlias alias (facultatif)
+	 * @param as alias de sortie
 	 */
 	public void removeColumn(String varName, String tableAlias, String as) {
 		List<Var> newOutVars = new ArrayList<DbQuery.Var>();
@@ -1813,8 +1736,7 @@ public class DbQuery implements Cloneable {
 	/**
 	 * Ajoute toutes colonnes d'une table
 	 * 
-	 * @param tableAlias
-	 *            alias
+	 * @param tableAlias alias
 	 */
 	public void addAllColumns(String tableAlias) {
 		Table t = getTable(tableAlias);
@@ -1836,8 +1758,7 @@ public class DbQuery implements Cloneable {
 	/**
 	 * Enlève toutes les colonnes en sortie de la table
 	 * 
-	 * @param tableAlias
-	 *            alias
+	 * @param tableAlias alias
 	 */
 	public void removeOutVars(String tableAlias) {
 		for (int i = outVars.size() - 1; i >= 0; i--) {
@@ -1851,10 +1772,8 @@ public class DbQuery implements Cloneable {
 	/**
 	 * Retourner une variable en sortie
 	 * 
-	 * @param alias
-	 *            alias de la colonne
-	 * @param tableAlias
-	 *            alias de la table (facultatif)
+	 * @param alias alias de la colonne
+	 * @param tableAlias alias de la table (facultatif)
 	 */
 	private Var findOutVarByAlias(String alias, String tableAlias) {
 		for (Var var : outVars) {
@@ -1868,10 +1787,8 @@ public class DbQuery implements Cloneable {
 	/**
 	 * Retourner une variable en sortie
 	 * 
-	 * @param varName
-	 *            variable de classe
-	 * @param tableAlias
-	 *            alias (facultatif)
+	 * @param varName variable de classe
+	 * @param tableAlias alias (facultatif)
 	 */
 	private Var findOutVar(String varName, String tableAlias) {
 		if (varName == null || varName.length() == 0) {
@@ -1922,8 +1839,7 @@ public class DbQuery implements Cloneable {
 	}
 
 	/**
-	 * @param alias
-	 *            alias de la table
+	 * @param alias alias de la table
 	 * @return nom de l'entité de la table
 	 */
 	public String getEntity(String alias) {
@@ -2065,7 +1981,7 @@ public class DbQuery implements Cloneable {
 	 * Création de la requête SQL de select à partir de l'identifiant de l'entité passée en paramètre
 	 * 
 	 * @param entity
-	 * @return
+	 * @return SQL query
 	 */
 	public static String createSelectByIdQuery(Entity entity) {
 		return createSelectByIdQuery(entity.getClass().getSimpleName(), entity.getModel().getKeyModel(), entity.getPrimaryKey());
@@ -2075,7 +1991,7 @@ public class DbQuery implements Cloneable {
 	 * Génération de la requête permettant de récupérer le prochain ID d'une séquence
 	 * 
 	 * @param entity
-	 * @return
+	 * @return SQL query
 	 */
 	public static String getNextSequenceIdQuery(Entity entity) {
 		String dbName = DomainUtils.createDbName(entity.getClass().getSimpleName());
@@ -2085,8 +2001,8 @@ public class DbQuery implements Cloneable {
 	/**
 	 * Génération de la requête permettant de récupérer le prochain ID d'une séquence
 	 * 
-	 * @param entity
-	 * @return
+	 * @param sequenceName Name of the sequence to use
+	 * @return SQL query
 	 */
 	public static String getNextSequenceIdQuery(String sequenceName) {
 		return "select " + Constants.EXTENSION_SEQUENCE + sequenceName + ".nextVal from dual";
@@ -2159,8 +2075,7 @@ public class DbQuery implements Cloneable {
 	 * - true : <b>NON</b> sensible<br>
 	 * - false : sensible.
 	 * 
-	 * @param caseInsensitiveSearch
-	 *            the caseInsensitiveSearch to set
+	 * @param caseInsensitiveSearch the caseInsensitiveSearch to set
 	 */
 
 	public void setCaseInsensitiveSearch(boolean caseInsensitiveSearch) {
@@ -2170,10 +2085,8 @@ public class DbQuery implements Cloneable {
 	/**
 	 * Ajout d'une fonction de regroupement (GROUP BY)
 	 * 
-	 * @param colAlias
-	 *            nom de variable
-	 * @param tableAlias
-	 *            alias
+	 * @param colAlias nom de variable
+	 * @param tableAlias alias
 	 */
 
 	public void addGroupBy(String colAlias, String tableAlias) {
@@ -2219,10 +2132,8 @@ public class DbQuery implements Cloneable {
 	/**
 	 * Ajouter une colonne utilisant la fonction AVG(colAlias)
 	 * 
-	 * @param colAlias
-	 *            nom de variable
-	 * @param tableAlias
-	 *            alias de classe (facultatif)
+	 * @param colAlias nom de variable
+	 * @param tableAlias alias de classe (facultatif)
 	 */
 	public void addAvg(String colAlias, String tableAlias) {
 		addGroupColumn(colAlias, tableAlias, "avg({0})", null);
@@ -2231,10 +2142,8 @@ public class DbQuery implements Cloneable {
 	/**
 	 * Ajouter une colonne utilisant la fonction SUM(colAlias)
 	 * 
-	 * @param colAlias
-	 *            nom de variable
-	 * @param tableAlias
-	 *            alias de classe (facultatif)
+	 * @param colAlias nom de variable
+	 * @param tableAlias alias de classe (facultatif)
 	 */
 	public void addSum(String colAlias, String tableAlias) {
 		addGroupColumn(colAlias, tableAlias, "sum({0})", null);
@@ -2243,10 +2152,8 @@ public class DbQuery implements Cloneable {
 	/**
 	 * Ajouter une colonne utilisant la fonction DISTINCT(colAlias)
 	 * 
-	 * @param colAlias
-	 *            nom de variable
-	 * @param tableAlias
-	 *            alias de classe (facultatif)
+	 * @param colAlias nom de variable
+	 * @param tableAlias alias de classe (facultatif)
 	 */
 	public void addDistinct(String colAlias, String tableAlias) {
 		addGroupColumn(colAlias, tableAlias, "distinct({0})", null);
@@ -2255,10 +2162,8 @@ public class DbQuery implements Cloneable {
 	/**
 	 * Ajouter une fonction maximum
 	 * 
-	 * @param colAlias
-	 *            nom de variable
-	 * @param tableAlias
-	 *            alias
+	 * @param colAlias nom de variable
+	 * @param tableAlias alias
 	 */
 	public void addMax(String colAlias, String tableAlias) {
 		addGroupColumn(colAlias, tableAlias, "max({0})", null);
@@ -2267,10 +2172,8 @@ public class DbQuery implements Cloneable {
 	/**
 	 * Ajouter une fonction minimum
 	 * 
-	 * @param colAlias
-	 *            nom de variable
-	 * @param tableAlias
-	 *            alias
+	 * @param colAlias nom de variable
+	 * @param tableAlias alias
 	 */
 	public void addMin(String colAlias, String tableAlias) {
 		addGroupColumn(colAlias, tableAlias, "min({0})", null);
@@ -2279,14 +2182,10 @@ public class DbQuery implements Cloneable {
 	/**
 	 * Ajout d'une colonne de comptage
 	 * 
-	 * @param colName
-	 *            nom de variable
-	 * @param tableAlias
-	 *            alias de table, <code>null</code>=facultatif
-	 * @param asName
-	 *            alias de la colonne
-	 * @param bDistinct
-	 *            <code>true</code>=count(distinct COLONNE) <code>false</code>=count(COLONNE) <br>
+	 * @param colName nom de variable
+	 * @param tableAlias alias de table, <code>null</code>=facultatif
+	 * @param asName alias de la colonne
+	 * @param bDistinct <code>true</code>=count(distinct COLONNE) <code>false</code>=count(COLONNE) <br>
 	 */
 	public void addCount(String colName, String tableAlias, String asName, boolean bDistinct) {
 		Var outVar = null;
@@ -2296,20 +2195,16 @@ public class DbQuery implements Cloneable {
 			outVar = addGroupColumn(colName, tableAlias, "count({0})", asName);
 		}
 		// override column type
-		outVar.model = new EntityField(outVar.model.getSqlName(), "INTEGER", 10, 0, Memory.NO, true, false);
+		outVar.model = new EntityField(outVar.model.getSqlName(), SqlTypes.INTEGER, 10, 0, Memory.NO, true, false);
 	}
 
 	/**
 	 * Ajout d'une expression decode : decode (<b>tableAlias.colAlias</b>, <b>args[0]</b> {args[1], args[2], ...}) as <b>asName</b>
 	 * 
-	 * @param colAlias
-	 *            nom de variable
-	 * @param tableAlias
-	 *            alias de table, <code>null</code>=facultatif
-	 * @param asName
-	 *            alias de colonne
-	 * @param args
-	 *            Valeurs de decode
+	 * @param colAlias nom de variable
+	 * @param tableAlias alias de table, <code>null</code>=facultatif
+	 * @param asName alias de colonne
+	 * @param args Valeurs de decode
 	 */
 	public void addDecode(String colAlias, String tableAlias, String asName, Object[] args) {
 		if (args == null || args.length == 0) {
@@ -2337,16 +2232,30 @@ public class DbQuery implements Cloneable {
 	}
 
 	/**
+	 * Returns the appropriate ifNull equivalent depending on DB type
+	 * 
+	 * @param connectionType Database type (ORACLE, MySQL, PostgreSQL, etc.)
+	 * @return name of the ifnull equivalent function to use (ifnull, nvl, coalesce, etc.)
+	 */
+	private String getIfNullFunction(Type connectionType) {
+		if (DbConnection.getDbType() == Type.ORACLE) {
+			return "nvl";
+
+		} else if (DbConnection.getDbType() == Type.PostgreSQL) {
+			return "COALESCE";
+
+		} else {
+			return "ifnull";
+		}
+	}
+
+	/**
 	 * Ajout d'une expression ifnull : ifnull (<b>tableAlias.colAlias</b>, <b>valueIfNull</b>) as </b>asName</b>
 	 * 
-	 * @param colAlias
-	 *            nom de variable
-	 * @param tableAlias
-	 *            alias de table, <code>null</code>=facultatif
-	 * @param asName
-	 *            alias de colonne
-	 * @param valueIfNull
-	 *            valeur si null
+	 * @param colAlias nom de variable
+	 * @param tableAlias alias de table, <code>null</code>=facultatif
+	 * @param asName alias de colonne
+	 * @param valueIfNull valeur si null
 	 */
 	public void addIfNull(String colAlias, String tableAlias, String asName, Object valueIfNull) {
 		if (valueIfNull == null) {
@@ -2354,27 +2263,12 @@ public class DbQuery implements Cloneable {
 		}
 		Var outVar = findOutVar(colAlias, tableAlias);
 		String function = parseDefaultValue(outVar, valueIfNull);
+		String ifNullFunction = getIfNullFunction(DbConnection.getDbType());
 		String expr;
 		if (null != function) {
-			if (DbConnection.getDbType() == Type.ORACLE) {
-				expr = "nvl({0}, " + function + ")";
-
-			} else if (DbConnection.getDbType() == Type.PostgreSQL) {
-				expr = "COALESCE({0}, " + function + ")";
-
-			} else {
-				expr = "ifnull({0}, " + function + ")";
-			}
+			expr = ifNullFunction + "({0}, " + function + ")";
 		} else {
-			if (DbConnection.getDbType() == Type.ORACLE) {
-				expr = "nvl({0}, ?)";
-
-			} else if (DbConnection.getDbType() == Type.PostgreSQL) {
-				expr = "COALESCE({0}, ?)";
-
-			} else {
-				expr = "ifnull({0}, ?)";
-			}
+			expr = ifNullFunction + "({0}, ?)";
 			bindValues.add(parse(outVar, valueIfNull));
 		}
 		addColumn(colAlias, tableAlias, asName, Visibility.VISIBLE, expr.toString());
@@ -2385,7 +2279,7 @@ public class DbQuery implements Cloneable {
 	 */
 
 	public void and() {
-		whereClause = whereClause.concat(andOperator(whereClause)); 
+		whereClause = whereClause.concat(andOperator(whereClause));
 	}
 
 	/**
@@ -2393,7 +2287,7 @@ public class DbQuery implements Cloneable {
 	 */
 
 	public void or() {
-		whereClause = whereClause.concat(orOperator(whereClause)); 
+		whereClause = whereClause.concat(orOperator(whereClause));
 	}
 
 	/**
@@ -2401,7 +2295,7 @@ public class DbQuery implements Cloneable {
 	 */
 
 	public void havingAnd() {
-		havingClause = havingClause.concat(andOperator(havingClause)); 
+		havingClause = havingClause.concat(andOperator(havingClause));
 	}
 
 	/**
@@ -2409,7 +2303,7 @@ public class DbQuery implements Cloneable {
 	 */
 
 	public void havingOr() {
-		havingClause = havingClause.concat(orOperator(havingClause)); 
+		havingClause = havingClause.concat(orOperator(havingClause));
 	}
 
 	/**
@@ -2419,7 +2313,7 @@ public class DbQuery implements Cloneable {
 		if (clause.length() > 0 && !clause.endsWith("(")) {
 			return " AND ";
 		}
-		return ""; 
+		return "";
 	}
 
 	/**
@@ -2429,7 +2323,7 @@ public class DbQuery implements Cloneable {
 		if (clause.length() > 0 && !clause.endsWith("(")) {
 			return " OR ";
 		}
-		return ""; 
+		return "";
 	}
 
 	/**
@@ -2437,7 +2331,7 @@ public class DbQuery implements Cloneable {
 	 */
 
 	public void startGroupCondition() {
-		whereClause = whereClause.concat("("); 
+		whereClause = whereClause.concat("(");
 	}
 
 	/**
@@ -2445,7 +2339,7 @@ public class DbQuery implements Cloneable {
 	 */
 
 	public void endGroupCondition() {
-		whereClause = whereClause.concat(")"); 
+		whereClause = whereClause.concat(")");
 	}
 
 	public boolean isForUpdate() {
@@ -2468,8 +2362,7 @@ public class DbQuery implements Cloneable {
 	/**
 	 * Finds an out var from the query with
 	 * 
-	 * @param columnAlias
-	 *            Column alias which is (tableAlias_varName)
+	 * @param columnAlias Column alias which is (tableAlias_varName)
 	 * @return Var corresponding to the alias, null if there's no such Var
 	 */
 	public Var getOutVar(String columnAlias) {

@@ -1,43 +1,66 @@
 package fr.logica.domain.objects;
 
 import java.io.Serializable;
-
 import java.util.HashSet;
 import java.util.Set;
 
-
+import fr.logica.business.Action.*;
 import fr.logica.business.Entity;
+import fr.logica.business.EntityField.SqlTypes;
 import fr.logica.business.Key;
+import fr.logica.business.KeyModel;
 import fr.logica.business.context.RequestContext;
 import fr.logica.db.DB;
-import fr.logica.domain.models.ShopUserModel;
+import fr.logica.domain.annotations.*;
+import fr.logica.domain.constants.ShopUserConstants;
 
 /**
  * Entity ShopUser definition
  * 
  * @author CGI
  */
+@EntityDef(dbName = "USER", primaryKey = { "login" })
+@Links({
+})
+@Actions({
+	@Action(code = 0, input = Input.NONE, persistence = Persistence.INSERT),
+	@Action(code = 2, persistence = Persistence.UPDATE),
+	@Action(code = 4, persistence = Persistence.DELETE, ui = UserInterface.READONLY),
+	@Action(code = 5, persistence = Persistence.NONE, ui = UserInterface.READONLY)
+})
 public class ShopUser extends Entity implements Serializable {
 	/** serialVersionUID */
 	public static final long serialVersionUID = 1L;
-	
 
 	/** Login */
-	private String login ;
+	@EntityField(sqlName = "LOGIN", sqlType = SqlTypes.VARCHAR2, sqlSize = 10, isMandatory = true)
+	private String login;
 
 	/** Nom */
-	private String name ;
+	@EntityField(sqlName = "NAME", sqlType = SqlTypes.VARCHAR2, sqlSize = 100, isMandatory = true)
+	private String name;
 
 	/** Mot de passe */
-	private String password ;
+	@EntityField(sqlName = "PASSWORD", sqlType = SqlTypes.VARCHAR2, sqlSize = 100)
+	private String password;
 
 	/** Profil */
-	private String profile = "USER";
+	@EntityField(sqlName = "PROFILE", sqlType = SqlTypes.VARCHAR2, sqlSize = 10, defaultValue = "USER")
+	@DefinedValues({
+			@DefinedValue(code = "USER", label = "shopUser.profile.USER", value = "USER", isDefault = true), // Utilisateur
+			@DefinedValue(code = "ADMIN", label = "shopUser.profile.ADMIN", value = "ADMIN"), // Administrateur
+			@DefinedValue(code = "BUYER", label = "shopUser.profile.BUYER", value = "BUYER") // Acheteur
+	})
+	private String profile;
 
 	/** Description */
-	private String internalCaption ;
+	@EntityField(sqlName = "W$_DESC", sqlType = SqlTypes.VARCHAR2, sqlSize = 100, memory = fr.logica.business.EntityField.Memory.SQL, sqlExpr = ":tableAlias.NAME")
+	private String internalCaption;
 
-
+	/**
+	 * Initialize a new ShopUser.<br/>
+	 * <b>The fields with initial value will be populated.</b>
+	 */
 	public ShopUser() {
 		// Default constructor
 		super();
@@ -53,38 +76,34 @@ public class ShopUser extends Entity implements Serializable {
 	 */
 	public ShopUser(String login) {
 		super();
-		Key primaryKey = ShopUserModel.buildPrimaryKey(login);
+		Key primaryKey = buildPrimaryKey(login);
 		setPrimaryKey(primaryKey);
 	}
 	
 	/**
-	 * Load a bean from database based on its primary key
-	 * <b>This method does not call the logic method dbPostLoad().</b>
-	 * @param login Login
-	 * @param ctx Current context with open database connection.
-	 * @return	<code>true</code> if the bean has been loaded, <code>false</code> if no entity was found.  
+	 * Initialize a new ShopUser from an existing ShopUser.<br/>
+	 * <b>All fields value are copied.</b>
 	 */
-	public boolean find(String login, RequestContext ctx) {
-		Key primaryKey = ShopUserModel.buildPrimaryKey(login);
-		if (!primaryKey.isFull()) {
-			return false;
-		}
-		ShopUser dbInstance = DB.get(NAME, primaryKey, ctx);
-		if (dbInstance != null) {
-			syncFromBean(dbInstance);
-			return true; 
-		}
-		return false; 
-	}
-	
 	public ShopUser(ShopUser pShopUser) {
 		super(pShopUser);
+	}
+
+	/**
+	 * Generate a primary key for the entity
+	 */
+	public static synchronized Key buildPrimaryKey(String login) {
+		KeyModel pkModel = new KeyModel(ShopUserConstants.ENTITY_NAME);
+		// FIXME : Récupérer la PK ...
+		Key key = new Key(pkModel);
+		key.setValue("login", login);
+
+		return key;
 	}
 
 	/** Entity name */
 	@Override
 	public String name() {
-		return "shopUser";
+		return ShopUserConstants.ENTITY_NAME;
 	}
 
 	/** Entity description */
@@ -101,7 +120,7 @@ public class ShopUser extends Entity implements Serializable {
 	public String getLogin() {
 		return this.login;
 	}
- 
+
 	/**
 	 * Set the value from field Login.
 	 *
@@ -110,8 +129,6 @@ public class ShopUser extends Entity implements Serializable {
 	public void setLogin(final String login) {
 		this.login = login;
 	}
-	
-
 
 	/**
 	 * Get the value from field Name.
@@ -121,7 +138,7 @@ public class ShopUser extends Entity implements Serializable {
 	public String getName() {
 		return this.name;
 	}
- 
+
 	/**
 	 * Set the value from field Name.
 	 *
@@ -130,8 +147,6 @@ public class ShopUser extends Entity implements Serializable {
 	public void setName(final String name) {
 		this.name = name;
 	}
-	
-
 
 	/**
 	 * Get the value from field Password.
@@ -141,7 +156,7 @@ public class ShopUser extends Entity implements Serializable {
 	public String getPassword() {
 		return this.password;
 	}
- 
+
 	/**
 	 * Set the value from field Password.
 	 *
@@ -150,8 +165,6 @@ public class ShopUser extends Entity implements Serializable {
 	public void setPassword(final String password) {
 		this.password = password;
 	}
-	
-
 
 	/**
 	 * Get the value from field Profile.
@@ -161,7 +174,7 @@ public class ShopUser extends Entity implements Serializable {
 	public String getProfile() {
 		return this.profile;
 	}
- 
+
 	/**
 	 * Set the value from field Profile.
 	 *
@@ -170,8 +183,6 @@ public class ShopUser extends Entity implements Serializable {
 	public void setProfile(final String profile) {
 		this.profile = profile;
 	}
-	
-
 
 	/**
 	 * Gets the value from field InternalCaption. This getter respects real Java naming convention. 
@@ -199,7 +210,7 @@ public class ShopUser extends Entity implements Serializable {
 	public String getInternalCaption() {
 		return this.internalCaption;
 	}
- 
+
 	/**
 	 * Set the value from field InternalCaption.
 	 *
@@ -207,32 +218,6 @@ public class ShopUser extends Entity implements Serializable {
 	 */
 	public void setInternalCaption(final String internalCaption) {
 		this.internalCaption = internalCaption;
-	}
-	
-
-
-	/** Holder for the var names */
-	public interface Var {
-		/** Var LOGIN */
-		String LOGIN = "login";
-		/** Var NAME */
-		String NAME = "name";
-		/** Var PASSWORD */
-		String PASSWORD = "password";
-		/** Var PROFILE */
-		String PROFILE = "profile";
-	}
-	
-	/** Holder for the defined values */
-	public interface ValueList {
-		public interface PROFILE {
-			/** Utilisateur */
-			String USER = "USER";
-			/** Administrateur */
-			String ADMIN = "ADMIN";
-			/** Acheteur */
-			String BUYER = "BUYER";
-		}
 	}
 
 	/**
@@ -249,27 +234,12 @@ public class ShopUser extends Entity implements Serializable {
 			// Do not get linked entities if PK is incomplete
 			return s;
 		}
-		for (Entity e : DB.getLinkedEntities(this, ShopUserModel.LINK_SHOP_ARTICLE_L_USER, ctx)) {
+		for (Entity e : DB.getLinkedEntities(this, ShopUserConstants.Links.LINK_SHOP_ARTICLE_L_USER, ctx)) {
 			s.add((ShopList) e);
 		}
 		return s;
 	}
 
-
-	/** Holder for the action names */
-	public interface Action {
-		/** Créer. */
-		int ACTION_0 = 0;
-		/** Modifier. */
-		int ACTION_2 = 2;
-		/** Supprimer. */
-		int ACTION_4 = 4;
-		/** Afficher. */
-		int ACTION_5 = 5;
-    }
-
-	/** Nom de l'entité. */
-	public static final String NAME = "shopUser";
 	
 	/**
 	 * Clones the current bean.

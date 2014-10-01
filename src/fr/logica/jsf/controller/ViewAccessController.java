@@ -11,7 +11,9 @@ import org.apache.log4j.Logger;
 import fr.logica.application.ApplicationUtils;
 import fr.logica.application.logic.ApplicationLogic;
 import fr.logica.business.Constants;
+import fr.logica.business.FunctionalException;
 import fr.logica.business.controller.Request;
+import fr.logica.jsf.utils.FacesMessagesUtils;
 
 /**
  * JSF Controller to allow permalink to work
@@ -54,10 +56,14 @@ public class ViewAccessController {
 		ApplicationLogic appLogic = new ApplicationLogic();
 		try {
 			request = appLogic.getPermalinkRequest(fc.getExternalContext().getRequestParameterMap(), jsfCtrl.getContext());
-		} catch (Exception e) {
+		} catch (FunctionalException fe) {
+            LOGGER.debug(fe.getMessage(), fe);
+            request = null;
+            fc.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, fe.getMessage(), null));
+        } catch (Exception e) {
 			LOGGER.error("Error handling directViewAccess: " + e.getMessage(), e);
 			request = null;
-			fc.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, jsfCtrl.getTechnicalMessage(e), null));
+			fc.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, FacesMessagesUtils.getTechnicalMessage(e), null));
 		}
 	}
 

@@ -14,14 +14,12 @@ import com.vividsolutions.jts.geom.Geometry;
 import fr.logica.business.Action.Input;
 import fr.logica.business.Action.Persistence;
 import fr.logica.business.Action.UserInterface;
+import fr.logica.business.EntityField.SqlTypes;
 import fr.logica.business.context.RequestContext;
 import fr.logica.business.controller.Request;
 import fr.logica.business.controller.Response;
 import fr.logica.business.data.ListData;
 import fr.logica.business.data.ScheduleEvent;
-import fr.logica.business.DateTimeUpgraded;
-import fr.logica.business.EntityField;
-import fr.logica.business.MessageUtils;
 import fr.logica.db.DB;
 import fr.logica.db.DbManager;
 import fr.logica.db.DbQuery;
@@ -30,11 +28,10 @@ import fr.logica.reflect.DomainUtils;
 import fr.logica.ui.Message;
 import fr.logica.ui.Message.Severity;
 
-@SuppressWarnings("unused")
 public abstract class AbstractDomainLogic<E extends Entity> {
 
-    /** Logger */
-    private static final Logger LOGGER = Logger.getLogger(AbstractDomainLogic.class);
+	/** Logger */
+	private static final Logger LOGGER = Logger.getLogger(AbstractDomainLogic.class);
 
 	public final List<Key> internalDoCustomAction(Request<E> request, E entity, List<Key> keys, RequestContext ctx) {
 		try {
@@ -55,19 +52,27 @@ public abstract class AbstractDomainLogic<E extends Entity> {
 	}
 
 	/**
-	 * Custom action on one / many elements. This method is called once for all selected item.
+	 * Custom action on one element.
 	 * 
-	 * @param bean Entity to process.
-	 * @param action Action called on entity.
-	 * @param keys Remaining keys to process.
-	 * @param ctx Current applicative context.
+	 * @param request Current request.
+	 * @param entity Entity to process.
+	 * @param ctx Current request context.
 	 * @return Remaining keys to process. If null, batch processing will stop after this element.
 	 */
 	public abstract List<Key> doCustomAction(Request<E> request, E entity, RequestContext ctx);
 
+	/**
+	 * Custom action on many elements. This method is called once for all selected item.
+	 * 
+	 * @param request Current request.
+	 * @param entity Entity to process.
+	 * @param keys Keys to process.
+	 * @param ctx Current request context.
+	 * @return Remaining keys to process. If null, batch processing will stop after this element.
+	 */
 	public abstract List<Key> doCustomAction(Request<E> request, E entity, List<Key> keys, RequestContext ctx);
 
-    public final boolean internalDoCheck(E bean, Action action, RequestContext ctx) {
+	public final boolean internalDoCheck(E bean, Action action, RequestContext ctx) {
 		boolean errors = false;
 		try {
 			for (String varName : bean.getModel().getFields()) {
@@ -80,26 +85,26 @@ public abstract class AbstractDomainLogic<E extends Entity> {
 			errors = true;
 		}
 		return errors;
-    }
+	}
 
-    /**
-     * Check consistency of an entity. Default behavior will call varCheck on every variable.
-     * 
-     * @param bean
-     *            Entity instance to check.
-     * @param action
-     *            Action to check.
-     * @param ctx
-     *            Current context.
-     * @throws FunctionalException
-     *             Exception thrown when entity is invalid.
-     * 
-     */
-    public abstract boolean doCheck(E bean, Action action, RequestContext ctx) throws FunctionalException;
+	/**
+	 * Check consistency of an entity. Default behavior will call varCheck on every variable.
+	 * 
+	 * @param bean
+	 *			Entity instance to check.
+	 * @param action
+	 *			Action to check.
+	 * @param ctx
+	 *			Current context.
+	 * @throws FunctionalException
+	 *			 Exception thrown when entity is invalid.
+	 * 
+	 */
+	public abstract boolean doCheck(E bean, Action action, RequestContext ctx) throws FunctionalException;
 
-    public final String internalDoDescription(E bean, RequestContext ctx) {
+	public final String internalDoDescription(E bean, RequestContext ctx) {
 		try {
-	        return doDescription(bean, ctx);
+			return doDescription(bean, ctx);
 		} catch (FunctionalException fEx) {
 			ctx.getMessages().addAll(fEx.getMessages()); 
 			throw fEx; 
@@ -112,50 +117,43 @@ public abstract class AbstractDomainLogic<E extends Entity> {
      * @param bean
      *            Entity instance (can be null).
      * @param ctx
-     *            Current applicative Context
+     *            Current request context
      * @return String describing the entity instance. Default behavior will look for a descriptionField declared in entity, if no description
      *         field exists, it will detail primary key fields.
      */
-    public abstract String doDescription(E bean, RequestContext ctx);
+	public abstract String doDescription(E bean, RequestContext ctx);
 
-    public final boolean internalDoVarCheck(E bean, Action action, String varName, RequestContext ctx) {
+	public final boolean internalDoVarCheck(E bean, Action action, String varName, RequestContext ctx) {
 		boolean errors = false;
 		try {
-	        // Check not-null fields
-	        if (bean.invokeGetter(varName) == null && !bean.getModel().isAutoIncrementField(varName)
-	                && (bean.getModel().getField(varName).isMandatory() || internalDoVarIsMandatory(bean, varName, action, ctx))) {
-	            String varLabel = internalUiVarCaption(bean, varName, action, ctx);
-	
-	            if (null == varLabel) {
-	                varLabel = MessageUtils.getInstance(ctx).getVarTitle(bean.name(), varName);
-	            }
-	            ctx.getMessages().add(new Message(varLabel + " : Vous devez indiquer une valeur.", Severity.ERROR));
-	            errors = true;
-	        }
-	        // Validate allowed values
-	 		EntityField field = bean.getModel().getField(varName);
-	 		if (field.hasDefinedValues()) {
-	 			Object value = bean.invokeGetter(varName);
-	 			boolean isDefinedValue = false;
-	 			for (Object definedObj : field.getValues()) {
-	 				if (value == null && definedObj == null || value != null && value.equals(definedObj)) {
-	 					// Input value exists amongst defined values
-	 					isDefinedValue = true;
-	 					break;
-	 				}
-	 			}
-	 			if (!isDefinedValue) {
-	 				ctx.getMessages().add(new Message(MessageUtils.getInstance(ctx).getMessage(
-	 						"uiControlerModel.fieldhasNotAllowedValue",
-	 						new Object[] { (Object) field.getDisplayText() }), Severity.ERROR));
-	 				errors = true;
-	 			}
-	 		}
-            errors |= doVarCheck(bean, varName, action, ctx);
-        } catch (FunctionalException ex) {
-            LOGGER.error(ex);
-            ctx.getMessages().add(new Message(ex.getMessage(), Severity.ERROR));
-            errors = true;
+			String varLabel = internalUiVarCaption(bean, varName, action, ctx);
+			if (null == varLabel) {
+				varLabel = MessageUtils.getInstance(ctx).getVarTitle(bean.name(), varName);
+			}
+			// Check not-null fields
+			if (bean.invokeGetter(varName) == null && !bean.getModel().isAutoIncrementField(varName)
+					&& (bean.getModel().getField(varName).isMandatory() || internalDoVarIsMandatory(bean, varName, action, ctx))) {
+				ctx.getMessages().add(new Message(MessageUtils.getInstance(ctx).getMessage(
+						"uiControlerModel.fieldIsMandatory",
+						new Object[] { varLabel }), Severity.ERROR));
+				errors = true;
+			}
+			// Validate allowed values
+			EntityField field = bean.getModel().getField(varName);
+			if (field.hasDefinedValues()) {
+				Object value = bean.invokeGetter(varName);
+				if (!field.isDefValue(value)) {
+					ctx.getMessages().add(new Message(MessageUtils.getInstance(ctx).getMessage(
+							"uiControlerModel.fieldhasNotAllowedValue",
+							new Object[] { varLabel }), Severity.ERROR));
+					errors = true;
+				}
+			}
+			errors |= doVarCheck(bean, varName, action, ctx);
+		} catch (FunctionalException ex) {
+			LOGGER.error(ex);
+			ctx.getMessages().add(new Message(ex.getMessage(), Severity.ERROR));
+			errors = true;
 		} 
 		return errors; 
 	}
@@ -170,13 +168,13 @@ public abstract class AbstractDomainLogic<E extends Entity> {
      * @param action
      *            Current Action
      * @param ctx
-     *            Current applicative context.
+     *            Current request context.
      * @throws FunctionalException
      *             If var is invalid.
      */
-    public abstract boolean doVarCheck(E bean, String varName, Action action, RequestContext ctx) throws FunctionalException;
+	public abstract boolean doVarCheck(E bean, String varName, Action action, RequestContext ctx) throws FunctionalException;
 
-    public final boolean internalDoVarIsMandatory(E bean, String varName, Action action, RequestContext ctx) {
+	public final boolean internalDoVarIsMandatory(E bean, String varName, Action action, RequestContext ctx) {
 		try {
 			return doVarIsMandatory(bean, varName, action, ctx);
 		} catch (FunctionalException fEx) {
@@ -195,15 +193,15 @@ public abstract class AbstractDomainLogic<E extends Entity> {
      * @param action
      *            Current action
      * @param ctx
-     *            Current applicative context
+     *            Current request context
      * @return <code>true</code> when varName is mandatory, <code>false</code> otherwise.
      */
-    public abstract boolean doVarIsMandatory(E bean, String varName, Action action, RequestContext ctx);
+	public abstract boolean doVarIsMandatory(E bean, String varName, Action action, RequestContext ctx);
 
-    @Deprecated
-    public final Object internalDoVarValue(Map<String, Object> vars, String domainName, String varName, RequestContext ctx) {
+	@Deprecated
+	public final Object internalDoVarValue(Map<String, Object> vars, String domainName, String varName, RequestContext ctx) {
 		try {
-	        return doVarValue(vars, domainName, varName, ctx);
+			return doVarValue(vars, domainName, varName, ctx);
 		} catch (FunctionalException fEx) {
 			ctx.getMessages().addAll(fEx.getMessages()); 
 			throw fEx; 
@@ -218,14 +216,15 @@ public abstract class AbstractDomainLogic<E extends Entity> {
      * varName, RequestContext ctx)
      * 
      * @param vars Variables used for computation
+     * @param domainName the name of the entity
      * @param varName Calculated Variable
-     * @param ctx Current applicative context
+     * @param ctx Current request context
      * @return Object containing variable value.
      */
-    @Deprecated
-    public abstract Object doVarValue(Map<String, Object> vars, String domainName, String varName, RequestContext ctx);
+	@Deprecated
+	public abstract Object doVarValue(Map<String, Object> vars, String domainName, String varName, RequestContext ctx);
 
-    public final Object internalUiListVarValue(Map<String, Object> vars, String queryName, String domainName, String varName, RequestContext ctx) {
+	public final Object internalUiListVarValue(Map<String, Object> vars, String queryName, String domainName, String varName, RequestContext ctx) {
 		try {
 			return uiListVarValue(vars, queryName, domainName, varName, ctx);
 		} catch (FunctionalException fEx) {
@@ -240,12 +239,12 @@ public abstract class AbstractDomainLogic<E extends Entity> {
      * @param vars All data contained in the row of the result set.
      * @param queryName the query name
      * @param varName Calculated Variable
-     * @param ctx Current applicative context
+     * @param ctx Current request context
      * @return Object containing variable value.
      */
-    public abstract Object uiListVarValue(Map<String, Object> vars, String queryName, String domainName, String varName, RequestContext ctx);
+	public abstract Object uiListVarValue(Map<String, Object> vars, String queryName, String domainName, String varName, RequestContext ctx);
 
-    public final Object internalDoVarValue(E bean, String varName, RequestContext ctx) {
+	public final Object internalDoVarValue(E bean, String varName, RequestContext ctx) {
 		try {
 			return doVarValue(bean, varName, ctx);
 		} catch (FunctionalException fEx) {
@@ -257,16 +256,16 @@ public abstract class AbstractDomainLogic<E extends Entity> {
     /**
      * Computes a memory variable value for a domain object instance.
      * 
-     * @param vars The current domain object instance.
+     * @param bean The current domain object instance.
      * @param varName Calculated Variable
-     * @param ctx Current applicative context
+     * @param ctx Current request context
      * @return Object containing variable value.
      */
-    public abstract Object doVarValue(E bean, String varName, RequestContext ctx);
+	public abstract Object doVarValue(E bean, String varName, RequestContext ctx);
 
-    public final void internalDbSecure(DbQuery query, RequestContext ctx) {
+	public final void internalDbSecure(DbQuery query, RequestContext ctx) {
 		try {
-	        dbSecure(query, ctx);
+			dbSecure(query, ctx);
 		} catch (FunctionalException fEx) {
 			ctx.getMessages().addAll(fEx.getMessages()); 
 			throw fEx; 
@@ -279,61 +278,61 @@ public abstract class AbstractDomainLogic<E extends Entity> {
      * @param query
      *            Current executed query.
      * @param ctx
-     *            Current applicative context.
+     *            Current request context.
      */
-    public abstract void dbSecure(DbQuery query, RequestContext ctx);
+	public abstract void dbSecure(DbQuery query, RequestContext ctx);
 
-    public final void internalDbOnSave(E bean, Action action, RequestContext ctx) {
+	public final void internalDbOnSave(E bean, Action action, RequestContext ctx) {
 		try {
-	        for (Field field : bean.getFields()) {
-	            String fieldName = field.getName();
+			for (Field field : bean.getFields()) {
+				String fieldName = field.getName();
 	
-	            if (Geometry.class.equals(field.getType()) && null == bean.invokeGetter(fieldName)) {
-	                String locationFieldName = Constants.GEOMETRY_ADDRESS + fieldName.substring(0, 1).toUpperCase()
-	                        + fieldName.substring(1);
+				if (Geometry.class.equals(field.getType()) && null == bean.invokeGetter(fieldName)) {
+					String locationFieldName = Constants.GEOMETRY_ADDRESS + fieldName.substring(0, 1).toUpperCase()
+							+ fieldName.substring(1);
 	
-	                if (null == bean.getModel().getField(locationFieldName)) {
-	                    continue;
-	                }
-	                String location = (String) bean.invokeGetter(locationFieldName);
+					if (null == bean.getModel().getField(locationFieldName)) {
+						continue;
+					}
+					String location = (String) bean.invokeGetter(locationFieldName);
 	
-	                if (null == location || location.isEmpty()) {
-	                    location = (String) internalDoVarValue(bean, locationFieldName, ctx);
-	                    if (location == null || location.isEmpty()) {
-	                        location = (String) internalDoVarValue(bean.dump(), bean.name(), locationFieldName, ctx);
-	                    }
-	                }
+					if (null == location || location.isEmpty()) {
+						location = (String) internalDoVarValue(bean, locationFieldName, ctx);
+						if (location == null || location.isEmpty()) {
+							location = (String) internalDoVarValue(bean.dump(), bean.name(), locationFieldName, ctx);
+						}
+					}
 	
-	                if (null != location && !location.isEmpty()) {
-	                    MapGeocoding geocodingService = new MapGeocoding();
-	                    Geometry geom = geocodingService.getGeometryPoint(location);
+					if (null != location && !location.isEmpty()) {
+						MapGeocoding geocodingService = new MapGeocoding();
+						Geometry geom = geocodingService.getGeometryPoint(location);
 	
-	                    if (null != geom) {
-	                        bean.invokeSetter(fieldName, geom);
-	                    }
-	                }
-	            }
-	        }
-	        for (String fieldName : bean.getModel().getFields()) {
+						if (null != geom) {
+							bean.invokeSetter(fieldName, geom);
+						}
+					}
+				}
+			}
+			for (String fieldName : bean.getModel().getFields()) {
 				EntityField field = bean.getModel().getField(fieldName);
 				if (field.getDefaultValue() != null && bean.invokeGetter(fieldName) == null) {
 					Object defaultValue = field.getDefaultValue();
 					// FIXME move the following code into getDefaultValue() in EntityField
-					if ("DATE".equals(field.getSqlType())) {
+					if (field.getSqlType() == SqlTypes.DATE) {
 						bean.invokeSetter(fieldName, ((DateTimeUpgraded) defaultValue).getDate());
-					} else if ("TIME".equals(field.getSqlType())) {
+					} else if (field.getSqlType() == SqlTypes.TIME) {
 						bean.invokeSetter(fieldName, ((DateTimeUpgraded) defaultValue).getTime());
-					} else if ("TIMESTAMP".equals(field.getSqlType())) {
+					} else if (field.getSqlType() == SqlTypes.TIMESTAMP) {
 						bean.invokeSetter(fieldName, ((DateTimeUpgraded) defaultValue).getTimestamp());
 					} else {
 						bean.invokeSetter(fieldName, defaultValue);
 					}
 				}
 			}
-	        dbOnSave(bean, action, ctx);
+			dbOnSave(bean, action, ctx);
 		} catch (FunctionalException fEx) {
-			ctx.getMessages().addAll(fEx.getMessages()); 
-			throw fEx; 
+			ctx.getMessages().addAll(fEx.getMessages());
+			throw fEx;
 		}
 	}
 
@@ -345,11 +344,11 @@ public abstract class AbstractDomainLogic<E extends Entity> {
      * @param action
      *            Current action.
      * @param ctx
-     *            Current applicative context.
+     *            Current request context.
      */
-    public abstract void dbOnSave(E bean, Action action, RequestContext ctx);
+	public abstract void dbOnSave(E bean, Action action, RequestContext ctx);
 
-    public final void internalDbOnDelete(E bean, Action action, RequestContext ctx) {
+	public final void internalDbOnDelete(E bean, Action action, RequestContext ctx) {
 		try {
 			dbOnDelete(bean, action, ctx);
 		} catch (FunctionalException fEx) {
@@ -366,11 +365,11 @@ public abstract class AbstractDomainLogic<E extends Entity> {
      * @param action
      *            Current action.
      * @param ctx
-     *            Current applicative context.
+     *            Current request context.
      */
-    public abstract void dbOnDelete(E bean, Action action, RequestContext ctx);
+	public abstract void dbOnDelete(E bean, Action action, RequestContext ctx);
 
-    public final void internalDbPostLoad(E bean, Action action, RequestContext ctx) {
+	public final void internalDbPostLoad(E bean, Action action, RequestContext ctx) {
 		try {
 			if (action.getInput() == Input.ONE && action.getPersistence() == Persistence.INSERT) {
 				for (String fieldName : bean.getPrimaryKey().getModel().getFields()) {
@@ -395,13 +394,13 @@ public abstract class AbstractDomainLogic<E extends Entity> {
      * @param action
      *            Current action.
      * @param ctx
-     *            Current applicative context.
+     *            Current request context.
      */
-    public abstract void dbPostLoad(E bean, Action action, RequestContext ctx);
+	public abstract void dbPostLoad(E bean, Action action, RequestContext ctx);
 
-    public final void internalDbPostSave(E bean, Action action, RequestContext ctx) {
+	public final void internalDbPostSave(E bean, Action action, RequestContext ctx) {
 		try {
-	        dbPostSave(bean, action, ctx);
+			dbPostSave(bean, action, ctx);
 		} catch (FunctionalException fEx) {
 			ctx.getMessages().addAll(fEx.getMessages()); 
 			throw fEx; 
@@ -416,13 +415,13 @@ public abstract class AbstractDomainLogic<E extends Entity> {
      * @param action
      *            Current action.
      * @param ctx
-     *            Current applicative context.
+     *            Current request context.
      */
-    public abstract void dbPostSave(E bean, Action action, RequestContext ctx);
+	public abstract void dbPostSave(E bean, Action action, RequestContext ctx);
 
-    public final void internalDbPostDelete(E bean, Action action, RequestContext ctx) {
+	public final void internalDbPostDelete(E bean, Action action, RequestContext ctx) {
 		try {
-	        dbPostDelete(bean, action, ctx);
+			dbPostDelete(bean, action, ctx);
 		} catch (FunctionalException fEx) {
 			ctx.getMessages().addAll(fEx.getMessages()); 
 			throw fEx; 
@@ -437,13 +436,13 @@ public abstract class AbstractDomainLogic<E extends Entity> {
      * @param action
      *            Current action.
      * @param ctx
-     *            Current applicative context.
+     *            Current request context.
      */
-    public abstract void dbPostDelete(E bean, Action action, RequestContext ctx);
+	public abstract void dbPostDelete(E bean, Action action, RequestContext ctx);
 
-    public final String internalUiActionTitle(Response<E> response, RequestContext ctx) {
+	public final String internalUiActionTitle(Response<E> response, RequestContext ctx) {
 		try {
-	        return uiActionTitle(response, ctx);
+			return uiActionTitle(response, ctx);
 		} catch (FunctionalException fEx) {
 			ctx.getMessages().addAll(fEx.getMessages()); 
 			throw fEx; 
@@ -453,17 +452,15 @@ public abstract class AbstractDomainLogic<E extends Entity> {
     /**
      * Get the title of an action page
      * 
-     * @param bean
-     *            Current entity instance
-     * @param action
-     *            Current action
+     * @param response
+     *            Current response
      * @param ctx
-     *            Current applicative context
+     *            Current request context
      * @return String displayed as action page title. Default behavior is "<Action> on entity <EntityDescription>"
      */
-    public abstract String uiActionTitle(Response<E> response, RequestContext ctx);
+	public abstract String uiActionTitle(Response<E> response, RequestContext ctx);
 
-    public final String internalUiVarCaption(E bean, String varName, Action action, RequestContext ctx) {
+	public final String internalUiVarCaption(E bean, String varName, Action action, RequestContext ctx) {
 		try {
 			return uiVarCaption(bean, varName, action, ctx);
 		} catch (FunctionalException fEx) {
@@ -482,23 +479,23 @@ public abstract class AbstractDomainLogic<E extends Entity> {
      * @param action
      *            Current action
      * @param ctx
-     *            Current applicative context.
+     *            Current request context.
      * @return String containing the caption displayed on the variable element in action page. Return <code>null</code> to keep default value.
      */
-    public abstract String uiVarCaption(E bean, String varName, Action action, RequestContext ctx);
+	public abstract String uiVarCaption(E bean, String varName, Action action, RequestContext ctx);
 
-    public final String internalUiLinkCaption(E bean, String linkName, Action action, RequestContext ctx) {
+	public final String internalUiLinkCaption(E bean, String linkName, Action action, RequestContext ctx) {
 		try {
-	        return uiLinkCaption(bean, linkName, action, ctx);
+			return uiLinkCaption(bean, linkName, action, ctx);
 		} catch (FunctionalException fEx) {
 			ctx.getMessages().addAll(fEx.getMessages()); 
 			throw fEx; 
 		}
 	}
 
-    public abstract String uiLinkCaption(E bean, String linkName, Action action, RequestContext ctx);
+	public abstract String uiLinkCaption(E bean, String linkName, Action action, RequestContext ctx);
 
-    public final String internalUiListColumnCaption(DbQuery query, LinkModel link, String varName, RequestContext ctx) {
+	public final String internalUiListColumnCaption(DbQuery query, LinkModel link, String varName, RequestContext ctx) {
 		try {
 			return uiListColumnCaption(query, link, varName, ctx);
 		} catch (FunctionalException fEx) {
@@ -517,10 +514,10 @@ public abstract class AbstractDomainLogic<E extends Entity> {
      * @param varName
      *            Variable
      * @param ctx
-     *            Current applicative context.
+     *            Current request context.
      * @return String containing the caption displayed on the column header element of a list. Return <code>null</code> to keep default value.
      */
-    public abstract String uiListColumnCaption(DbQuery query, LinkModel link, String varName, RequestContext ctx);
+	public abstract String uiListColumnCaption(DbQuery query, LinkModel link, String varName, RequestContext ctx);
 
 	public final boolean internalUiListColumnIsVisible(DbQuery query, LinkModel link, String varName, RequestContext ctx) {
 		try {
@@ -541,10 +538,10 @@ public abstract class AbstractDomainLogic<E extends Entity> {
      * @param varName
      *            Variable.
      * @param ctx
-     *            Current applicative context.
+     *            Current request context.
      * @return {@code true} is the variable should be displayed, {@code false} otherwise.
      */
-    public abstract boolean uiListColumnIsVisible(DbQuery query, LinkModel link, String varName, RequestContext ctx);
+	public abstract boolean uiListColumnIsVisible(DbQuery query, LinkModel link, String varName, RequestContext ctx);
 
 	public final boolean internalUiVarIsVisible(Entity bean, String varName, Action action, RequestContext ctx) {
 		try {
@@ -561,12 +558,12 @@ public abstract class AbstractDomainLogic<E extends Entity> {
 	 * @param bean Current entity instance.
 	 * @param varName Variable to check.
 	 * @param action Current action.
-	 * @param ctx Current applicative context.
+	 * @param ctx Current request context.
 	 * @return <code>true</code> when varName is visible, <code>false</code> otherwise.
 	 */
 	public abstract boolean uiVarIsVisible(Entity bean, String varName, Action action, RequestContext ctx);
 	
-    public final boolean internalUiLinkIsVisible(Entity entity, String linkName, Action action, RequestContext ctx) {
+	public final boolean internalUiLinkIsVisible(Entity entity, String linkName, Action action, RequestContext ctx) {
 		try {
 			return uiLinkIsVisible(entity, linkName, action, ctx);
 		} catch (FunctionalException fEx) {
@@ -578,17 +575,17 @@ public abstract class AbstractDomainLogic<E extends Entity> {
     /**
      * Defines if a link is displayed in an action page.
      * 
-     * @param bean
+     * @param entity
      *            Current entity instance.
-     * @param link
-     *            Link to check.
+     * @param linkName
+     *            Link name to check.
      * @param action
      *            Current action.
      * @param ctx
-     *            Current applicative context.
+     *            Current request context.
      * @return <code>true</code> when link is visible, <code>false</code> otherwise.
      */
-    public abstract boolean uiLinkIsVisible(Entity entity, String linkName, Action action, RequestContext ctx);
+	public abstract boolean uiLinkIsVisible(Entity entity, String linkName, Action action, RequestContext ctx);
 
 	public final boolean internalUiGroupIsVisible(Entity bean, String groupName, Action action, RequestContext ctx) {
 		try {
@@ -602,15 +599,15 @@ public abstract class AbstractDomainLogic<E extends Entity> {
 	/**
 	 * Defines if a block / group is displayed in a page.
 	 * 
-	 * @param page Page to display.
 	 * @param bean Current entity instance.
 	 * @param groupName Group to check.
-	 * @param ctx Current applicative context.
+     * @param action Current action.
+	 * @param ctx Current request context.
 	 * @return <code>true</code> when group is visible, <code>false</code> otherwise.
 	 */
 	public abstract boolean uiGroupIsVisible(Entity bean, String groupName, Action action, RequestContext ctx);
 
-    public final boolean internalUiListIsProtected(Entity targetEntity, String linkName, String queryName, Action action, RequestContext ctx) {
+	public final boolean internalUiListIsProtected(Entity targetEntity, String linkName, String queryName, Action action, RequestContext ctx) {
 		try {
 			return uiListIsProtected(targetEntity, linkName, queryName, action, ctx);
 		} catch (FunctionalException fEx) {
@@ -622,21 +619,21 @@ public abstract class AbstractDomainLogic<E extends Entity> {
     /**
      * Defines if a <b>link</b> list is protected (data cannot be modified).
      * 
-     * @param bean
+     * @param targetEntity
      *            Current entity instance
+     * @param linkName
+     *            Base link of link list
      * @param queryName
      *            Query name used to display list
-     * @param link
-     *            Base link of link list
      * @param action
      *            Current action
      * @param ctx
-     *            Current Applicative Context
+     *            Current request context
      * @return <code>true</code> when list is protected, <code>false</code> otherwise.
      */
-    public abstract boolean uiListIsProtected(Entity targetEntity, String linkName, String queryName, Action action, RequestContext ctx);
+	public abstract boolean uiListIsProtected(Entity targetEntity, String linkName, String queryName, Action action, RequestContext ctx);
 
-    public final boolean internalUiListIsReadOnly(E bean, String linkName, String queryName, Action action, RequestContext ctx) {
+	public final boolean internalUiListIsReadOnly(E bean, String linkName, String queryName, Action action, RequestContext ctx) {
 		try {
 			return uiListIsReadOnly(bean, linkName, queryName, action, ctx);
 		} catch (FunctionalException fEx) {
@@ -650,17 +647,17 @@ public abstract class AbstractDomainLogic<E extends Entity> {
      * 
      * @param bean
      *            Current entity instance
+     * @param linkName
+     *            Base link of link list
      * @param queryName
      *            Query name used to display list
-     * @param link
-     *            Base link of link list
      * @param action
      *            Current action
      * @param ctx
-     *            Current Applicative Context
+     *            Current request context
      * @return <code>true</code> when list is protected, <code>false</code> otherwise.
      */
-    public abstract boolean uiListIsReadOnly(E bean, String linkName, String queryName, Action action, RequestContext ctx);
+	public abstract boolean uiListIsReadOnly(E bean, String linkName, String queryName, Action action, RequestContext ctx);
 
 
 	public final boolean internalUiVarIsProtected(Entity bean, String varName, Action action, RequestContext ctx) {
@@ -681,12 +678,12 @@ public abstract class AbstractDomainLogic<E extends Entity> {
 	 * @param bean Current entity instance.
 	 * @param varName Checked variable
 	 * @param action Current action
-	 * @param ctx Current applicative context
+	 * @param ctx Current request context
 	 * @return <code>true</code> when varName is protected, <code>false</code> otherwise.
 	 */
 	public abstract boolean uiVarIsProtected(Entity bean, String varName, Action action, RequestContext ctx);
 
-    public final void internalUiActionOnLoad(Response<E> response, RequestContext ctx) {
+	public final void internalUiActionOnLoad(Response<E> response, RequestContext ctx) {
 		try {
 			uiActionOnLoad(response, ctx);
 		} catch (FunctionalException fEx) {
@@ -698,16 +695,16 @@ public abstract class AbstractDomainLogic<E extends Entity> {
     /**
      * Allows custom behavior before page display.
      * 
-     * @param bean
-     *            Current page
+     * @param response
+     *            Current response
      * @param ctx
-     *            Current applicative context
+     *            Current request context
      */
-    public abstract void uiActionOnLoad(Response<E> response, RequestContext ctx);
+	public abstract void uiActionOnLoad(Response<E> response, RequestContext ctx);
 
-    public final void internalUiActionOnValidation(Request<E> request, RequestContext ctx) {
+	public final void internalUiActionOnValidation(Request<E> request, RequestContext ctx) {
 		try {
-	        uiActionOnValidation(request, ctx);
+			uiActionOnValidation(request, ctx);
 		} catch (FunctionalException fEx) {
 			ctx.getMessages().addAll(fEx.getMessages()); 
 			throw fEx; 
@@ -717,14 +714,12 @@ public abstract class AbstractDomainLogic<E extends Entity> {
     /**
      * Allows custom behavior before action page validation
      * 
-     * @param bean
-     *            Current entity instance
-     * @param action
-     *            Current action
+     * @param request
+     *            Current request
      * @param ctx
-     *            Current applicative context
+     *            Current request context
      */
-    public abstract void uiActionOnValidation(Request<E> request, RequestContext ctx);
+	public abstract void uiActionOnValidation(Request<E> request, RequestContext ctx);
 
 	public final boolean internalUiTabIsVisible(Entity bean, String tabName, Action action, RequestContext ctx) {
 		try {
@@ -738,10 +733,10 @@ public abstract class AbstractDomainLogic<E extends Entity> {
 	/**
 	 * Defines if a tab is visible in an action page.
 	 * 
-	 * @param page Page to display.
 	 * @param bean Current entity instance.
-	 * @param tab Identifier of the tab to check.
-	 * @param ctx Current applicative context
+	 * @param tabName Identifier of the tab to check.
+	 * @param action Current action
+	 * @param ctx Current request context
 	 * @return <code>true</code> when tab is visible, <code>false</code> otherwise.
 	 */
 	public abstract boolean uiTabIsVisible(Entity bean, String tabName, Action action, RequestContext ctx);
@@ -758,15 +753,15 @@ public abstract class AbstractDomainLogic<E extends Entity> {
 	/**
 	 * Defines the tab to open in an action page containing tabs.
 	 * 
-	 * @param page Page to display.
 	 * @param bean Current entity instance.
 	 * @param tabPanelName Identifier of the tab panel.
-	 * @param ctx Current applicative context.
+	 * @param action Current action
+	 * @param ctx Current request context.
 	 * @return Tab identifier of the tab to display on page loading.
 	 */
 	public abstract String uiTabToOpen(Entity bean, String tabPanelName, Action action, RequestContext ctx);
 
-    public final Map<Key, String> internalUiLinkLoadCombo(Entity bean, LinkModel link, DbQuery filterQuery, Action action, RequestContext ctx) {
+	public final Map<Key, String> internalUiLinkLoadCombo(Entity bean, LinkModel link, DbQuery filterQuery, Action action, RequestContext ctx) {
 		try {
 			return uiLinkLoadCombo(bean, link, filterQuery, action, ctx);
 		} catch (FunctionalException fEx) {
@@ -784,17 +779,17 @@ public abstract class AbstractDomainLogic<E extends Entity> {
      *            Link name between entity and comboboxed-entity.
      * @param filterQuery
      *            Optional filter query, allow users to filter displayed data (null if not supplied).
-     * @param page
-     *            Current page.
+     * @param action
+     *            Current action.
      * @param ctx
-     *            Current applicative context.
+     *            Current request context.
      * @return Map containing primary key of each element displayed in the combobox and element descriptions.
      */
-    public abstract Map<Key, String> uiLinkLoadCombo(Entity bean, LinkModel link, DbQuery filterQuery, Action action, RequestContext ctx);
+	public abstract Map<Key, String> uiLinkLoadCombo(Entity bean, LinkModel link, DbQuery filterQuery, Action action, RequestContext ctx);
 
 	public final Request<?> internalUiCtrlNextAction(Request<E> request, RequestContext ctx) {
 		try {
-	        return uiCtrlNextAction(request, ctx);
+			return uiCtrlNextAction(request, ctx);
 		} catch (FunctionalException fEx) {
 			ctx.getMessages().addAll(fEx.getMessages()); 
 			throw fEx; 
@@ -804,19 +799,17 @@ public abstract class AbstractDomainLogic<E extends Entity> {
     /**
      * Defines the next action to occur after current action completion.
      * 
-     * @param bean
-     *            Current entity instance.
-     * @param action
-     *            Current action
+     * @param request
+     *            Current request
      * @param ctx
-     *            Current applicative context
+     *            Current request context
      * @return New action to start. Return null when no custom action should occurs after current action completion.
      */
-    public abstract Request<?> uiCtrlNextAction(Request<E> request, RequestContext ctx);
+	public abstract Request<?> uiCtrlNextAction(Request<E> request, RequestContext ctx);
 
-    public final Response<?> internalUiCtrlOverrideAction(Response<E> response, RequestContext ctx) {
+	public final Response<?> internalUiCtrlOverrideAction(Response<E> response, RequestContext ctx) {
 		try {
-	        return uiCtrlOverrideAction(response, ctx);
+			return uiCtrlOverrideAction(response, ctx);
 		} catch (FunctionalException fEx) {
 			ctx.getMessages().addAll(fEx.getMessages()); 
 			throw fEx; 
@@ -826,15 +819,15 @@ public abstract class AbstractDomainLogic<E extends Entity> {
     /**
      * Allows action override. This method is called before any other customizable method in the process.
      * 
-     * @param page
-     *            Current loaded action page
+     * @param response
+     *            Current response
      * @param ctx
-     *            Current applicative context
+     *            Current request context
      * @return ActionPage to start instead of current action. Return null if current action should be executed.
      */
-    public abstract Response<?> uiCtrlOverrideAction(Response<E> response, RequestContext ctx);
+	public abstract Response<?> uiCtrlOverrideAction(Response<E> response, RequestContext ctx);
 
-    public final List<Key> internalUiCtrlMenuAction(Action action, RequestContext ctx) {
+	public final List<Key> internalUiCtrlMenuAction(Action action, RequestContext ctx) {
 		try {
 			return uiCtrlMenuAction(action, ctx);
 		} catch (FunctionalException fEx) {
@@ -849,10 +842,10 @@ public abstract class AbstractDomainLogic<E extends Entity> {
      * @param action
      *            Action launched from application menu.
      * @param ctx
-     *            Current applicative context.
+     *            Current request context.
      * @return Key to use in action processing. Return null will end in a new instance of the entity.
      */
-    public abstract List<Key> uiCtrlMenuAction(Action action, RequestContext ctx);
+	public abstract List<Key> uiCtrlMenuAction(Action action, RequestContext ctx);
 
 	public final void internalUiListPrepare(DbQuery query, E entity, Action action, String linkName, Entity linkedEntity, RequestContext ctx) {
 		try {
@@ -870,10 +863,16 @@ public abstract class AbstractDomainLogic<E extends Entity> {
      * 
      * @param query
      *            The list page query.
-     * @param criteria
-     *            Criteria bean with user defined values.
+     * @param entity
+     *            The list page base entity.
+     * @param action
+     *            The current action.
+     * @param linkName
+     *            The link used.
+     * @param linkedEntity
+     *            The linked entity.
      * @param ctx
-     *            Current applicative context.
+     *            Current request context.
      * 
      * @return <code>true</code> if default query preparation should be skipped, <code>false</code> if query should still be prepared with user
      *         input in Criteria object.
@@ -899,16 +898,16 @@ public abstract class AbstractDomainLogic<E extends Entity> {
      * @param criteria
      *            Criteria Search string.
      * @param ctx
-     *            Current applicative context.
+     *            Current request context.
      * 
      * @return <code>true</code> if default query preparation should be skipped, <code>false</code> if query should still be prepared with user
      *         input in Criteria object.
      */
 	public abstract boolean uiListPrepare(DbQuery query, String criteria, Action action, String linkName, Entity linkedEntity, RequestContext ctx);
 
-    public final void internalUiListPrepare(DbQuery query, Entity parentEntity, String linkName, RequestContext ctx) {
+	public final void internalUiListPrepare(DbQuery query, Entity parentEntity, String linkName, RequestContext ctx) {
 		try {
-	        uiListPrepare(query, parentEntity, linkName, ctx);
+			uiListPrepare(query, parentEntity, linkName, ctx);
 		} catch (FunctionalException fEx) {
 			ctx.getMessages().addAll(fEx.getMessages()); 
 			throw fEx; 
@@ -920,47 +919,42 @@ public abstract class AbstractDomainLogic<E extends Entity> {
      * 
      * @param query
      *            The link query.
-     * @param bean
+     * @param parentEntity
      *            Referenced bean.
+     * @param linkName
+     *            Used link.
      * @param ctx
-     *            Current applicative context.
+     *            Current request context.
      */
-    public abstract void uiListPrepare(DbQuery query, Entity parentEntity, String linkName, RequestContext ctx);
+	public abstract void uiListPrepare(DbQuery query, Entity parentEntity, String linkName, RequestContext ctx);
 
-    /**
-     * Not Yet Implemented - ToyEasyLnkList
-     */
-    public final boolean uiEasyLnkListGoToNextLine(E bean, LinkModel link) {
-        throw new TechnicalException("Not yet implemented");
-    }
+	/**
+	 * Not Yet Implemented - ToyLnkListExclude
+	 */
+	public final Action uiListLinkAttach(E bean, LinkModel link) {
+		throw new TechnicalException("Not yet implemented");
+	}
 
-    /**
-     * Not Yet Implemented - ToyLnkListExclude
-     */
-    public final Action uiListLinkAttach(E bean, LinkModel link) {
-        throw new TechnicalException("Not yet implemented");
-    }
+	/**
+	 * Not Yet Implemented - ToyLnkCodLib
+	 */
+	public final Key uiLnkKey(E bean, LinkModel link) {
+		throw new TechnicalException("Not yet implemented");
+	}
 
-    /**
-     * Not Yet Implemented - ToyLnkCodLib
-     */
-    public final Key uiLnkKey(E bean, LinkModel link) {
-        throw new TechnicalException("Not yet implemented");
-    }
+	/**
+	 * Not Yet Implemented - ToyLnkCodLib
+	 */
+	public final boolean uiLnkKeyVarIsProtected(E bean, LinkModel link, String varName) {
+		throw new TechnicalException("Not yet implemented");
+	}
 
-    /**
-     * Not Yet Implemented - ToyLnkCodLib
-     */
-    public final boolean uiLnkKeyVarIsProtected(E bean, LinkModel link, String varName) {
-        throw new TechnicalException("Not yet implemented");
-    }
-
-    /**
-     * Not Yet Implemented - ToyLnkCodLib
-     */
-    public final Key uiLnkKeyVarIsVisible(E bean, LinkModel link, String varName) {
-        throw new TechnicalException("Not yet implemented");
-    }
+	/**
+	 * Not Yet Implemented - ToyLnkCodLib
+	 */
+	public final Key uiLnkKeyVarIsVisible(E bean, LinkModel link, String varName) {
+		throw new TechnicalException("Not yet implemented");
+	}
 
 	private void defaultUiListPrepare(DbQuery query, E critEntity, Action action) {
 		// process simple variables
@@ -990,7 +984,7 @@ public abstract class AbstractDomainLogic<E extends Entity> {
 				}
 
 			} else if (value1 != null) {
-				if ("VARCHAR2".equals(field.getSqlType())) {
+				if (DbQuery.STRING_SQL_TYPES.contains(field.getSqlType())) {
 					query.addCondLike(fieldName, alias, "%" + value1 + "%");
 				} else {
 					query.addCondEq(fieldName, alias, value1);
@@ -1041,27 +1035,27 @@ public abstract class AbstractDomainLogic<E extends Entity> {
 		}
 	}
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    public final Map<Key, String> internalUiLinkLoadValues(Entity bean, LinkModel linkModel, DbQuery filterQuery, boolean limitSize,
-            RequestContext ctx) {
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public final Map<Key, String> internalUiLinkLoadValues(Entity bean, LinkModel linkModel, DbQuery filterQuery, boolean limitSize,
+			RequestContext ctx) {
 		try {
-	        String mainAlias = "T1";
-	        DbQuery query = DB.createQuery(ctx, linkModel.getRefEntityName(), mainAlias);
+			String mainAlias = "T1";
+			DbQuery query = DB.createQuery(ctx, linkModel.getRefEntityName(), mainAlias);
 	
-	        if (filterQuery != null) {
-	            query = filterQuery;
-	            mainAlias = query.getMainEntityAlias();
-	            // By default all columns are selected to allow doDescription() to work.
-	            query.addAllColumns(mainAlias);
-	        }
-        
-	        // Prepare partial key conditions
-			Key fk = bean.getForeignKey(linkModel.getKeyName());
+			if (filterQuery != null) {
+				query = filterQuery;
+				mainAlias = query.getMainEntityAlias();
+				// By default all columns are selected to allow doDescription() to work.
+				query.addAllColumns(mainAlias);
+			}
+		
+			// Prepare partial key conditions
+			Key fk = bean.getForeignKey(linkModel.getLinkName());
 			if (!fk.isFull() && !fk.isNull()) {
 				// Multi fields key partially filled
 				query.addCondKey(fk, query.getAlias(linkModel.getRefEntityName()));
 			}
-        
+		
 			DomainLogic targetDomainLogic = DomainUtils.getLogic(query.getMainEntity().name());
 			targetDomainLogic.internalUiListPrepare(query, bean, linkModel.getLinkName(), ctx);
 
@@ -1084,18 +1078,18 @@ public abstract class AbstractDomainLogic<E extends Entity> {
 				}
 			}
 
-	        if (!limitSize && map.size() > Constants.MAX_ROW) {
-	            LOGGER.warn("Performance issue, loading combo with "+map.size()+" elements !");
-	        }
-        
-	        return map;
+			if (!limitSize && map.size() > Constants.MAX_ROW) {
+				LOGGER.warn("Performance issue, loading combo with "+map.size()+" elements !");
+			}
+		
+			return map;
 		} catch (FunctionalException fEx) {
 			ctx.getMessages().addAll(fEx.getMessages()); 
 			throw fEx; 
 		}
 	}
 
-    public final boolean internalUiWizardCheckStep(E bean, Action action, String currentStep, String nextStep, RequestContext ctx) {
+	public final boolean internalUiWizardCheckStep(E bean, Action action, String currentStep, String nextStep, RequestContext ctx) {
 		try {
 			return uiWizardCheckStep(bean, action, currentStep, nextStep, ctx);
 		} catch (FunctionalException fEx) {
@@ -1116,10 +1110,10 @@ public abstract class AbstractDomainLogic<E extends Entity> {
      * @param nextStep
      *            The step that the user want to display.
      * @param ctx
-     *            Current applicative context.
+     *            Current request context.
      * @return {@code true} is the user is allowed to see the next step, {@code false} otherwise.
      */
-    public abstract boolean uiWizardCheckStep(E bean, Action action, String currentStep, String nextStep, RequestContext ctx);
+	public abstract boolean uiWizardCheckStep(E bean, Action action, String currentStep, String nextStep, RequestContext ctx);
 
 	public final ListData internalExtQueryLoad(RequestContext context, String entityName, String queryName) {
 		return extQueryLoad(context, entityName, queryName);
@@ -1143,7 +1137,7 @@ public abstract class AbstractDomainLogic<E extends Entity> {
 	 * Transforms an entity instance into an event.
 	 * @param entity Entity to transform.
 	 * @param entityName Entity name.
-	 * @param ctx Current applicative context.
+	 * @param ctx Current request context.
 	 * @return An event representation of the entity.
 	 */
 	public final ScheduleEvent internalUiSchedulePrepareEvent(E entity, String entityName, RequestContext ctx) {
@@ -1161,15 +1155,15 @@ public abstract class AbstractDomainLogic<E extends Entity> {
 	 * <ul>
 	 * <li>pk : entity's primary key, it will be used as the event id.</li>
 	 * <li>title : this property is set with the entity description ({@link #doDescription(Entity, RequestContext)}).</li>
-	 * <li>start : Event start date (automatically populated with the property {@link #uiScheduleEventDateStartName()}).</li>
-	 * <li>end : Event end date (automatically populated with the property {@link #uiScheduleEventDateEndName()}).</li>
+	 * <li>start : Event start date (automatically populated with the property {@link #uiScheduleEventStartName()}).</li>
+	 * <li>end : Event end date (automatically populated with the property {@link #uiScheduleEventEndName()}).</li>
 	 * </ul>
 	 * </p>
 	 * 
 	 * @param event Event to customize.
 	 * @param entity Entity represented by the event.
 	 * @param entityName Entity name.
-	 * @param ctx Current applicative context.
+	 * @param ctx Current request context.
 	 */
 	public abstract void uiSchedulePrepareEvent(ScheduleEvent event, E entity, String entityName, RequestContext ctx);
 

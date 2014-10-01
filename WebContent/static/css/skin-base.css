@@ -160,19 +160,18 @@ button[disabled],input[type="button"][disabled],input[type="submit"][disabled],
 ******************************************************************************/
 
 /* Field labels */
-.colFieldSetLeft {
+.col-label {
 	text-align: right;
 	padding-right: 10px;
 	font-weight: bold;
 }
 
-/* "display: table-cell" to show the colon */
-.colFieldSetMid {
-	display: table-cell;
+.col-label:after {
+	content: ':';
 }
 
 /* Fields */
-.colFieldSetRight {
+.col-value {
 	text-align: left;
 	padding-left: 10px;
 }
@@ -406,6 +405,7 @@ td.globalSearch .btn_large input {
 .results_container table > thead > tr > th {
 	background-image: none;
 	background-color: white;
+	color: initial;
 	text-align: center;
 	font-weight: bold;
 }
@@ -432,6 +432,9 @@ td.globalSearch .btn_large input {
 	color: white;
 	background-color: rgb(0, 116, 202);
 }
+.datatable-empty table > tbody > tr:hover > td {
+	background-color: transparent;
+}
 
 
 
@@ -445,13 +448,13 @@ form > .actions {
 }
 
 /* Space between main blocks. Note that no padding is applied to the first block. */
-#mainForm > .inner-content > .group_table > tbody > tr > td {
+#mainForm > .inner-content > .group > .col {
 	padding-top: 20px;
 }
 
 /* Whole block (title plus content). The "form_container" can't be defined without a prefix, because a form_container is something different on list pages */
 #mainForm > .inner-content > .form_container, /* single block on a form page, for the simplest form pages  */
-.group_table .form_container, /* sequential blocks on form pages */
+.group .form_container, /* sequential blocks on form pages */
 .mainTable_container /* block for link lists */ {
 	border: 1px solid rgb(0, 116, 202);
 	padding: 0px;
@@ -461,7 +464,7 @@ form > .actions {
 
 /* Whole block when reduced */
 #mainForm > .inner-content > .form_container.reduced,
-.group_table .form_container.reduced,
+.group .form_container.reduced,
 .mainTable_container.reduced {
 	border: none;
 	padding: 1px; /* to compensate for the loss of the 1px border */
@@ -469,7 +472,7 @@ form > .actions {
 
 /* Block titles */
 #mainForm > .inner-content > .form_container > .form_title, /* block title on single block  */
-.group_table .form_container > .form_title, /* block title on sequential blocks */
+.group .form_container > .form_title, /* block title on sequential blocks */
 .mainTable_container > .table_title, /* block title on link lists */
 .lineTitle /* titles of group templates */ {
 	border: 1px solid rgb(0, 116, 202);
@@ -486,8 +489,8 @@ form > .actions {
 }
 
 /* Block contents */
-#mainForm > .inner-content > .form_container > .group_table, /* block content on single block */
-.group_table .form_container > .group_table, /* block content on sequential blocks */
+#mainForm > .inner-content > .form_container > .group, /* block content on single block */
+.group .form_container > .group, /* block content on sequential blocks */
 .mainTable_container>.table_container /* block content on link lists */ {
 	
 }
@@ -596,8 +599,8 @@ div.ui-tabs div.ui-tabs-panel {
 }
 
 /* already a border on the tab, no border on the first element */
-div.ui-tabs div.ui-tabs-panel > table > tbody > tr > td > .mainTable_container,
-div.ui-tabs div.ui-tabs-panel > table > tbody > tr > td > .form_container{
+div.ui-tabs div.ui-tabs-panel > .col > .mainTable_container,
+div.ui-tabs div.ui-tabs-panel > .col > .form_container{
 	border: none;
 }
 

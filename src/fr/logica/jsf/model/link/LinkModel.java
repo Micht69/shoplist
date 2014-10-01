@@ -42,8 +42,7 @@ public class LinkModel extends DataModel {
 		this.filterName = filterName;
 		this.linkName = linkName;
 		if (store.get(ENCODED_VALUE) != null) {
-			sourceEntity.setForeignKey(sourceEntity.getModel().getLinkModel(linkName).getKeyName(),
-					new Key(entityName, store.get(ENCODED_VALUE)));
+			sourceEntity.setForeignKey(linkName, new Key(entityName, store.get(ENCODED_VALUE)));
 		}
 		loadData(viewCtrl.getContext());
 	}

@@ -37,8 +37,7 @@ public class LinkInnerModel extends DataModel {
 	public void loadData(RequestContext context) {
 		if (entity.getLink(linkName).getEntity() != null) {
 			// Entity is already loaded - Check if foreign key from source entity is different. It it is, we need to reload target entity
-			String fkName = entity.getModel().getLinkModel(linkName).getKeyName();
-			if (!entity.getForeignKey(fkName).hasSameValues(entity.getLink(linkName).getEntity().getPrimaryKey())) {
+			if (!entity.getForeignKey(linkName).hasSameValues(entity.getLink(linkName).getEntity().getPrimaryKey())) {
 				// Loaded entity doesn't match current foreign key, we need to reload the entity
 				entity.getLink(linkName).setEntity(null);
 			}
@@ -49,7 +48,7 @@ public class LinkInnerModel extends DataModel {
 			Entity linkEntity = bc.getLinkInnerEntity(entity, entityName, linkName, action, context);
 			Map<String, UiAccess> access = bc.getEntityUiAccess(linkEntity, action, context);
 			for (Entry<String, UiAccess> e : access.entrySet()) {
-				viewCtrl.getCurrentView().getUiAccess().put(linkName + "#" + e.getKey(), e.getValue());
+				viewCtrl.getCurrentView().getUiAccess().put(linkName + "." + e.getKey(), e.getValue());
 			}
 			entity.getLink(linkName).setEntity(linkEntity);
 			// Default link protection
@@ -57,7 +56,7 @@ public class LinkInnerModel extends DataModel {
 					|| viewCtrl.getCurrentView().getAction().getUi() == UserInterface.READONLY) {
 				readonly = true;
 			}
-			if (!entity.getModel().isStrongKey(entity.getModel().getLinkModel(linkName).getKeyName())) {
+			if (!entity.getModel().isStrongKey(linkName)) {
 				readonly = true;
 			}
 			entity.getLink(linkName).setApplyActionOnLink(!readonly);

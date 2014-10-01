@@ -150,11 +150,9 @@ div.header_left h1.header_title {
 }
 
 .notificationCounter {
-	float: right;
-	position: relative;
     height: 16px;
     min-width: 12px;
-	margin: 0 -26px 0 5px;
+	margin: 0 -10px 0 5px;
 	padding: 0 5px 4px 5px;
 	color: #ffffff;
 	font-weight: bold;
@@ -172,7 +170,9 @@ div.header_left h1.header_title {
 }
 
 #menu li ul li a span.notificationCounter {
-	margin: 0 -20px 0 5px;
+	position: absolute;
+	right: 0;
+	margin: 0 -11px 0 5px;
 }
 
 /******************************************************************************
@@ -210,7 +210,7 @@ div.messages {
 
 ul.message {
 	margin: 10px 0;
-	white-space: pre; 
+	white-space: pre-wrap;
 }
 
 ul.message > li {
@@ -238,9 +238,6 @@ ul.message > li.message_success {
 }
 
 ul.message > li.message_info {
-	background-color: #D9EDF7;
-	border-color: #BCE8F1;
-	color: #3A87AD;
 }
 
 

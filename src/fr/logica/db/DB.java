@@ -87,7 +87,7 @@ public class DB {
 	/**
 	 * Retrieves a domain object linked to the given entity.
 	 * 
-	 * @param entity Entity linked to the domain object to retrieve.
+	 * @param e Entity linked to the domain object to retrieve.
 	 * @param linkName Name of the link between the given entity and the domain object to retrieve.
 	 * @param ctx Current context.
 	 * @return The domain object linked to the given entity or {@code null} if the domain object is not found.

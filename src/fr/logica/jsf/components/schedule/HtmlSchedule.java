@@ -2,11 +2,12 @@ package fr.logica.jsf.components.schedule;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.el.ELException;
+import javax.el.MethodExpression;
 import javax.el.ValueExpression;
 import javax.faces.application.FacesMessage;
 import javax.faces.application.ResourceDependencies;
@@ -20,6 +21,7 @@ import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ComponentSystemEvent;
 import javax.faces.event.ExceptionQueuedEvent;
 import javax.faces.event.ExceptionQueuedEventContext;
+import javax.faces.event.FacesEvent;
 import javax.faces.event.ListenerFor;
 import javax.faces.event.PhaseId;
 import javax.faces.event.PostAddToViewEvent;
@@ -44,25 +46,23 @@ public class HtmlSchedule extends UIInput {
 	protected enum PropertyKeys {
 		date,
 		dayClick,
+		events,
 		firstDay,
 		firstHour,
 		locale,
 		localDateSet,
-		localSelectedEventSet,
 		localViewSet,
 		maxTime,
 		minTime,
-		onchange,
 		readonly,
-		selectedEvent,
 		showWeekends,
 		slotMinutes,
+		updateListener,
 		value,
 		view;
 	}
 
 	private String submittedDate = null;
-	private String submittedSelectedEvent = null;
 	private String submittedView = null;
 
 	public HtmlSchedule() {
@@ -76,6 +76,16 @@ public class HtmlSchedule extends UIInput {
 	public void setDate(Date date) {
 		getStateHelper().put(PropertyKeys.date, date);
 		setLocalDateSet(true);
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<ScheduleEvent> getEvents() {
+		return (List<ScheduleEvent>) getStateHelper().eval(PropertyKeys.events, null);
+	}
+
+	public void setEvents(List<ScheduleEvent> events) {
+		getStateHelper().put(PropertyKeys.events, events);
+		handleAttribute(PropertyKeys.events.toString(), events);
 	}
 
 	public String getDayClick() {
@@ -131,31 +141,12 @@ public class HtmlSchedule extends UIInput {
 		handleAttribute(PropertyKeys.minTime.toString(), minTime);
 	}
 
-	public String getOnchange() {
-		return (String) getStateHelper().eval(PropertyKeys.onchange, null);
-
-	}
-
-	public void setOnchange(String onchange) {
-		getStateHelper().put(PropertyKeys.onchange, onchange);
-		handleAttribute(PropertyKeys.onchange.toString(), onchange);
-	}
-
 	public boolean isReadonly() {
 		return (Boolean) getStateHelper().eval(PropertyKeys.readonly, Boolean.FALSE);
 	}
 
 	public void setReadonly(boolean readonly) {
 		getStateHelper().put(PropertyKeys.readonly, readonly);
-	}
-
-	public ScheduleEvent getSelectedEvent() {
-		return (ScheduleEvent) getStateHelper().eval(PropertyKeys.selectedEvent, null);
-	}
-
-	public void setSelectedEvent(ScheduleEvent selectedEvent) {
-		getStateHelper().put(PropertyKeys.selectedEvent, selectedEvent);
-		setLocalSelectedEventSet(true);
 	}
 
 	public Boolean getShowWeekends() {
@@ -176,13 +167,13 @@ public class HtmlSchedule extends UIInput {
 		handleAttribute(PropertyKeys.slotMinutes.toString(), slotMinutes);
 	}
 
-	@SuppressWarnings("unchecked")
-	public List<ScheduleEvent> getValue() {
-		return (List<ScheduleEvent>) getStateHelper().eval(PropertyKeys.value, null);
+	public MethodExpression getUpdateListener() {
+		return (MethodExpression) getStateHelper().eval(PropertyKeys.updateListener, null);
 	}
 
-	public void setValue(List<ScheduleEvent> events) {
-		getStateHelper().put(PropertyKeys.value, events);
+	public void setUpdateListener(MethodExpression updateListener) {
+		getStateHelper().put(PropertyKeys.updateListener, updateListener);
+		handleAttribute(PropertyKeys.updateListener.toString(), updateListener);
 	}
 
 	public ScheduleView getView() {
@@ -202,14 +193,6 @@ public class HtmlSchedule extends UIInput {
 		getStateHelper().put(PropertyKeys.localDateSet, localDateSet);
 	}
 
-	public boolean isLocalSelectedEventSet() {
-		return (Boolean) getStateHelper().eval(PropertyKeys.localSelectedEventSet, false);
-	}
-
-	public void setLocalSelectedEventSet(boolean localSelectedEventSet) {
-		getStateHelper().put(PropertyKeys.localSelectedEventSet, localSelectedEventSet);
-	}
-
 	public boolean isLocalViewSet() {
 		return (Boolean) getStateHelper().eval(PropertyKeys.localViewSet, false);
 	}
@@ -226,20 +209,18 @@ public class HtmlSchedule extends UIInput {
 		this.submittedDate = submittedDate;
 	}
 
-	public String getSubmittedSelectedEvent() {
-		return submittedSelectedEvent;
-	}
-
-	public void setSubmittedSelectedEvent(String submittedSelectedEvent) {
-		this.submittedSelectedEvent = submittedSelectedEvent;
-	}
-
 	public String getSubmittedView() {
 		return submittedView;
 	}
 
 	public void setSubmittedView(String submittedView) {
 		this.submittedView = submittedView;
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<ScheduleEvent> getValue() {
+		return (List<ScheduleEvent>) super.getValue();
 	}
 
 	@Override
@@ -261,18 +242,13 @@ public class HtmlSchedule extends UIInput {
 
 	@Override
 	public void updateModel(FacesContext context) {
+		// Selected events.
 		super.updateModel(context);
 
 		// Selected date.
 		if (updateProperty(context, PropertyKeys.date, isLocalDateSet(), getDate())) {
 			setDate(null);
 			setLocalDateSet(false);
-		}
-
-		// Selected event.
-		if (updateProperty(context, PropertyKeys.selectedEvent, isLocalSelectedEventSet(), getSelectedEvent())) {
-			setSelectedEvent(null);
-			setLocalSelectedEventSet(false);
 		}
 
 		// Selected view.
@@ -332,7 +308,7 @@ public class HtmlSchedule extends UIInput {
 
 	@Override
 	public void validate(FacesContext context) {
-		// Events
+		// Selected events.
 		super.validate(context);
 
 		// Selected date.
@@ -347,35 +323,7 @@ public class HtmlSchedule extends UIInput {
 			} catch (NumberFormatException e) {
 				FacesMessage message = MessageFactory.getMessage(context, UPDATE_MESSAGE_ID, MessageFactory.getLabel(context, this));
 				context.addMessage(getClientId(context), message);
-	            setValid(false);
-			}
-		}
-
-		// Selected event.
-		String submittedSelectedEvent = getSubmittedSelectedEvent();
-
-		if (null != submittedSelectedEvent && !submittedSelectedEvent.isEmpty()) {
-			List<ScheduleEvent> events = getValue();
-			ScheduleEvent selectedEvent = null;
-
-			if (null != events) {
-				Iterator<ScheduleEvent> iter = events.iterator();
-
-				while (null == selectedEvent && iter.hasNext()) {
-					ScheduleEvent tmp = iter.next();
-
-					if (null != tmp && submittedSelectedEvent.equals(tmp.getId())) {
-						selectedEvent = tmp;
-					}
-				}
-				setSelectedEvent(selectedEvent);
-				setSubmittedSelectedEvent(null);
-			}
-
-			if (null == selectedEvent) {
-				FacesMessage message = MessageFactory.getMessage(context, UPDATE_MESSAGE_ID, MessageFactory.getLabel(context, this));
-				context.addMessage(getClientId(context), message);
-	            setValid(false);
+				setValid(false);
 			}
 		}
 
@@ -392,7 +340,35 @@ public class HtmlSchedule extends UIInput {
 			} catch (IllegalArgumentException e) {
 				FacesMessage message = MessageFactory.getMessage(context, UPDATE_MESSAGE_ID, MessageFactory.getLabel(context, this));
 				context.addMessage(getClientId(context), message);
-	            setValid(false);
+				setValid(false);
+			}
+		}
+	}
+
+	/**
+	 * Indicates whether the current request is an Ajax request which the source is this component.
+	 * 
+	 * @param context
+	 *            JSF context.
+	 * @return {@code true} if request parameters contains "{@code javax.faces.partial.ajax}" and the parameter "
+	 *         {@code javax.faces.partial.source}" is equal to {@code this.getClientId()}.
+	 */
+	public boolean isScheduleRequest(FacesContext context) {
+		Map<String, String> params = context.getExternalContext().getRequestParameterMap();
+		return params.get("javax.faces.partial.ajax") != null && this.getClientId().equals(params.get("javax.faces.source"));
+	}
+
+	@Override
+	public void broadcast(FacesEvent event) throws AbortProcessingException {
+		super.broadcast(event);
+
+		if (event instanceof HtmlScheduleEvent) {
+			HtmlScheduleEvent scheduleEvent = (HtmlScheduleEvent) event;
+			FacesContext context = getFacesContext();
+			MethodExpression me = getUpdateListener();
+
+			if (me != null) {
+				me.invoke(context.getELContext(), new Object[] { scheduleEvent.getEvent() });
 			}
 		}
 	}

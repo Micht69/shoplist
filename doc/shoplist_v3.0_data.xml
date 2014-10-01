@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="WINDOWS-1252"?>
+<TOY version="3.1.9-SNAPSHOT">
+<Apps>
+<App name="SHOPLIST" product="SSCH">
+<Entity id="SHOP_ARTICLE" >
+<Obj><Var id="ID">0</Var><Var id="W$_DESC">Cuisse de Lapin</Var><Var id="NAME">Cuisse de Lapin</Var><Var id="SHELF">VIA</Var></Obj>
+<Obj><Var id="ID">1</Var><Var id="W$_DESC">Bavette</Var><Var id="NAME">Bavette</Var><Var id="SHELF">VIA</Var></Obj>
+<Obj><Var id="ID">2</Var><Var id="W$_DESC">Filet de poulet</Var><Var id="NAME">Filet de poulet</Var><Var id="SHELF">VIA</Var></Obj>
+<Obj><Var id="ID">3</Var><Var id="W$_DESC">Viande de Boeuf hachée</Var><Var id="NAME">Viande de Boeuf hachée</Var><Var id="SHELF">VIA</Var></Obj>
+<Obj><Var id="ID">4</Var><Var id="W$_DESC">Riz</Var><Var id="NAME">Riz</Var><Var id="SHELF">CONS</Var></Obj>
+<Obj><Var id="ID">5</Var><Var id="W$_DESC">Potimarron</Var><Var id="NAME">Potimarron</Var><Var id="SHELF">LEG</Var></Obj>
+<Obj><Var id="ID">6</Var><Var id="W$_DESC">Galettes de riz</Var><Var id="NAME">Galettes de riz</Var><Var id="SHELF">DEJ</Var></Obj>
+<Obj><Var id="ID">7</Var><Var id="W$_DESC">Lunettes Petit Déjeuner</Var><Var id="NAME">Lunettes Petit Déjeuner</Var><Var id="SHELF">DEJ</Var></Obj>
+<Obj><Var id="ID">8</Var><Var id="W$_DESC">Petit beurre</Var><Var id="NAME">Petit beurre</Var><Var id="SHELF">DEJ</Var></Obj>
+<Obj><Var id="ID">9</Var><Var id="W$_DESC">Dosettes Voluptuoso</Var><Var id="NAME">Dosettes Voluptuoso</Var><Var id="SHELF">DEJ</Var></Obj>
+<Obj><Var id="ID">10</Var><Var id="W$_DESC">Flocons d'avoine</Var><Var id="NAME">Flocons d'avoine</Var><Var id="SHELF">DEJ</Var></Obj>
+<Obj><Var id="ID">11</Var><Var id="W$_DESC">Fromage blanc</Var><Var id="NAME">Fromage blanc</Var><Var id="SHELF">FRAI</Var></Obj>
+<Obj><Var id="ID">12</Var><Var id="W$_DESC">Yahourt</Var><Var id="NAME">Yahourt</Var><Var id="SHELF">FRAI</Var></Obj>
+<Obj><Var id="ID">13</Var><Var id="W$_DESC">Desserts Seb</Var><Var id="NAME">Desserts Seb</Var><Var id="SHELF">FRAI</Var></Obj>
+<Obj><Var id="ID">14</Var><Var id="W$_DESC">Fromage rapé</Var><Var id="NAME">Fromage rapé</Var><Var id="SHELF">FRAI</Var></Obj>
+<Obj><Var id="ID">15</Var><Var id="W$_DESC">Parmesan</Var><Var id="NAME">Parmesan</Var><Var id="SHELF">FRAI</Var></Obj>
+<Obj><Var id="ID">16</Var><Var id="W$_DESC">Banane</Var><Var id="NAME">Banane</Var><Var id="SHELF">LEG</Var></Obj>
+<Obj><Var id="ID">17</Var><Var id="W$_DESC">Oignons</Var><Var id="NAME">Oignons</Var><Var id="SHELF">LEG</Var></Obj>
+<Obj><Var id="ID">18</Var><Var id="W$_DESC">Pain de seigle</Var><Var id="NAME">Pain de seigle</Var><Var id="SHELF">DIV</Var></Obj>
+<Obj><Var id="ID">19</Var><Var id="W$_DESC">Champignons de Paris</Var><Var id="NAME">Champignons de Paris</Var><Var id="SHELF">CONS</Var></Obj>
+<Obj><Var id="ID">20</Var><Var id="W$_DESC">Purée de tomate 400g</Var><Var id="NAME">Purée de tomate 400g</Var><Var id="SHELF">CONS</Var></Obj>
+<Obj><Var id="ID">21</Var><Var id="W$_DESC">Sirop pèche</Var><Var id="NAME">Sirop pèche</Var><Var id="SHELF">LIQ</Var></Obj>
+<Obj><Var id="ID">22</Var><Var id="W$_DESC">Sirop grenadine</Var><Var id="NAME">Sirop grenadine</Var><Var id="SHELF">LIQ</Var></Obj>
+<Obj><Var id="ID">23</Var><Var id="W$_DESC">Sirop stevia</Var><Var id="NAME">Sirop stevia</Var><Var id="SHELF">LIQ</Var></Obj>
+<Obj><Var id="ID">24</Var><Var id="W$_DESC">Vinaigre de vin</Var><Var id="NAME">Vinaigre de vin</Var><Var id="SHELF">CONS</Var></Obj>
+<Obj><Var id="ID">25</Var><Var id="W$_DESC">Stevia</Var><Var id="NAME">Stevia</Var><Var id="SHELF">DEJ</Var></Obj>
+<Obj><Var id="ID">26</Var><Var id="W$_DESC">Cachou</Var><Var id="NAME">Cachou</Var><Var id="SHELF">CONF</Var></Obj>
+<Obj><Var id="ID">27</Var><Var id="W$_DESC">Carottes (kg)</Var><Var id="NAME">Carottes (kg)</Var><Var id="SHELF">LEG</Var></Obj>
+<Obj><Var id="ID">28</Var><Var id="W$_DESC">Orange</Var><Var id="NAME">Orange</Var><Var id="SHELF">LEG</Var></Obj>
+<Obj><Var id="ID">29</Var><Var id="W$_DESC">Huile</Var><Var id="NAME">Huile</Var><Var id="SHELF">CONS</Var></Obj>
+<Obj><Var id="ID">30</Var><Var id="W$_DESC">Jambon</Var><Var id="NAME">Jambon</Var><Var id="SHELF">FRAI</Var></Obj>
+<Obj><Var id="ID">31</Var><Var id="W$_DESC">Emmental</Var><Var id="NAME">Emmental</Var><Var id="SHELF">FRAI</Var></Obj>
+<Obj><Var id="ID">32</Var><Var id="W$_DESC">Fromage raclette merzer</Var><Var id="NAME">Fromage raclette merzer</Var><Var id="SHELF">FRAI</Var></Obj>
+</Entity>
+<Entity id="SHOP_LIST" >
+<Obj><Var id="ID">0</Var><Var id="W$_DESC">Carrefour</Var><Var id="USER">micht</Var><Var id="CREATE_DATE">2013-12-09</Var><Var id="NAME">Carrefour</Var></Obj>
+<Obj><Var id="ID">1</Var><Var id="W$_DESC">Avenel</Var><Var id="USER">micht</Var><Var id="CREATE_DATE">2013-12-09</Var><Var id="NAME">Avenel</Var></Obj>
+<Obj><Var id="ID">3</Var><Var id="W$_DESC">Satoriz</Var><Var id="USER">micht</Var><Var id="CREATE_DATE">2014-01-13</Var><Var id="NAME">Satoriz</Var></Obj>
+<Obj><Var id="ID">4</Var><Var id="W$_DESC">Courses WE</Var><Var id="USER">micht</Var><Var id="CREATE_DATE">2014-03-18</Var><Var id="NAME">Courses WE</Var></Obj>
+</Entity>
+<Entity id="SHOP_LIST_L_ARTICLE" >
+<Obj><Var id="STATUS">BUY</Var><Var id="QUANTITY">1</Var><Var id="ARTICLE_ID">4</Var><Var id="LIST_ID">0</Var></Obj>
+<Obj><Var id="STATUS">BUY</Var><Var id="QUANTITY">1</Var><Var id="ARTICLE_ID">19</Var><Var id="LIST_ID">0</Var></Obj>
+<Obj><Var id="STATUS">BUY</Var><Var id="QUANTITY">1</Var><Var id="ARTICLE_ID">20</Var><Var id="LIST_ID">0</Var></Obj>
+<Obj><Var id="STATUS">BUY</Var><Var id="QUANTITY">1</Var><Var id="ARTICLE_ID">24</Var><Var id="LIST_ID">0</Var></Obj>
+<Obj><Var id="STATUS">BUY</Var><Var id="QUANTITY">1</Var><Var id="ARTICLE_ID">26</Var><Var id="LIST_ID">0</Var></Obj>
+<Obj><Var id="STATUS">BUY</Var><Var id="QUANTITY">1</Var><Var id="ARTICLE_ID">29</Var><Var id="LIST_ID">0</Var></Obj>
+<Obj><Var id="STATUS">BUY</Var><Var id="QUANTITY">1</Var><Var id="ARTICLE_ID">4</Var><Var id="LIST_ID">1</Var></Obj>
+<Obj><Var id="STATUS">BUY</Var><Var id="QUANTITY">1</Var><Var id="ARTICLE_ID">19</Var><Var id="LIST_ID">1</Var></Obj>
+<Obj><Var id="STATUS">BUY</Var><Var id="QUANTITY">1</Var><Var id="ARTICLE_ID">20</Var><Var id="LIST_ID">1</Var></Obj>
+<Obj><Var id="STATUS">BUY</Var><Var id="QUANTITY">1</Var><Var id="ARTICLE_ID">26</Var><Var id="LIST_ID">1</Var></Obj>
+<Obj><Var id="STATUS">BUY</Var><Var id="QUANTITY">1</Var><Var id="ARTICLE_ID">29</Var><Var id="LIST_ID">1</Var></Obj>
+<Obj><Var id="STATUS">BUY</Var><Var id="QUANTITY">8</Var><Var id="ARTICLE_ID">30</Var><Var id="LIST_ID">4</Var></Obj>
+<Obj><Var id="STATUS">BUY</Var><Var id="QUANTITY">8</Var><Var id="ARTICLE_ID">31</Var><Var id="LIST_ID">4</Var></Obj>
+<Obj><Var id="STATUS">BUY</Var><Var id="QUANTITY">1</Var><Var id="ARTICLE_ID">32</Var><Var id="LIST_ID">4</Var></Obj>
+</Entity>
+<Entity id="SHOP_SHELF" >
+<Obj><Var id="CODE">CONF</Var><Var id="W$_DESC">Confiserie</Var><Var id="POSITION">60</Var><Var id="NAME">Confiserie</Var></Obj>
+<Obj><Var id="CODE">CONS</Var><Var id="W$_DESC">Conserves</Var><Var id="POSITION">40</Var><Var id="NAME">Conserves</Var></Obj>
+<Obj><Var id="CODE">DEJ</Var><Var id="W$_DESC">Petit-Déjeuner</Var><Var id="POSITION">50</Var><Var id="NAME">Petit-Déjeuner</Var></Obj>
+<Obj><Var id="CODE">DIV</Var><Var id="W$_DESC">Divers</Var><Var id="POSITION">999</Var><Var id="NAME">Divers</Var></Obj>
+<Obj><Var id="CODE">FRAI</Var><Var id="W$_DESC">Frais</Var><Var id="POSITION">80</Var><Var id="NAME">Frais</Var></Obj>
+<Obj><Var id="CODE">LEG</Var><Var id="W$_DESC">Légumes</Var><Var id="POSITION">70</Var><Var id="NAME">Légumes</Var></Obj>
+<Obj><Var id="CODE">LIQ</Var><Var id="W$_DESC">Liquides</Var><Var id="POSITION">10</Var><Var id="NAME">Liquides</Var></Obj>
+<Obj><Var id="CODE">VIA</Var><Var id="W$_DESC">Viande</Var><Var id="POSITION">200</Var><Var id="NAME">Viande</Var></Obj>
+</Entity>
+<Entity id="SHOP_USER" >
+<Obj><Var id="W$_DESC">Seb</Var><Var id="PROFILE">ADMIN</Var><Var id="LOGIN">micht</Var><Var id="NAME">Seb</Var><Var id="PASSWORD">titia1803</Var></Obj>
+<Obj><Var id="W$_DESC">Laeti</Var><Var id="PROFILE">ADMIN</Var><Var id="LOGIN">titia</Var><Var id="NAME">Laeti</Var><Var id="PASSWORD">sebastien</Var></Obj>
+</Entity>
+</App>
+</Apps>
+</TOY>

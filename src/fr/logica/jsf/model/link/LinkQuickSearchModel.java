@@ -55,9 +55,8 @@ public class LinkQuickSearchModel extends LinkModel implements Serializable {
 	@Override
 	public void validateView(View currentView) {
 		if (encodedValue != null) {
-			String keyName = sourceEntity.getModel().getLinkModel(linkName).getKeyName();
 			Key foreignKey = new Key(entityName, encodedValue);
-			sourceEntity.setForeignKey(keyName, foreignKey);
+			sourceEntity.setForeignKey(linkName, foreignKey);
 		}
 	}
 

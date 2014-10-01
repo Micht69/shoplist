@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 
 import javax.naming.AuthenticationException;
 import javax.naming.Context;
@@ -78,15 +79,15 @@ public class LdapSecurityManager extends DefaultSecurityManager {
 	}
 
 	@Override
-	public User getUser(String login, String password, RequestContext ctx) {
+	public User getUser(String pLogin, String password, RequestContext ctx) {
 		// Escape login invalid characters
-		LOGGER.debug("Login attempt with login=" + login);
-		login = sanitize(login);
+		LOGGER.debug("Login attempt with login=" + pLogin);
+		String login = sanitize(pLogin);
 		LOGGER.debug("Login sanitized into login=" + login);
 
 		try {
 			// Search for user
-			HashMap<String, String> userData = getUserInfosFromLdap(login, ldapUserOtherAttributes);
+			Map<String, String> userData = getUserInfosFromLdap(login, ldapUserOtherAttributes);
 			String bindDn = userData.get(ldapUserDnAttribute);
 
 			if (bindDn != null) {
@@ -114,7 +115,7 @@ public class LdapSecurityManager extends DefaultSecurityManager {
 					return user;
 				} catch (AuthenticationException ae) {
 					// Login failed
-					LOGGER.warn("User log-in rejected for '" + login + "'");
+					LOGGER.warn("User log-in rejected for '" + login + "'", ae);
 
 					// Return null to reject login
 					return null;
@@ -141,9 +142,9 @@ public class LdapSecurityManager extends DefaultSecurityManager {
 		return env;
 	}
 
-	public HashMap<String, String> getUserInfosFromLdap(String cn, List<String> ldapAttributes) {
+	public Map<String, String> getUserInfosFromLdap(String cn, List<String> ldapAttributes) {
 
-		HashMap<String, String> userData = new HashMap<String, String>();
+		Map<String, String> userData = new HashMap<String, String>();
 		try {
 			// Get LDAP context
 			DirContext dctx = new InitialDirContext(getEnv());
@@ -176,8 +177,10 @@ public class LdapSecurityManager extends DefaultSecurityManager {
 				// Get the other attributes
 				for (int i = 0; i < ldapAttributes.size(); i++) {
 					String attr = ldapAttributes.get(i);
-					String value = (String) attrs.get(attr).get();
-					userData.put(attr, value);
+					if (attrs.get(attr) != null) {
+						String value = (String) attrs.get(attr).get();
+						userData.put(attr, value);
+					}
 				}
 			}
 
@@ -223,8 +226,9 @@ public class LdapSecurityManager extends DefaultSecurityManager {
 				// higher-order 2, 3 and 4-byte UTF-8 chars
 				try {
 					byte[] utf8bytes = String.valueOf(c).getBytes("UTF8");
-					for (byte b : utf8bytes)
+					for (byte b : utf8bytes) {
 						s.append(String.format("\\%02x", b));
+					}
 				} catch (UnsupportedEncodingException e) {
 					// Ignore char
 					LOGGER.debug(e.getMessage(), e);

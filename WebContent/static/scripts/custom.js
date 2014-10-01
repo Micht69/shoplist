@@ -17,15 +17,5 @@ function doPageCustomize(pageName) {
  * @param pageName the name of the page displaying the list
  */
 function doListCustomize(queryName, pageName) {
-}
-
-/**
- * Disable fixed list header
- */
-function initList(listName) {
-	$('#datatable-div-header-' + listName).remove();
-	$('#datatable-div-data-' + listName).css('visibility', 'visible');
-	$('td[class="first"]').click(function(event) {
-		event.stopPropagation();
-	});
+	$(".filter").focus();
 }

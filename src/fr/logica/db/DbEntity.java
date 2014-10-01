@@ -10,9 +10,9 @@ import fr.logica.business.Constants;
 import fr.logica.business.DomainLogic;
 import fr.logica.business.Entity;
 import fr.logica.business.EntityField;
+import fr.logica.business.EntityField.SqlTypes;
 import fr.logica.business.EntityManager;
 import fr.logica.business.EntityModel;
-import fr.logica.business.FunctionalException;
 import fr.logica.business.Key;
 import fr.logica.business.Link;
 import fr.logica.business.LinkModel;
@@ -25,12 +25,13 @@ import fr.logica.reflect.DomainUtils;
 /**
  * Utility class used to query database for a given domain object.
  */
+@SuppressWarnings("unchecked")
 public class DbEntity {
 
 	/**
 	 * Retrieves a domain object linked to the given entity.
 	 * 
-	 * @param entity
+	 * @param e
 	 *            Entity linked to the domain object to retrieve.
 	 * @param linkModel
 	 *            Model object representing the link between the given entity and the domain object to retrieve.
@@ -41,7 +42,7 @@ public class DbEntity {
 	 *             Exception thrown if an error occurs.
 	 */
 	public Entity getRef(Entity e, LinkModel linkModel, RequestContext ctx) throws DbException {
-		Key foreignKey = e.getForeignKey(linkModel.getKeyName());
+		Key foreignKey = e.getForeignKey(linkModel.getLinkName());
 		if (!foreignKey.isFull()) {
 			return null;
 		}
@@ -53,7 +54,7 @@ public class DbEntity {
 	/**
 	 * Retrieves a domain object by its primary key.
 	 * 
-	 * @param entityName
+	 * @param domainName
 	 *            Name of the domain object to retrieve.
 	 * @param primaryKey
 	 *            Primary key of the domain object to retrieve.
@@ -101,7 +102,6 @@ public class DbEntity {
 
 		try {
 			DbManagerUpdatable.fillAutoIncrement(entity, ctx);
-
 			DbQuery query = DB.createQuery(ctx, entity.name(), "T01");
 			query.addCondKey(entity.getPrimaryKey(), "T01");
 			query.setForUpdate(true);
@@ -133,7 +133,6 @@ public class DbEntity {
 
 		try {
 			DbManagerUpdatable.fillAutoIncrement(entity, ctx);
-
 			DbQuery query = DB.createQuery(ctx, entity.name(), "T01");
 			if (entity.getInitialKey() != null) {
 				query.addCondKey(entity.getInitialKey(), "T01");
@@ -169,7 +168,6 @@ public class DbEntity {
 
 		try {
 			DbManagerUpdatable.fillAutoIncrement(domain, ctx);
-
 			DbQuery query = DB.createQuery(ctx, domain.name(), "T01");
 			if (domain.getInitialKey() != null) {
 				query.addCondKey(domain.getInitialKey(), "T01");
@@ -213,13 +211,12 @@ public class DbEntity {
 		Link link = baseBean.getBackRef(linkName);
 		EntityModel entityModel = EntityManager.getEntityModel(link.getModel().getEntityName());
 		String associatedLinkName = entityModel.getAssociatedLink(linkName);
-		String associatedKeyName = entityModel.getLinkModel(associatedLinkName).getKeyName();
 
 		for (Key selectedKey : selectedKeys) {
 			// For each selected element we'll create an association.
 			Entity association = DomainUtils.newDomain(link.getModel().getEntityName());
-			association.setForeignKey(associatedKeyName, selectedKey);
-			association.setForeignKey(link.getModel().getKeyName(), baseBean.getPrimaryKey());
+			association.setForeignKey(associatedLinkName, selectedKey);
+			association.setForeignKey(link.getModel().getLinkName(), baseBean.getPrimaryKey());
 			association.getLink(linkName).setEntity(baseBean);
 			DB.persist(association, new Action(Constants.SELECT, Constants.SELECT), ctx);
 		}
@@ -280,13 +277,12 @@ public class DbEntity {
 		Link link = baseBean.getBackRef(linkName);
 		EntityModel entityModel = EntityManager.getEntityModel(link.getModel().getEntityName());
 		String associatedLinkName = entityModel.getAssociatedLink(linkName);
-		String associatedKeyName = entityModel.getLinkModel(associatedLinkName).getKeyName();
 
 		for (Key selectedKey : selectedKeys) {
 			// For each selected element we'll create an association.
 			Entity association = DomainUtils.newDomain(link.getModel().getEntityName());
-			association.setForeignKey(associatedKeyName, selectedKey);
-			association.setForeignKey(link.getModel().getKeyName(), baseBean.getPrimaryKey());
+			association.setForeignKey(associatedLinkName, selectedKey);
+			association.setForeignKey(link.getModel().getLinkName(), baseBean.getPrimaryKey());
 			association.getLink(linkName).setEntity(baseBean);
 			DB.remove(association, new Action(Constants.DETACH, Constants.DETACH), ctx);
 		}
@@ -368,14 +364,15 @@ public class DbEntity {
 	}
 
 	/**
+	 * Get the DbQuery for a given link.
+	 * 
 	 * @param e
 	 * @param linkName
 	 * @param queryName
 	 * @param selectAll
 	 * @param ctx
-	 * @return
+	 * @return the query matching the given link
 	 */
-	@SuppressWarnings("unchecked")
 	public DbQuery getLinkQuery(Entity e, String linkName, String queryName, boolean selectAll, RequestContext ctx) {
 		EntityModel eModel = EntityManager.getEntityModel(e.name());
 		if (!eModel.getBackRefNames().contains(linkName)) {
@@ -428,7 +425,7 @@ public class DbEntity {
 
 			if (manager.next()) {
 
-				if ("CLOB".equals(lobField.getSqlType())) {
+				if (lobField.getSqlType() == SqlTypes.CLOB) {
 					String clob = manager.getClob(manager.getColumnIndex(entity.name(), propertyName));
 					if (null != clob) {
 						content = clob.getBytes();

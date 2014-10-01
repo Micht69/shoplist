@@ -106,6 +106,7 @@ public abstract class DataModel implements Serializable {
 	}
 
 	public void downloadFile(File f) {
+		FileInputStream stream = null;
 		OutputStream out = null;
 		try {
 			FacesContext fc = FacesContext.getCurrentInstance();
@@ -116,7 +117,7 @@ public abstract class DataModel implements Serializable {
 			response.addHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
 			response.addHeader("Cache-Control", "public");
 
-			FileInputStream stream = new FileInputStream(f);
+			stream = new FileInputStream(f);
 			out = response.getOutputStream();
 			byte[] buffer = new byte[1024];
 			int length;
@@ -126,12 +127,23 @@ public abstract class DataModel implements Serializable {
 			stream.close();
 			out.flush();
 			out.close();
+			stream = null;
+			out = null;
+			
 			fc.responseComplete();
 		} catch (FileNotFoundException e) {
 			LOGGER.error(e.getMessage(), e);
 		} catch (IOException e) {
 			LOGGER.error(e.getMessage(), e);
 		} finally {
+			try {
+				if (stream != null) {
+					stream.close();
+				}
+			} catch (IOException e) {
+				LOGGER.error(e);
+			}
+
 			try {
 				if (out != null) {
 					out.close();

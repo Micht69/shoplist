@@ -43,7 +43,7 @@ public class DefaultSecurityManager extends AbstractSecurityManager {
 	 * This method is called to load everything needed in user session. For instance application access to lists and actions.
 	 */
 	@Override
-	public final void initializeAccessRights(RequestContext context) {
+	public void initializeAccessRights(RequestContext context) {
 		User user = context.getSessionContext().getUser();
 
 		// No user => No access

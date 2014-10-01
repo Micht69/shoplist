@@ -11,6 +11,8 @@ import org.apache.log4j.Logger;
 import fr.logica.business.Action;
 import fr.logica.business.Constants;
 import fr.logica.business.Entity;
+import fr.logica.business.EntityManager;
+import fr.logica.business.EntityModel;
 import fr.logica.business.FunctionalException;
 import fr.logica.business.Key;
 import fr.logica.business.MessageUtils;
@@ -22,8 +24,9 @@ import fr.logica.business.data.ListData;
 import fr.logica.business.data.Row;
 import fr.logica.db.DB;
 import fr.logica.jsf.controller.ViewController;
-import fr.logica.jsf.model.backref.BackRefListModel;
+import fr.logica.jsf.utils.FacesMessagesUtils;
 import fr.logica.reflect.DomainUtils;
+import fr.logica.security.SecurityUtils;
 import fr.logica.ui.Message;
 import fr.logica.ui.Message.Severity;
 
@@ -98,7 +101,7 @@ public class BackRefListTabeditModel extends BackRefListModel implements Seriali
 	private boolean existsCreateAction(RequestContext ctx) {
 		if (createAction == null) {
 			LOGGER.error("No create action defined for current page");
-			String msg = MessageUtils.getInstance(ctx).getMessage("error.bug", null);
+			String msg = MessageUtils.getInstance(ctx).getMessage("error.bug", (Object[]) null);
 			ctx.getMessages().add(new Message(msg, Severity.ERROR));
 			return false;
 		}
@@ -108,7 +111,7 @@ public class BackRefListTabeditModel extends BackRefListModel implements Seriali
 	private boolean existsModifyAction(RequestContext ctx) {
 		if (modifyAction == null) {
 			LOGGER.error("No modify action defined for current page");
-			String msg = MessageUtils.getInstance(ctx).getMessage("error.bug", null);
+			String msg = MessageUtils.getInstance(ctx).getMessage("error.bug", (Object[]) null);
 			ctx.getMessages().add(new Message(msg, Severity.ERROR));
 			return false;
 		}
@@ -145,7 +148,7 @@ public class BackRefListTabeditModel extends BackRefListModel implements Seriali
 
 	public void validateCreate(RequestContext ctx) {
 		if (currentEntity == null) {
-			String msg = MessageUtils.getInstance(ctx).getMessage("error.bug", null);
+			String msg = MessageUtils.getInstance(ctx).getMessage("error.bug", (Object[]) null);
 			ctx.getMessages().add(new Message(msg, Severity.ERROR));
 			return;
 		}
@@ -173,7 +176,7 @@ public class BackRefListTabeditModel extends BackRefListModel implements Seriali
 
 	public void validateModify(RequestContext ctx) {
 		if (currentEntity == null) {
-			String msg = MessageUtils.getInstance(ctx).getMessage("error.bug", null);
+			String msg = MessageUtils.getInstance(ctx).getMessage("error.bug", (Object[]) null);
 			ctx.getMessages().add(new Message(msg, Severity.ERROR));
 			return;
 		}
@@ -218,7 +221,7 @@ public class BackRefListTabeditModel extends BackRefListModel implements Seriali
 		/* Create an action page for this update */
 		/* Create a request for this update */
 		Request<Entity> saveRequest = new Request<Entity>(entityName, action, null, queryName, linkName, true);
-		currentEntity.setForeignKey(currentEntity.getModel().getLinkModel(linkName).getKeyName(), entity.getPrimaryKey());
+		currentEntity.setForeignKey(linkName, entity.getPrimaryKey());
 		saveRequest.setEntity(currentEntity);
 		saveRequest.setLinkedEntity(entity);
 		List<Key> keys = new ArrayList<Key>();
@@ -240,7 +243,7 @@ public class BackRefListTabeditModel extends BackRefListModel implements Seriali
 			success = false;
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage(), e);
-			context.getMessages().add(new Message(viewCtrl.getTechnicalMessage(e), Severity.ERROR));
+			context.getMessages().add(new Message(FacesMessagesUtils.getTechnicalMessage(e), Severity.ERROR));
 			success = false;
 		}
 		viewCtrl.displayMessages(context);
@@ -301,6 +304,14 @@ public class BackRefListTabeditModel extends BackRefListModel implements Seriali
 	}
 
 	public void setCreateAction(int code, int type) {
+		if (isProtected) {
+			return;
+		}
+		EntityModel model = EntityManager.getEntityModel(entityName);
+		if (!SecurityUtils.getSecurityManager().isActionRendered(model.name(), code,
+				viewCtrl.getSessionCtrl().getContext())) {
+			return;
+		}
 		if (createAction == null) {
 			Row row = new Row();
 			row.put("$rownum", NEW_LINE_ROWNUM);
@@ -310,6 +321,14 @@ public class BackRefListTabeditModel extends BackRefListModel implements Seriali
 	}
 
 	public void setModifyAction(int code, int type) {
+		if (isProtected) {
+			return;
+		}
+		EntityModel model = EntityManager.getEntityModel(entityName);
+		if (!SecurityUtils.getSecurityManager().isActionRendered(model.name(), code,
+				viewCtrl.getSessionCtrl().getContext())) {
+			return;
+		}
 		modifyAction = new Action(code, type);
 	}
 
@@ -319,6 +338,10 @@ public class BackRefListTabeditModel extends BackRefListModel implements Seriali
 
 	public void setSuccess(boolean success) {
 		this.success = success;
+	}
+
+	public boolean isProtected() {
+		return (isProtected || modifyAction == null);
 	}
 
 	/**
@@ -348,4 +371,17 @@ public class BackRefListTabeditModel extends BackRefListModel implements Seriali
 			}
 		}
 	}
+	
+	/**
+	 * Do not count the empty "create-line"
+	 */
+	@Override
+	public String getResultCount() {
+		String message = super.getResultCount();
+		if (createAction != null) {
+			return (data.getRows().size() - 1) + message.substring(message.indexOf(" "));
+		}
+		return message;
+	}
+
 }

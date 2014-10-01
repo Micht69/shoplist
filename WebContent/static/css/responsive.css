@@ -24,9 +24,9 @@
 		margin-bottom: 10px;
 	}
 	.content {
-	    padding-top: 0px;
-	    padding-bottom: 0px;
-	    width: 100%;
+		padding-top: 0px;
+		padding-bottom: 0px;
+		width: 100%;
 	}
 	.footer { 
 		position: relative; 
@@ -59,10 +59,15 @@
 	}
 	
 	/* Form fields */
-	.colFieldSetRight > .quickSearch input {
+	.col-1,
+	.col-2 {
+		display: block;
+		width: 100%;
+	}
+	.col-value > .quickSearch input {
 		width: 82%;
 	}
-	.colFieldSetRight > select {
+	.col-value > select {
 		width: 98%;
 	}
 	textarea, select, input[type="text"], input[type="password"], input[type="datetime"], 

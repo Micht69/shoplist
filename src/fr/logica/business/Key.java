@@ -1,10 +1,18 @@
 package fr.logica.business;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 public class Key implements Serializable {
+
+	private static final Logger LOGGER = Logger.getLogger(Key.class);
 
 	private static final long serialVersionUID = 3861723578927708930L;
 	private static final String FIELD_SEPARATOR = ";;;";
@@ -68,7 +76,35 @@ public class Key implements Serializable {
 			}
 			encodedKey.append(fieldName);
 			encodedKey.append(KEY_VALUE_SEPARATOR);
-			encodedKey.append(values.get(fieldName));
+			Object v = values.get(fieldName);
+			String sValue = String.valueOf(v);
+			if (v == null) {
+				encodedKey.append("N");
+				sValue = "";
+			} else if (v instanceof Integer) {
+				encodedKey.append("I");
+			} else if (v instanceof String) {
+				encodedKey.append("S");
+			} else if (v instanceof Long) {
+				encodedKey.append("L");
+			} else if (v instanceof Boolean) {
+				encodedKey.append("B");
+			} else if (v instanceof BigDecimal) {
+				encodedKey.append("F");
+			} else if (v instanceof Date) {
+				sValue = String.valueOf(((Date) v).getTime());
+				if (v instanceof Timestamp) {
+					encodedKey.append("T");
+				} else if (v instanceof Time) {
+					encodedKey.append("H");
+				} else if (v instanceof Date) {
+					encodedKey.append("D");
+				}
+			} else {
+				LOGGER.error("Error in Key " + model == null ? "<keyModel is null>" : model.getName());
+				LOGGER.error("Unable to serialize Key value " + sValue + " of type " + v.getClass().getSimpleName() + " in field " + fieldName);
+			}
+			encodedKey.append(sValue);
 			first = false;
 		}
 		return encodedKey.toString();
@@ -85,23 +121,44 @@ public class Key implements Serializable {
 			String[] valTab = fieldValues[i].split(KEY_VALUE_SEPARATOR);
 			if (valTab.length > 1) {
 				String field = valTab[0];
-				Object value = valTab[1];
-				values.put(field, value);
-			}
-		}
-	}
+				String sValue = valTab[1];
+				if (sValue.length() == 0) {
+					LOGGER.error("Error in Key " + model == null ? "<keyModel is null>" : model.getName());
+					LOGGER.error("Unable to deserialize Key value for field " + field);
+				} else {
+					String sType = sValue.substring(0, 1);
+					sValue = sValue.substring(1);
 
-	public void setEncodedValueNull(String encodedString) {
-		String[] fieldValues = encodedString.split(FIELD_SEPARATOR);
-		values.clear();
-		for (int i = 0; i < fieldValues.length; i++) {
-			if (fieldValues[i].split(KEY_VALUE_SEPARATOR).length > 1) {
-				String field = fieldValues[i].split(KEY_VALUE_SEPARATOR)[0];
-				String value = fieldValues[i].split(KEY_VALUE_SEPARATOR)[1];
-				if ("null".equals(fieldValues[i].split(KEY_VALUE_SEPARATOR)[1])) {
-					value = null;
+					Object value = null;
+
+					if ("N".equals(sType)) {
+						// NULL value
+						value = null;
+					} else if ("S".equals(sType)) {
+						value = sValue;
+					} else if ("I".equals(sType)) {
+						value = Integer.parseInt(sValue);
+					} else if ("L".equals(sType)) {
+						value = Long.parseLong(sValue);
+					} else if ("B".equals(sType)) {
+						value = Boolean.valueOf(sValue);
+					} else if ("F".equals(sType)) {
+						value = new BigDecimal(sValue);
+					} else if ("D".equals(sType) || "H".equals(sType) || "T".equals(sType)) {
+						long ts = Long.parseLong(sValue);
+						if ("D".equals(sType)) {
+							value = new Date(ts);
+						} else if ("H".equals(sType)) {
+							value = new Time(ts);
+						} else if ("T".equals(sType)) {
+							value = new Timestamp(ts);
+						}
+					} else {
+						LOGGER.error("Error in Key " + model == null ? "<keyModel is null>" : model.getName());
+						LOGGER.error("Unable to deserialize Key value for field " + field + " - unknown field type " + sType);
+					}
+					values.put(field, value);
 				}
-				values.put(field, value);
 			}
 		}
 	}

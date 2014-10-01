@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.faces.application.Resource;
 import javax.faces.application.ResourceHandler;
@@ -29,6 +30,33 @@ import fr.logica.reflect.DomainUtils;
  * 
  */
 public class ImageLinkResource extends Resource {
+
+	/** Mapped characters in resource names */
+	private static final HashMap<Character, Character> mappedCars = new HashMap<Character, Character>();
+
+	/** Builds a resource unique ID */
+	public static String getResourceId(String entityName, String encodedKey, String varName) {
+		if (mappedCars.size() == 0) {
+			mappedCars.put('é', 'e');
+			mappedCars.put('è', 'e');
+			mappedCars.put('ê', 'e');
+			mappedCars.put('ë', 'e');
+			mappedCars.put('é', 'e');
+			mappedCars.put('à', 'a');
+			mappedCars.put('ä', 'a');
+			mappedCars.put('â', 'a');
+			mappedCars.put('ï', 'i');
+			mappedCars.put('î', 'i');
+			mappedCars.put('ô', 'o');
+			mappedCars.put('ö', 'o');
+		}
+		String id = "ImageLink:" + entityName + "/" + encodedKey.replace(":::", "=").replace(";;;", "&") + "/" + varName;
+		for (Entry<Character, Character> e : mappedCars.entrySet()) {
+			id = id.replace(e.getKey(), e.getValue());
+		}
+		return id;
+	}
+
 
 	private final String mediaId;
 
@@ -61,7 +89,7 @@ public class ImageLinkResource extends Resource {
 
 			Entity e = DomainUtils.newDomain(entityName);
 			Key pk = new Key(entityName);
-			pk.setEncodedValue(jsfEncodedKey.replace("=", ":::"));
+			pk.setEncodedValue(jsfEncodedKey.replace("=", ":::").replace("&", ";;;"));
 			e.setPrimaryKey(pk);
 			SessionController sessionCtrl = (SessionController) request.getSession().getAttribute("sessionCtrl");
 

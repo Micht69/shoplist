@@ -33,15 +33,6 @@ public class FileRenderer extends TextRenderer {
 		ResponseWriter writer = context.getResponseWriter();
 		String clientId = component.getClientId(context);
 
-		/* Span component to display selected file name. */
-		writer.startElement("span", null);
-		writer.writeAttribute("id", clientId + "-span", null);
-
-		if (null != currentValue) {
-			writer.writeText(currentValue, null);
-		}
-		writer.endElement("span");
-
 		writer.startElement("input", component);
 		writeIdAttributeIfNecessary(context, writer, component);
 		writer.writeAttribute("type", "file", null);

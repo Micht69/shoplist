@@ -32,8 +32,7 @@ public class ListCategoryModel extends ListModel {
 	public void loadData(RequestContext context) {
 		// data should be an instance of ListCategoryData if query has category breaks
 		data = new BusinessController().getListData(entity, entityName, queryName, criteria, viewCtrl.getCurrentView().getAction(), viewCtrl
-				.getCurrentView().getLinkName(), viewCtrl.getCurrentView().getLinkedEntity(),
-				context);
+				.getCurrentView().getLinkName(), viewCtrl.getCurrentView().getLinkedEntity(), globalSearch, context);
 		loadTree((ListCategoryData) data);
 	}
 
@@ -58,19 +57,39 @@ public class ListCategoryModel extends ListModel {
 		root = new DefaultTreeNode("root", null);
 		List<String> breakers = data.getCategoryBreak();
 
-		for (Row r : data.getRows()) {
+		if (breakers.size() > 0) {
 			for (int i = 0; i < breakers.size(); i++) {
-				String broker = breakers.get(i);
-				String breakValue = (String) r.get(broker);
-				if (nodeMap.get(breakValue) == null) {
-					TreeNode parent = i == 0 ? root : nodeMap.get(r.get(breakers.get(i - 1)));
-					BreakNode node = new BreakNode(breakValue, parent);
-					nodeMap.put(breakValue, node);
+				String breaker = breakers.get(i);
+
+				for (Row r : data.getRows()) {
+					String breakValue = String.valueOf(r.get(breaker));
+					StringBuilder key = new StringBuilder();
+					String parentKey;
+
+					for (int j = 0; j < i; j++) {
+						key.append(String.valueOf(r.get(breakers.get(j))));
+					}
+					parentKey = key.toString();
+					key.append(breakValue);
+
+					if (nodeMap.get(key.toString()) == null) {
+						TreeNode parent = i == 0 ? root : nodeMap.get(parentKey);
+						BreakNode node = new BreakNode(breakValue, parent);
+						nodeMap.put(key.toString(), node);
+					}
 				}
 			}
-			if (breakers.size() > 0) {
-				new RowNode(r, nodeMap.get(r.get(breakers.get(breakers.size() - 1))));
-			} else {
+
+			for (Row r : data.getRows()) {
+				StringBuilder key = new StringBuilder();
+				for (int i = 0; i < breakers.size(); i++) {
+					key.append(String.valueOf(r.get(breakers.get(i))));
+				}
+				new RowNode(r, nodeMap.get(key.toString()));
+			}
+
+		} else {
+			for (Row r : data.getRows()) {
 				new RowNode(r, root);
 			}
 		}

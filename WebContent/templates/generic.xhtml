@@ -1,13 +1,13 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd" >
 <html xmlns="http://www.w3.org/1999/xhtml"
-        xmlns:h="http://java.sun.com/jsf/html"
-        xmlns:ui="http://java.sun.com/jsf/facelets"
-        xmlns:f="http://java.sun.com/jsf/core">
+		xmlns:h="http://java.sun.com/jsf/html"
+		xmlns:ui="http://java.sun.com/jsf/facelets"
+		xmlns:f="http://java.sun.com/jsf/core">
 <f:view contentType="text/html" locale="#{sessionCtrl.context.locale}">
 <f:metadata>
-    <f:event type="preRenderView" listener="#{menuCtrl.executeMenuQueries()}" />
-    <ui:insert name="metadata"/>
+	<f:event type="preRenderView" listener="#{menuCtrl.executeMenuQueries()}" />
+	<ui:insert name="metadata"/>
 </f:metadata>
 <h:head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -63,17 +63,17 @@
 </h:head>
 <h:body>
 	<div class="wrapper">
-    	<ui:include src="../includes/header.xhtml" />
-    	<ui:include src="../includes/modals.xhtml" />
+		<ui:include src="../includes/header.xhtml" />
+		<ui:include src="../includes/modals.xhtml" />
 
-	    <!-- Début du contenaire central -->
-	    <div class="content">
-		    <h:form id="mainForm" class="clear_fix">
+		<!-- Début du contenaire central -->
+		<div class="content">
+			<h:form id="mainForm" class="clear_fix">
 				<h:panelGroup layout="block" styleClass="inner-content">
-			        <!-- Champ pour sauvegarder l'état sale. Immediate car doit être passé au serveur même si une erreur de validation survient. -->
-			        <h:inputHidden id="dirty" value="#{jsfCtrl.dirty}" immediate="true" />
+					<!-- Champ pour sauvegarder l'état sale. Immediate car doit être passé au serveur même si une erreur de validation survient. -->
+					<h:inputHidden id="dirty" value="#{jsfCtrl.dirty}" immediate="true" />
 
-			        <ui:insert name="body">Corps de la page</ui:insert>
+					<ui:insert name="body">Corps de la page</ui:insert>
 
 					<div style="display: none;">
 						<h:outputText escape="false" value="#{jsfCtrl.customData}"></h:outputText>
@@ -88,34 +88,34 @@
 				</h:panelGroup>
 
 				<!-- Messages are rendered AFTER mainForm has loaded all its components  -->
-		       	<h:panelGroup id="messageGroup" layout="block" styleClass="messages">
-		       		<h:messages layout="list" errorClass="message_error" styleClass="message" id="messages" />
-	       		</h:panelGroup>
-		    </h:form>
-	    </div>
+				<h:panelGroup id="messageGroup" layout="block" styleClass="messages">
+					<h:messages layout="list" errorClass="message_error" infoClass="message_info" styleClass="message" id="messages" />
+				</h:panelGroup>
+			</h:form>
+		</div>
 		<script type="text/javascript">$('input:radio').closest('td').addClass('td_radio');</script>
-    	<!-- Fin du contenaire central -->
+		<!-- Fin du contenaire central -->
 
-    	<ui:include src="../includes/footer.xhtml" />
-    </div>
-    <h:form id="conversationForm">
-    	<h:inputHidden id="conversation" value="#{jsfCtrl.conversation}" immediate="true" />
-    	<h:panelGroup id="newConversationWrapper">
-	    	<h:panelGroup id="newConversation" rendered="#{jsfCtrl.newConversation}">
-			    <script type="text/javascript">
-			    	window.name=<h:outputText value="#{jsfCtrl.conversation}" />
-			    </script>
-	    	</h:panelGroup>
-    	</h:panelGroup>
-	    <h:commandButton id="conversationButton" value="sendConversationId" style="display: none">
-	        <f:ajax listener="#{jsfCtrl.attachToConversation}" execute="conversation" render="newConversationWrapper"/>
-	    </h:commandButton>
-	    <script type="text/javascript">
-	    	$(document).ready(function() { 
-	    		$('input[id="conversationForm\\:conversation"]').val(window.name); 
-	    		$('input[id="conversationForm\\:conversationButton"]').click();
-	    	});</script>
-    </h:form>
+		<ui:include src="../includes/footer.xhtml" />
+	</div>
+	<h:form id="conversationForm">
+		<h:inputHidden id="conversation" value="#{jsfCtrl.conversation}" immediate="true" />
+		<h:panelGroup id="newConversationWrapper">
+			<h:panelGroup id="newConversation" rendered="#{jsfCtrl.newConversation}">
+				<script type="text/javascript">
+					window.name=<h:outputText value="#{jsfCtrl.conversation}" />
+				</script>
+			</h:panelGroup>
+		</h:panelGroup>
+		<h:commandButton id="conversationButton" value="sendConversationId" style="display: none">
+			<f:ajax listener="#{jsfCtrl.attachToConversation}" execute="conversation" render="newConversationWrapper"/>
+		</h:commandButton>
+		<script type="text/javascript">
+			$(document).ready(function() { 
+				$('input[id="conversationForm\\:conversation"]').val(window.name); 
+				$('input[id="conversationForm\\:conversationButton"]').click();
+			});</script>
+	</h:form>
 
 </h:body>
 </f:view>

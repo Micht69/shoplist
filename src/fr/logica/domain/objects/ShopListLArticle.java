@@ -2,39 +2,66 @@ package fr.logica.domain.objects;
 
 import java.io.Serializable;
 
-
+import fr.logica.business.Action.*;
 import fr.logica.business.Entity;
+import fr.logica.business.EntityField.SqlTypes;
 import fr.logica.business.Key;
+import fr.logica.business.KeyModel;
 import fr.logica.business.context.RequestContext;
 import fr.logica.db.DB;
-import fr.logica.domain.models.ShopListLArticleModel;
+import fr.logica.domain.annotations.*;
+import fr.logica.domain.constants.ShopListLArticleConstants;
 
 /**
  * Entity ShopListLArticle definition
  * 
  * @author CGI
  */
+@EntityDef(dbName = "SHOP_LIST_L_ARTICLE", primaryKey = { "listId", "articleId" })
+@Links({
+	@Link(name = "shopListLArticleLList", targetEntity = "shopList", fields = { "listId" }),
+	@Link(name = "shopListLArticleLArticle", targetEntity = "shopArticle", fields = { "articleId" })
+})
+@Actions({
+	@Action(code = 0, nextAction = 51, input = Input.NONE, persistence = Persistence.INSERT),
+	@Action(code = 51, nextAction = 0, input = Input.NONE, persistence = Persistence.INSERT),
+	@Action(code = 70, input = Input.NONE, persistence = Persistence.UPDATE, ui = UserInterface.NONE, process = fr.logica.business.Action.Process.CUSTOM),
+	@Action(code = 2, persistence = Persistence.UPDATE),
+	@Action(code = 20, pageName = "SHOP_LIST_L_ARTICLE_DELETE", input = Input.MANY, persistence = Persistence.DELETE, ui = UserInterface.READONLY, process = fr.logica.business.Action.Process.CUSTOM),
+	@Action(code = 60, input = Input.MANY, persistence = Persistence.UPDATE, ui = UserInterface.NONE, process = fr.logica.business.Action.Process.CUSTOM)
+})
 public class ShopListLArticle extends Entity implements Serializable {
 	/** serialVersionUID */
 	public static final long serialVersionUID = 1L;
-	
 
 	/** Liste */
-	private Integer listId ;
+	@EntityField(sqlName = "LIST_ID", sqlType = SqlTypes.INTEGER, sqlSize = 10, isMandatory = true)
+	private Integer listId;
 
 	/** Article */
-	private Integer articleId ;
+	@EntityField(sqlName = "ARTICLE_ID", sqlType = SqlTypes.INTEGER, sqlSize = 10, isMandatory = true)
+	private Integer articleId;
 
 	/** Quantité */
+	@EntityField(sqlName = "QUANTITY", sqlType = SqlTypes.INTEGER, sqlSize = 3, isMandatory = true)
 	private Integer quantity = 1;
 
 	/** Statut */
-	private String status = "BUY";
+	@EntityField(sqlName = "STATUS", sqlType = SqlTypes.VARCHAR2, sqlSize = 5, defaultValue = "BUY")
+	@DefinedValues({
+			@DefinedValue(code = "BUY", label = "shopListLArticle.status.BUY", value = "BUY", isDefault = true), // A acheter
+			@DefinedValue(code = "DONE", label = "shopListLArticle.status.DONE", value = "DONE") // Acheté
+	})
+	private String status;
 
 	/** Récapitulatif */
-	private String deleteInfos ;
+	@EntityField(sqlName = "DELETE_INFOS", sqlType = SqlTypes.VARCHAR2, sqlSize = 1000, memory = fr.logica.business.EntityField.Memory.ALWAYS)
+	private String deleteInfos;
 
-
+	/**
+	 * Initialize a new ShopListLArticle.<br/>
+	 * <b>The fields with initial value will be populated.</b>
+	 */
 	public ShopListLArticle() {
 		// Default constructor
 		super();
@@ -51,39 +78,35 @@ public class ShopListLArticle extends Entity implements Serializable {
 	 */
 	public ShopListLArticle(Integer listId, Integer articleId) {
 		super();
-		Key primaryKey = ShopListLArticleModel.buildPrimaryKey(listId, articleId);
+		Key primaryKey = buildPrimaryKey(listId, articleId);
 		setPrimaryKey(primaryKey);
 	}
 	
 	/**
-	 * Load a bean from database based on its primary key
-	 * <b>This method does not call the logic method dbPostLoad().</b>
-	 * @param listId Liste
-	 * @param articleId Article
-	 * @param ctx Current context with open database connection.
-	 * @return	<code>true</code> if the bean has been loaded, <code>false</code> if no entity was found.  
+	 * Initialize a new ShopListLArticle from an existing ShopListLArticle.<br/>
+	 * <b>All fields value are copied.</b>
 	 */
-	public boolean find(Integer listId, Integer articleId, RequestContext ctx) {
-		Key primaryKey = ShopListLArticleModel.buildPrimaryKey(listId, articleId);
-		if (!primaryKey.isFull()) {
-			return false;
-		}
-		ShopListLArticle dbInstance = DB.get(NAME, primaryKey, ctx);
-		if (dbInstance != null) {
-			syncFromBean(dbInstance);
-			return true; 
-		}
-		return false; 
-	}
-	
 	public ShopListLArticle(ShopListLArticle pShopListLArticle) {
 		super(pShopListLArticle);
+	}
+
+	/**
+	 * Generate a primary key for the entity
+	 */
+	public static synchronized Key buildPrimaryKey(Integer listId, Integer articleId) {
+		KeyModel pkModel = new KeyModel(ShopListLArticleConstants.ENTITY_NAME);
+		// FIXME : Récupérer la PK ...
+		Key key = new Key(pkModel);
+		key.setValue("listId", listId);
+		key.setValue("articleId", articleId);
+
+		return key;
 	}
 
 	/** Entity name */
 	@Override
 	public String name() {
-		return "shopListLArticle";
+		return ShopListLArticleConstants.ENTITY_NAME;
 	}
 
 	/** Entity description */
@@ -100,7 +123,7 @@ public class ShopListLArticle extends Entity implements Serializable {
 	public Integer getListId() {
 		return this.listId;
 	}
- 
+
 	/**
 	 * Set the value from field ListId.
 	 *
@@ -109,8 +132,6 @@ public class ShopListLArticle extends Entity implements Serializable {
 	public void setListId(final Integer listId) {
 		this.listId = listId;
 	}
-	
-
 
 	/**
 	 * Get the value from field ArticleId.
@@ -120,7 +141,7 @@ public class ShopListLArticle extends Entity implements Serializable {
 	public Integer getArticleId() {
 		return this.articleId;
 	}
- 
+
 	/**
 	 * Set the value from field ArticleId.
 	 *
@@ -129,8 +150,6 @@ public class ShopListLArticle extends Entity implements Serializable {
 	public void setArticleId(final Integer articleId) {
 		this.articleId = articleId;
 	}
-	
-
 
 	/**
 	 * Get the value from field Quantity.
@@ -140,7 +159,7 @@ public class ShopListLArticle extends Entity implements Serializable {
 	public Integer getQuantity() {
 		return this.quantity;
 	}
- 
+
 	/**
 	 * Set the value from field Quantity.
 	 *
@@ -149,8 +168,6 @@ public class ShopListLArticle extends Entity implements Serializable {
 	public void setQuantity(final Integer quantity) {
 		this.quantity = quantity;
 	}
-	
-
 
 	/**
 	 * Get the value from field Status.
@@ -160,7 +177,7 @@ public class ShopListLArticle extends Entity implements Serializable {
 	public String getStatus() {
 		return this.status;
 	}
- 
+
 	/**
 	 * Set the value from field Status.
 	 *
@@ -169,8 +186,6 @@ public class ShopListLArticle extends Entity implements Serializable {
 	public void setStatus(final String status) {
 		this.status = status;
 	}
-	
-
 
 	/**
 	 * Get the value from field DeleteInfos.
@@ -180,7 +195,7 @@ public class ShopListLArticle extends Entity implements Serializable {
 	public String getDeleteInfos() {
 		return this.deleteInfos;
 	}
- 
+
 	/**
 	 * Set the value from field DeleteInfos.
 	 *
@@ -188,32 +203,6 @@ public class ShopListLArticle extends Entity implements Serializable {
 	 */
 	public void setDeleteInfos(final String deleteInfos) {
 		this.deleteInfos = deleteInfos;
-	}
-	
-
-
-	/** Holder for the var names */
-	public interface Var {
-		/** Var LIST_ID */
-		String LIST_ID = "listId";
-		/** Var ARTICLE_ID */
-		String ARTICLE_ID = "articleId";
-		/** Var QUANTITY */
-		String QUANTITY = "quantity";
-		/** Var STATUS */
-		String STATUS = "status";
-		/** Var DELETE_INFOS */
-		String DELETE_INFOS = "deleteInfos";
-	}
-	
-	/** Holder for the defined values */
-	public interface ValueList {
-		public interface STATUS {
-			/** A acheter */
-			String BUY = "BUY";
-			/** Acheté */
-			String DONE = "DONE";
-		}
 	}
 
 	/**
@@ -224,7 +213,7 @@ public class ShopListLArticle extends Entity implements Serializable {
 	 * @return Instance of ShopList matching the link pays if any, null otherwise.
 	 */
 	public ShopList getRef_ShopListLArticleListFk(RequestContext ctx) {
-		return (ShopList) DB.getRef(this, ShopListLArticleModel.LINK_SHOP_LIST_L_ARTICLE_L_LIST, ctx);
+		return (ShopList) DB.getRef(this, ShopListLArticleConstants.Links.LINK_SHOP_LIST_L_ARTICLE_L_LIST, ctx);
 	}
 	
 	/**
@@ -239,7 +228,7 @@ public class ShopListLArticle extends Entity implements Serializable {
 		if (pShopList != null) {
 			primaryKey = pShopList.getPrimaryKey();
 		}
-		setForeignKey(getModel().getLinkModel(ShopListLArticleModel.LINK_SHOP_LIST_L_ARTICLE_L_LIST).getKeyName(), primaryKey);
+		setForeignKey(ShopListLArticleConstants.Links.LINK_SHOP_LIST_L_ARTICLE_L_LIST, primaryKey);
 	}
 
 	/**
@@ -250,7 +239,7 @@ public class ShopListLArticle extends Entity implements Serializable {
 	 * @return Instance of ShopArticle matching the link pays if any, null otherwise.
 	 */
 	public ShopArticle getRef_ShopListLArticleArticleFk(RequestContext ctx) {
-		return (ShopArticle) DB.getRef(this, ShopListLArticleModel.LINK_SHOP_LIST_L_ARTICLE_L_ARTICLE, ctx);
+		return (ShopArticle) DB.getRef(this, ShopListLArticleConstants.Links.LINK_SHOP_LIST_L_ARTICLE_L_ARTICLE, ctx);
 	}
 	
 	/**
@@ -265,28 +254,9 @@ public class ShopListLArticle extends Entity implements Serializable {
 		if (pShopArticle != null) {
 			primaryKey = pShopArticle.getPrimaryKey();
 		}
-		setForeignKey(getModel().getLinkModel(ShopListLArticleModel.LINK_SHOP_LIST_L_ARTICLE_L_ARTICLE).getKeyName(), primaryKey);
+		setForeignKey(ShopListLArticleConstants.Links.LINK_SHOP_LIST_L_ARTICLE_L_ARTICLE, primaryKey);
 	}
 
-
-	/** Holder for the action names */
-	public interface Action {
-		/** Créer. */
-		int ACTION_0 = 0;
-		/** Créer. */
-		int ACTION_51 = 51;
-		/** Sélectionner articles. */
-		int ACTION_70 = 70;
-		/** Modifier. */
-		int ACTION_2 = 2;
-		/** Supprimer. */
-		int ACTION_20 = 20;
-		/** Marquer acheté. */
-		int ACTION_60 = 60;
-    }
-
-	/** Nom de l'entité. */
-	public static final String NAME = "shopListLArticle";
 	
 	/**
 	 * Clones the current bean.

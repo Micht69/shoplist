@@ -11,6 +11,8 @@ import org.apache.log4j.Logger;
 import fr.logica.business.Action;
 import fr.logica.business.Constants;
 import fr.logica.business.Entity;
+import fr.logica.business.EntityManager;
+import fr.logica.business.EntityModel;
 import fr.logica.business.FunctionalException;
 import fr.logica.business.Key;
 import fr.logica.business.MessageUtils;
@@ -23,8 +25,9 @@ import fr.logica.business.data.ListData;
 import fr.logica.business.data.Row;
 import fr.logica.db.DB;
 import fr.logica.jsf.controller.ViewController;
-import fr.logica.jsf.model.list.ListModel;
+import fr.logica.jsf.utils.FacesMessagesUtils;
 import fr.logica.reflect.DomainUtils;
+import fr.logica.security.SecurityUtils;
 import fr.logica.ui.Message;
 import fr.logica.ui.Message.Severity;
 
@@ -100,7 +103,7 @@ public class TabeditModel extends ListModel implements Serializable {
 	private boolean existsCreateAction(RequestContext ctx) {
 		if (createAction == null) {
 			LOGGER.error("No create action defined for current page");
-			String msg = MessageUtils.getInstance(ctx).getMessage("error.bug", null);
+			String msg = MessageUtils.getInstance(ctx).getMessage("error.bug", (Object[]) null);
 			ctx.getMessages().add(new Message(msg, Severity.ERROR));
 			return false;
 		}
@@ -110,7 +113,7 @@ public class TabeditModel extends ListModel implements Serializable {
 	private boolean existsModifyAction(RequestContext ctx) {
 		if (modifyAction == null) {
 			LOGGER.error("No modify action defined for current page");
-			String msg = MessageUtils.getInstance(ctx).getMessage("error.bug", null);
+			String msg = MessageUtils.getInstance(ctx).getMessage("error.bug", (Object[]) null);
 			ctx.getMessages().add(new Message(msg, Severity.ERROR));
 			return false;
 		}
@@ -147,7 +150,7 @@ public class TabeditModel extends ListModel implements Serializable {
 
 	public void validateCreate(RequestContext ctx) {
 		if (currentEntity == null) {
-			String msg = MessageUtils.getInstance(ctx).getMessage("error.bug", null);
+			String msg = MessageUtils.getInstance(ctx).getMessage("error.bug", (Object[]) null);
 			ctx.getMessages().add(new Message(msg, Severity.ERROR));
 			return;
 		}
@@ -175,7 +178,7 @@ public class TabeditModel extends ListModel implements Serializable {
 
 	public void validateModify(RequestContext ctx) {
 		if (currentEntity == null) {
-			String msg = MessageUtils.getInstance(ctx).getMessage("error.bug", null);
+			String msg = MessageUtils.getInstance(ctx).getMessage("error.bug", (Object[]) null);
 			ctx.getMessages().add(new Message(msg, Severity.ERROR));
 			return;
 		}
@@ -239,7 +242,7 @@ public class TabeditModel extends ListModel implements Serializable {
 			success = false;
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage(), e);
-			context.getMessages().add(new Message(viewCtrl.getTechnicalMessage(e), Severity.ERROR));
+			context.getMessages().add(new Message(FacesMessagesUtils.getTechnicalMessage(e), Severity.ERROR));
 			success = false;
 		}
 		viewCtrl.displayMessages(context);
@@ -257,7 +260,7 @@ public class TabeditModel extends ListModel implements Serializable {
 		copy.setPrimaryKey(currentEntity.getPrimaryKey());
 		ListData rowData = new BusinessController().getListData(copy, entityName, queryName, new ListCriteria(), viewCtrl.getCurrentView().getAction(),
 				viewCtrl
-						.getCurrentView().getLinkName(), viewCtrl.getCurrentView().getLinkedEntity(),
+						.getCurrentView().getLinkName(), viewCtrl.getCurrentView().getLinkedEntity(), globalSearch,
 				context);
 		Row newRow = rowData.getRows().get(0);
 		for (Entry<String, Object> entry : newRow.entrySet()) {
@@ -304,6 +307,14 @@ public class TabeditModel extends ListModel implements Serializable {
 	}
 
 	public void setCreateAction(int code, int type) {
+		if (isProtected) {
+			return;
+		}
+		EntityModel model = EntityManager.getEntityModel(entityName);
+		if (!SecurityUtils.getSecurityManager().isActionRendered(model.name(), code,
+				viewCtrl.getSessionCtrl().getContext())) {
+			return;
+		}
 		if (createAction == null) {
 			Row row = new Row();
 			row.put("$rownum", NEW_LINE_ROWNUM);
@@ -313,6 +324,14 @@ public class TabeditModel extends ListModel implements Serializable {
 	}
 
 	public void setModifyAction(int code, int type) {
+		if (isProtected) {
+			return;
+		}
+		EntityModel model = EntityManager.getEntityModel(entityName);
+		if (!SecurityUtils.getSecurityManager().isActionRendered(model.name(), code,
+				viewCtrl.getSessionCtrl().getContext())) {
+			return;
+		}
 		modifyAction = new Action(code, type);
 	}
 
@@ -322,6 +341,10 @@ public class TabeditModel extends ListModel implements Serializable {
 
 	public void setSuccess(boolean success) {
 		this.success = success;
+	}
+
+	public boolean isProtected() {
+		return (isProtected || modifyAction == null);
 	}
 
 	/**
@@ -351,4 +374,17 @@ public class TabeditModel extends ListModel implements Serializable {
 			}
 		}
 	}
+	
+	/**
+	 * Do not count the empty "create-line"
+	 */
+	@Override
+	public String getResultCount() {
+		String message = super.getResultCount();
+		if (createAction != null) {
+			return (data.getRows().size() - 1) + message.substring(message.indexOf(" "));
+		}
+		return message;
+	}
+
 }

@@ -10,7 +10,7 @@ public class KeyModel implements Serializable {
 	 */
 	private static final long serialVersionUID = 1594216317013783414L;
 
-	private String name;
+	protected String name;
 
 	private boolean isUnique;
 

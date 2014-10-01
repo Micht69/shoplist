@@ -19,7 +19,7 @@ public class DomainUtils {
 	/**
 	 * Retourne la classe associée à la classe passée en paramêtre
 	 * 
-	 * @param Domain
+	 * @param entity
 	 *            object dont on veut la logique
 	 * @return Instance de CustomClass
 	 */
@@ -30,8 +30,8 @@ public class DomainUtils {
 	/**
 	 * Retourne la classe associée à la classe passée en paramètre
 	 * 
-	 * @param Nom
-	 *            de l'entité dont on veut la customClass
+	 * @param entityName
+	 *            Nom de l'entité dont on veut la customClass
 	 * @return Instance de CustomClass
 	 */
 	public static DomainLogic<? extends Entity> getLogic(String entityName) {
@@ -114,7 +114,7 @@ public class DomainUtils {
 	 * 
 	 * @param name
 	 * @param isClass
-	 * @return
+	 * @return the formated java name
 	 */
 	public static String createJavaName(String name, boolean isClass) {
 		char[] strLower = name.toLowerCase().toCharArray();
@@ -150,7 +150,7 @@ public class DomainUtils {
 	 * Création du nom de la table ou du champ à partir du nom passé en paramètre
 	 * 
 	 * @param name
-	 * @return
+	 * @return the formatted db name
 	 */
 	public static String createDbName(String name) {
 		char[] strName = name.toCharArray();

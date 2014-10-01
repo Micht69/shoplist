@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 
 import fr.logica.business.Entity;
 import fr.logica.jsf.controller.ViewController;
+import fr.logica.jsf.utils.ImageLinkResource;
 
 public class ImageLinkModel extends FileUploadModel implements Serializable {
 
@@ -21,6 +22,6 @@ public class ImageLinkModel extends FileUploadModel implements Serializable {
 	}
 
 	public String getResourceId() {
-		return "ImageLink:" + entity.name() + "/" + entity.getPrimaryKey().getEncodedValue().replace(":::", "=") + "/" + varName;
+		return ImageLinkResource.getResourceId(entity.name(), entity.getPrimaryKey().getEncodedValue(), varName);
 	}
 }

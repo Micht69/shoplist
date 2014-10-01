@@ -1,4 +1,3 @@
-
 package fr.logica.business.controller;
 
 import java.io.File;
@@ -24,11 +23,11 @@ import fr.logica.business.DomainLogic;
 import fr.logica.business.Entity;
 import fr.logica.business.EntityManager;
 import fr.logica.business.FileContainer;
+import fr.logica.business.FunctionalException;
 import fr.logica.business.Key;
 import fr.logica.business.Link;
 import fr.logica.business.LinkModel;
 import fr.logica.business.MessageUtils;
-
 import fr.logica.business.TechnicalException;
 import fr.logica.business.context.RequestContext;
 import fr.logica.business.data.BackRefData;
@@ -75,27 +74,56 @@ public class BusinessController implements Serializable {
 	public Response process(Request request) {
 		RequestContext context = request.getContext();
 
+		// When an INPUT_ONE or INPUT_MANY action starts from a menu clic (or somewhere in a custom controller where no PK is provided), we call
+		// a custom method to get it programatically
 		checkMenuAction(request);
 
+		// Initialization of response to send to this request
 		Response response = new Response(request);
+
+		// If response's main entity is not loaded, we load it
 		if (response.getEntity() == null) {
 			response.setEntity(getEntity(response, context));
 		}
+
+		// When action starts through links, we may attach related entity to the current main entity
 		attachLinkedEntity(response);
 
+		// When action is an INPUT_ONE, we'll handle ONE key at a time. Other selected keys, if any, are kept for later in response and they will
+		// be processed when current request processing ends.
 		if (response.getAction().getInput() == Input.ONE && response.getKeys() != null && response.getKeys().size() > 1) {
 			splitProcessedKeys(response);
 		}
 
+		// Call custom method uiCtrlOverrideAction until there's no override to do. Response may be completely different.
 		response = overrideResponse(response, context);
 
+		// Response is now initialized. If response has a UserInterface, we'll load it and send it back to UI level.
 		if (response.getAction().getUi() != UserInterface.NONE) {
+			// Loads UI components of the view (title, visible and protected attributes, etc.)
 			loadUi(response, context);
 			return response;
 		}
 
+		// Response has no UI, we start validation right now
 		Request validationRequest = new Request(response, context);
-		return validate(validationRequest);
+		Response validationResponse = validate(validationRequest);
+		if (validationResponse != null) {
+			// Keep potential previously selected keys.
+			validationResponse.setRemKeys(response.getRemKeys());
+			validationResponse.setRemAction(response.getRemAction());
+			validationResponse.setRemKeys(response.getRemKeys());
+			return validationResponse;
+		} else if (response.getRemKeys() != null && response.getRemKeys().size() > 0) {
+			// We finished current action, there are remaining keys that were selected but not processed (typically, with a INPUT ONE / DISPLAY
+			// NONE action). We create a new request and start processing.
+			Request remRequest = new Request<Entity>(response.getRemEntityName(), response.getRemAction(), response.getRemKeys(),
+					request.getQueryName(), request.getLinkName(), request.isBackRef());
+			return process(remRequest);
+		} else {
+			// Nothing more to do.
+			return null;
+		}
 	}
 
 	/**
@@ -107,7 +135,7 @@ public class BusinessController implements Serializable {
 	private void attachLinkedEntity(Response<?> response) {
 		if (response.getLinkName() != null && response.isBackRef() && response.getLinkedEntity() != null
 				&& !response.getLinkedEntity().getModel().isAssociativeLink(response.getLinkName())
-				&& response.getAction().getInput() == Input.ONE) {
+				&& (response.getAction().getInput() == Input.ONE || response.getAction().getInput() == Input.NONE)) {
 			// Avoid N-N links
 			response.getEntity().getLink(response.getLinkName()).setEntity(response.getLinkedEntity());
 		}
@@ -140,13 +168,22 @@ public class BusinessController implements Serializable {
 			List<Key> keys = domainLogic.internalUiCtrlMenuAction(action, request.getContext());
 			if (keys == null) {
 				String errorMsg = MessageUtils.getInstance(request.getContext()).getMessage("error.menu.action.no.elt",
-						new String[] { request.getEntityName(), request.getEntityName() });
+						new Object[] { request.getEntityName(), request.getEntityName() });
 				throw new TechnicalException(errorMsg);
 			}
 			request.setKeys(keys);
 		}
 	}
 
+	/**
+	 * Splits a list of keys in one key + remaining keys. This method is used when response's action is an INPUT_ONE action (one entity processed
+	 * at a time), and there are more than one key selected. We'll keep only the first selected key as selected key, and store remaining keys for
+	 * later processing.
+	 * 
+	 * @param response A response with more than on key in keys list and an INPUT_ONE action. Method will keep only one key in its keys list, and
+	 *        other keys in remaining keys list (remKeys). remAction and remEntityName will store initial response information that could will
+	 *        allow to process these keys later.
+	 */
 	private void splitProcessedKeys(Response response) {
 		response.setRemAction(response.getAction());
 		response.setRemEntityName(response.getEntityName());
@@ -184,7 +221,6 @@ public class BusinessController implements Serializable {
 	 * @param request The request to validate
 	 * @return Response to send to the client when there is a "next action" to start. null if there's no nextAction.
 	 */
-	@SuppressWarnings("unchecked")
 	public <E extends Entity> Response<?> validate(Request<E> request) {
 		RequestContext context = request.getContext();
 		DomainLogic<E> domainLogic = (DomainLogic<E>) DomainUtils.getLogic(request.getEntityName());
@@ -206,7 +242,6 @@ public class BusinessController implements Serializable {
 			}
 
 			validateInner(request, request.getEntity(), true);
-
 		} catch (RuntimeException e) {
 			restoreBackup(request, mainEntityBackup);
 			throw e;
@@ -315,13 +350,12 @@ public class BusinessController implements Serializable {
 		// Action has been started through a link, we may need to update linked entity based on what have been done on the current entity.
 		// (created an element, modified the primary key, attached or detached an element)
 		if (linkName != null && !request.isBackRef()) {
-			String foreignKeyName = linkedEntity.getModel().getLinkModel(linkName).getKeyName();
 			if (action.getCode() == Constants.SELECT) {
-				linkedEntity.setForeignKey(foreignKeyName, keys.get(0));
+				linkedEntity.setForeignKey(linkName, keys.get(0));
 			} else if (action.getPersistence() == Persistence.INSERT) {
-				linkedEntity.setForeignKey(foreignKeyName, entity.getPrimaryKey());
+				linkedEntity.setForeignKey(linkName, entity.getPrimaryKey());
 			} else if (action.getPersistence() == Persistence.DELETE || action.getCode() == Constants.DETACH) {
-				linkedEntity.setForeignKey(foreignKeyName, null);
+				linkedEntity.setForeignKey(linkName, null);
 			}
 		}
 	}
@@ -335,7 +369,7 @@ public class BusinessController implements Serializable {
 					// Execution of an action on a backRef, so we may have to set / update the foreign key in child entity to make it reference
 					// our entity's primary key
 					if (request.getAction().getPersistence() == Persistence.INSERT || request.getAction().getPersistence() == Persistence.UPDATE) {
-						backRef.getEntity().setForeignKey(backRef.getModel().getKeyName(), entity.getPrimaryKey());
+						backRef.getEntity().setForeignKey(backRef.getModel().getLinkName(), entity.getPrimaryKey());
 					}
 					applyActionOnLink(request, backRef.getEntity());
 					validateInner(request, backRef.getEntity(), true);
@@ -349,9 +383,9 @@ public class BusinessController implements Serializable {
 					applyActionOnLink(request, link.getEntity());
 					// We executed an action on a link, so we can now update the foreign key in child entity
 					if (request.getAction().getPersistence() == Persistence.INSERT || request.getAction().getPersistence() == Persistence.UPDATE) {
-						entity.setForeignKey(entity.getModel().getLinkModel(linkName).getKeyName(), link.getEntity().getPrimaryKey());
+						entity.setForeignKey(linkName, link.getEntity().getPrimaryKey());
 					} else if (request.getAction().getPersistence() == Persistence.DELETE) {
-						entity.setForeignKey(entity.getModel().getLinkModel(linkName).getKeyName(), null);
+						entity.setForeignKey(linkName, null);
 					}
 					validateInner(request, link.getEntity(), true);
 				}
@@ -368,12 +402,11 @@ public class BusinessController implements Serializable {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	public <E extends Entity> void validateCustom(Request<E> request) {
 		RequestContext context = request.getContext();
 		DomainLogic<E> domainLogic = (DomainLogic<E>) DomainUtils.getLogic(request.getEntityName());
 		Action action = request.getAction();
-		if (action.getInput() == Input.NONE) {
+		if (action.getInput() == Input.NONE || action.getInput() == Input.ONE) {
 			domainLogic.internalDoCustomAction(request, request.getEntity(), context);
 		} else {
 			domainLogic.internalDoCustomAction(request, request.getEntity(), request.getKeys(), context);
@@ -393,7 +426,7 @@ public class BusinessController implements Serializable {
 		} else {
 			for (Key selectedKey : keys) {
 				Entity selectedEntity = DB.get(link.getModel().getEntityName(), selectedKey, action, context);
-				selectedEntity.setForeignKey(link.getModel().getKeyName(), linkedEntity.getPrimaryKey());
+				selectedEntity.setForeignKey(link.getModel().getLinkName(), linkedEntity.getPrimaryKey());
 				selectedEntity.getLink(linkName).setEntity(linkedEntity);
 				DB.persist(selectedEntity, action, context);
 			}
@@ -407,7 +440,7 @@ public class BusinessController implements Serializable {
 		} else {
 			for (Key selectedKey : keys) {
 				Entity selectedEntity = DB.get(link.getModel().getEntityName(), selectedKey, action, context);
-				selectedEntity.setForeignKey(link.getModel().getKeyName(), null);
+				selectedEntity.setForeignKey(link.getModel().getLinkName(), null);
 				selectedEntity.getLink(linkName).setEntity(linkedEntity);
 				DB.persist(selectedEntity, action, context);
 			}
@@ -445,8 +478,7 @@ public class BusinessController implements Serializable {
 				// Avoid N-N links
 				if (!response.getLinkedEntity().getModel().isAssociativeLink(response.getLinkName())) {
 					// Action launched through back ref template --> Initialize foreign key
-					String keyName = entity.getModel().getLinkModel(response.getLinkName()).getKeyName();
-					entity.setForeignKey(keyName, response.getLinkedEntity().getPrimaryKey());
+					entity.setForeignKey(response.getLinkName(), response.getLinkedEntity().getPrimaryKey());
 				}
 			}
 			domainLogic.internalDbPostLoad(entity, action, context);
@@ -458,8 +490,7 @@ public class BusinessController implements Serializable {
 		DomainLogic domainLogic = DomainUtils.getLogic(entityName);
 		Entity innerEntity = null;
 		if (EntityManager.getEntityModel(entityName).isExternal()) {
-			innerEntity = domainLogic.internalExtActionLoad(entityName,
-					entity.getForeignKey(EntityManager.getEntityModel(entityName).getLinkModel(linkName).getKeyName()), action, context);
+			innerEntity = domainLogic.internalExtActionLoad(entityName, entity.getForeignKey(linkName), action, context);
 		} else {
 			innerEntity = DB.getRef(entity, linkName, action, context);
 			if (innerEntity == null) {
@@ -475,8 +506,7 @@ public class BusinessController implements Serializable {
 		DomainLogic domainLogic = DomainUtils.getLogic(entityName);
 		Entity innerEntity = null;
 		if (EntityManager.getEntityModel(entityName).isExternal()) {
-			innerEntity = domainLogic.internalExtActionLoad(entityName,
-					entity.getForeignKey(EntityManager.getEntityModel(entityName).getBackRefModel(backRefName).getKeyName()), action, context);
+			innerEntity = domainLogic.internalExtActionLoad(entityName, entity.getForeignKey(EntityManager.getEntityModel(entityName).getBackRefModel(backRefName).getLinkName()), action, context);
 		} else {
 			innerEntity = DB.getUniqueBackRef(entity, backRefName, action, context);
 			if (innerEntity == null) {
@@ -527,13 +557,19 @@ public class BusinessController implements Serializable {
 	/**
 	 * Prepares data for a list
 	 * 
-	 * @param domain Main entity
+	 * @param entity Main entity
+	 * @param entityName Entity name
 	 * @param queryName Query Name
-	 * @param context Request context
+	 * @param criteria criteria list
+	 * @param action Current action
+	 * @param linkName Link name
+	 * @param linkedEntity Linked entity
+	 * @param globalSearch is global search
+	 * @param context Current request context
 	 * @return ListData
 	 */
 	public <E extends Entity> ListData getListData(E entity, String entityName, String queryName, ListCriteria criteria, Action action,
-			String linkName, Entity linkedEntity, RequestContext context) {
+			String linkName, Entity linkedEntity, boolean globalSearch, RequestContext context) {
 		ListData data = null;
 		DomainLogic<E> domainLogic = (DomainLogic<E>) DomainUtils.getLogic(entityName);
 		if (EntityManager.getEntityModel(entityName).isExternal()) {
@@ -547,12 +583,24 @@ public class BusinessController implements Serializable {
 				Var v = query.getOutVar(criteria.orderByField);
 				query.addSortBy(v.name, v.tableId, criteria.orderByDirection, true);
 			}
-			if (criteria.searchCriteria != null) {
-				domainLogic.internalUiListPrepare(query, criteria.searchCriteria, action, linkName, linkedEntity, context);
-			} else {
-				domainLogic.internalUiListPrepare(query, entity, action, linkName, linkedEntity, context);
+			try { 
+				if (globalSearch) {
+					domainLogic.internalUiListPrepare(query, criteria.searchCriteria, action, linkName, linkedEntity, context);
+				} else {
+					domainLogic.internalUiListPrepare(query, entity, action, linkName, linkedEntity, context);
+				}
+				data = getListData(query, true, context);
+			} catch (FunctionalException e) {
+				data = getEmptyListData(query, context); // Prevent from having a null ListData
+			} catch (TechnicalException e) {
+				data = getEmptyListData(query, context); // Prevent from having a null ListData
+				context.getMessages().add(
+						new Message(
+								MessageUtils.getInstance(context).getMessage("uiControlerModel.queryExecError",
+										new Object[] { (Object) e.getMessage() }),
+								Severity.ERROR));
+				LOGGER.error(e.getMessage(), e);
 			}
-			data = getListData(query, true, context);
 		}
 		return data;
 	}
@@ -561,12 +609,16 @@ public class BusinessController implements Serializable {
 		DomainLogic domainLogic = DomainUtils.getLogic(query.getMainEntity().name());
 		ListData data = null;
 		DbManager dbManager = null;
+
+		// Get data from base
 		try {
 			dbManager = DB.createDbManager(context, query);
 			data = dbManager.getListData();
 			if (count) {
 				data.setTotalRowCount(dbManager.count());
 			}
+
+			// Put list metadata
 			for (DbQuery.Var var : query.getOutVars()) {
 				String columnKey = var.tableId + "_" + var.name;
 				ColumnData columnData = new ColumnData();
@@ -574,8 +626,10 @@ public class BusinessController implements Serializable {
 				columnData.setVisible(domainLogic.internalUiListColumnIsVisible(query, null, columnKey, context));
 				data.getColumns().put(columnKey, columnData);
 			}
+		} catch (FunctionalException e) {
+			data = getEmptyListData(query, context); // Prevent from having a null ListData
 		} catch (TechnicalException e) {
-			data = new ListData(query.getMainEntity().name()); // Prevent from having a null ListData
+			data = getEmptyListData(query, context); // Prevent from having a null ListData
 			context.getMessages().add(new Message(
 					MessageUtils.getInstance(context).getMessage("uiControlerModel.queryExecError", new Object[] { (Object) e.getMessage() }),
 					Severity.ERROR));
@@ -585,6 +639,23 @@ public class BusinessController implements Serializable {
 				dbManager.close();
 			}
 		}
+
+		return data;
+	}
+
+	private ListData getEmptyListData(DbQuery query, RequestContext context) {
+		ListData data = new ListData(query.getMainEntity().name());
+
+		// Put list metadata (either if success and error)
+		DomainLogic domainLogic = DomainUtils.getLogic(query.getMainEntity().name());
+		for (DbQuery.Var var : query.getOutVars()) {
+			String columnKey = var.tableId + "_" + var.name;
+			ColumnData columnData = new ColumnData();
+			columnData.setTitle(domainLogic.internalUiListColumnCaption(query, null, columnKey, context));
+			columnData.setVisible(domainLogic.internalUiListColumnIsVisible(query, null, columnKey, context));
+			data.getColumns().put(columnKey, columnData);
+		}
+
 		return data;
 	}
 
@@ -595,18 +666,31 @@ public class BusinessController implements Serializable {
 
 	public <E extends Entity> ListData getBackRefListData(E targetEntity, String entityName, String linkName, String queryName,
 			ListCriteria criteria, Action action, RequestContext context) {
-		// If parent primary key is not full, back ref list is necessarily empty
-		if (targetEntity == null || !targetEntity.getPrimaryKey().isFull()) {
-			return new ListData(entityName);
-		}
 		DbQuery query = new DbEntity().getLinkQuery(targetEntity, linkName, queryName, false, context);
+		// If parent primary key is not full, back ref list is necessarily empty
+		if (!targetEntity.getPrimaryKey().isFull()) {
+			return getEmptyListData(query, context);
+		}
 		if (criteria != null && criteria.orderByField != null) {
 			Var v = query.getOutVar(criteria.orderByField);
 			query.addSortBy(v.name, v.tableId, criteria.orderByDirection, true);
 		}
 		DomainLogic sourceDomainLogic = DomainUtils.getLogic(query.getMainEntity().name());
-		sourceDomainLogic.internalUiListPrepare(query, targetEntity, linkName, context);
-		ListData data = getListData(query, false, context);
+		ListData data = null; 
+		try {
+			sourceDomainLogic.internalUiListPrepare(query, targetEntity, linkName, context);
+			data = getListData(query, false, context);
+		} catch (FunctionalException e) {
+			data = getEmptyListData(query, context); // Prevent from having a null ListData
+		} catch (TechnicalException e) {
+			data = getEmptyListData(query, context); // Prevent from having a null ListData
+			context.getMessages().add(
+					new Message(
+							MessageUtils.getInstance(context).getMessage("uiControlerModel.queryExecError",
+									new Object[] { (Object) e.getMessage() }),
+							Severity.ERROR));
+			LOGGER.error(e.getMessage(), e);
+		}
 		// ListIsProtected is called on target entity
 		DomainLogic targetDomainLogic = DomainUtils.getLogic(targetEntity.name());
 		data.setProtected(targetDomainLogic.internalUiListIsProtected(targetEntity, linkName, queryName, action, context));
@@ -617,11 +701,11 @@ public class BusinessController implements Serializable {
 	public <E extends Entity> ListData getBackRefListDataSingleElement(E targetEntity, String entityName, String linkName, String queryName,
 			Key pk,
 			RequestContext context) {
-		// If parent primary key is not full, back ref list is necessarily empty
-		if (targetEntity == null || !targetEntity.getPrimaryKey().isFull()) {
-			return new ListData(entityName);
-		}
 		DbQuery query = new DbEntity().getLinkQuery(targetEntity, linkName, queryName, false, context);
+		// If parent primary key is not full, back ref list is necessarily empty
+		if (!targetEntity.getPrimaryKey().isFull()) {
+			return getEmptyListData(query, context);
+		}
 		query.addCondKey(pk, query.getMainEntityAlias());
 		DomainLogic domainLogic = DomainUtils.getLogic(query.getMainEntity());
 		domainLogic.internalUiListPrepare(query, targetEntity, linkName, context);
@@ -649,8 +733,7 @@ public class BusinessController implements Serializable {
 		DomainLogic<Entity> targetEntityLogic = (DomainLogic<Entity>) DomainUtils.getLogic(entityName);
 		String description = null;
 		if (EntityManager.getEntityModel(entityName).isExternal()) {
-			targetEntity = targetEntityLogic.internalExtActionLoad(entityName,
-					sourceEntity.getForeignKey(sourceEntity.getModel().getLinkModel(linkName).getKeyName()), action, context);
+			targetEntity = targetEntityLogic.internalExtActionLoad(entityName, sourceEntity.getForeignKey(linkName), action, context);
 		} else {
 			targetEntity = DB.getRef(sourceEntity, linkName, action, context);
 		}
@@ -697,7 +780,7 @@ public class BusinessController implements Serializable {
 
 		if (lookupFields.isEmpty()) {
 			for (Var var : columns) {
-				if (!var.model.isTransient()) {
+				if (!var.model.isTransient() && var.model.isAlpha()) {
 					colAliases.add(var.name);
 					tableAliases.add(var.tableId);
 				}
@@ -720,7 +803,7 @@ public class BusinessController implements Serializable {
 		try {
 			Map<Key, String> values = domainLogic.internalUiLinkLoadValues(sourceEntity, link.getModel(), filterQuery, true, context);
 			if (null == values || values.isEmpty()) {
-				result.put("-1", MessageUtils.getInstance(context).getMessage("autocomplete.noResult", null));
+				result.put("-1", MessageUtils.getInstance(context).getMessage("autocomplete.noResult", (Object[]) null));
 			} else if (values.size() > Constants.AUTOCOMPLETE_MAX_ROW) {
 				result.put("-1", MessageUtils.getInstance(context).getMessage("autocomplete.tooManyResults", new Object[] { values.size() }));
 			} else {
@@ -729,7 +812,7 @@ public class BusinessController implements Serializable {
 				}
 			}
 		} catch (TechnicalException exception) {
-			result.put("-1", MessageUtils.getInstance(context).getMessage("autocomplete.error", null));
+			result.put("-1", MessageUtils.getInstance(context).getMessage("autocomplete.error", (Object[]) null));
 		}
 		return result;
 	}
@@ -787,21 +870,19 @@ public class BusinessController implements Serializable {
 		return container;
 	}
 
-	@SuppressWarnings("unchecked")
 	public <E extends Entity> boolean isGroupVisible(E bean, String groupName, Action action, RequestContext ctx) {
 		DomainLogic<E> domainLogic = (DomainLogic<E>) DomainUtils.getLogic(bean.name());
 		return domainLogic.internalUiGroupIsVisible(bean, groupName, action, ctx);
 	}
 
 	/**
-	 * 
-	 * @param sourceEntity
-	 * @param linkName
-	 * @param action
-	 * @param actionLinkName Link used to launch the current action. This link may not be modified. Null when the action hasn't been started
-	 *        through a link.
-	 * @param context
-	 * @return
+	 * Check if a link is visible
+
+	 * @param sourceEntity Entity
+	 * @param linkName Link name
+	 * @param action Current action
+	 * @param context Current request context
+	 * @return true if link is visible, else false
 	 */
 	public Boolean isLinkVisible(Entity sourceEntity, String linkName, Action action, RequestContext context) {
 		DomainLogic domainLogic = DomainUtils.getLogic(sourceEntity.name());
@@ -811,7 +892,7 @@ public class BusinessController implements Serializable {
 	public Boolean isLinkProtected(Entity sourceEntity, String linkName, Action action, RequestContext context) {
 		LinkModel linkModel = sourceEntity.getModel().getLinkModel(linkName);
 		DomainLogic domainLogic = DomainUtils.getLogic(sourceEntity.name());
-		for (String varName : sourceEntity.getModel().getForeignKeyModel(linkModel.getKeyName()).getFields()) {
+		for (String varName : linkModel.getFields()) {
 			if (domainLogic.internalUiVarIsProtected(sourceEntity, varName, action, context)) {
 				// If at least one variable of the link is protected, link is protected.
 				return true;
@@ -823,7 +904,7 @@ public class BusinessController implements Serializable {
 	public Boolean isLinkMandatory(Entity sourceEntity, String linkName, Action action, RequestContext context) {
 		LinkModel linkModel = sourceEntity.getModel().getLinkModel(linkName);
 		DomainLogic domainLogic = DomainUtils.getLogic(sourceEntity.name());
-		for (String varName : sourceEntity.getModel().getForeignKeyModel(linkModel.getKeyName()).getFields()) {
+		for (String varName : linkModel.getFields()) {
 			if (!domainLogic.internalDoVarIsMandatory(sourceEntity, varName, action, context)) {
 				// If at least one variable of the link is not mandatory, link is not mandatory.
 				return false;
@@ -837,7 +918,6 @@ public class BusinessController implements Serializable {
 		return domainLogic.internalUiLinkCaption(sourceEntity, linkName, action, context);
 	}
 
-	@SuppressWarnings("unchecked")
 	public <E extends Entity, LE extends Entity> ListData getBackRefScheduleData(E entity, String entityName, String linkName,
 			String queryName, Action action, RequestContext context) {
 
@@ -857,12 +937,11 @@ public class BusinessController implements Serializable {
 	 * Initialize bean's start and end properties for the creation page.
 	 * 
 	 * @param bean Bean to update.
-	 * @param domainLogic DomainLogic used to retrieve start and end properties.
+	 * @param action Current action
 	 * @param selectedDate Selected date into the schedule in the previous page.
-	 * @param context Current applicative context.
+	 * @param context Current request context.
 	 */
 	public <E extends Entity> void initEventCreation(E bean, Action action, Date selectedDate, RequestContext context) {
-		@SuppressWarnings("unchecked")
 		DomainLogic<E> domainLogic = (DomainLogic<E>) DomainUtils.getLogic(bean.name());
 		bean.invokeSetter(domainLogic.uiScheduleEventStartName(), selectedDate);
 		bean.invokeSetter(domainLogic.uiScheduleEventEndName(), selectedDate);
@@ -870,6 +949,20 @@ public class BusinessController implements Serializable {
 		// Ce n'est peut-être pas la peine de créer n méthodes dans domainLogic pour la initialiser correctement les dates
 		// car cela peut être fait dans dbPostLoad...
 		domainLogic.internalDbPostLoad(bean, action, context);
+	}
+
+	/**
+	 * Updates an event.
+	 * @param entityName Name of the entity to update.
+	 * @param event Event corresponding to the entity.
+	 * @param context Current request context.
+	 */
+	public void updateEvent(String entityName, ScheduleEvent event, RequestContext context) {
+		Entity bean = DB.get(entityName, event.getPk(), context);
+		DomainLogic domainLogic = (DomainLogic) DomainUtils.getLogic(bean.name());
+		bean.invokeSetter(domainLogic.uiScheduleEventStartName(), event.getStart());
+		bean.invokeSetter(domainLogic.uiScheduleEventEndName(), event.getEnd());
+		DB.update(bean, context);
 	}
 
 	public <E extends Entity> File getListExportXls(E entity, String entityName, String queryName, ListCriteria criteria, Action action,
@@ -884,6 +977,10 @@ public class BusinessController implements Serializable {
 		context.getAttributes().put("EXPORT_TYPE", "xls");
 
 		domainLogic.internalUiListPrepare(query, entity, action, linkName, linkedEntity, context);
+		if (DB.count(query, context) > Constants.MAX_ROW_EXCEL_EXPORT) {
+			throw new FunctionalException(new Message(
+					MessageUtils.getInstance(context).getMessage("xls.export.error.max", (Object[]) null), Severity.ERROR));
+		}
 		ListData data = getListData(query, false, context);
 		return prepareExcelSheet(query, data, context);
 	}
@@ -892,6 +989,10 @@ public class BusinessController implements Serializable {
 		DbQuery query = new DbEntity().getLinkQuery(entity, linkName, queryName, false, context);
 		DomainLogic domainLogic = DomainUtils.getLogic(query.getMainEntity().name());
 		domainLogic.internalUiListPrepare(query, entity, linkName, context);
+		if (DB.count(query, context) > Constants.MAX_ROW_EXCEL_EXPORT) {
+			throw new FunctionalException(new Message(
+					MessageUtils.getInstance(context).getMessage("xls.export.error.max", (Object[]) null), Severity.ERROR));
+		}
 		ListData data = getListData(query, false, context);
 		return prepareExcelSheet(query, data, context);
 	}

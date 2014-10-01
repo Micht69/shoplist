@@ -17,12 +17,12 @@
 		<tr>
 			<td width="1%" style="text-align: left; white-space: nowrap;">
 				<div id="advanced-actions">
-	    			<h:panelGroup rendered="#{commentCtrl.commentsEnabled}">
+					<h:panelGroup rendered="#{commentCtrl.commentsEnabled}">
 						<h:commandLink id="commentAction" styleClass="btn_comment" value="#{commentCtrl.commentsCount('shopListLArticle', jsfCtrl.entity.primaryKey.encodedValue)}" title="#{jsfCtrl.getXhtmlLabel('labels', 'boutons.comment')}" onclick="commentPage();">
 							<f:ajax event="click" execute="@none" render="comment-list" />
 						</h:commandLink>
-	    				<ui:include src="../includes/comment.xhtml" />
-	    			</h:panelGroup>
+						<ui:include src="../includes/comment.xhtml" />
+					</h:panelGroup>
 					<h:outputText value=" "/>
 					<h:commandButton id="printAction" styleClass="btn_print" image="../static/img/buttons/print.png" title="#{jsfCtrl.getXhtmlLabel('labels', 'boutons.print')}" onclick="window.print(); return false;" />
 					<h:outputText value=" "/>
@@ -43,29 +43,20 @@
 		<div class="form_title">
 			<h:outputText value="#{jsfCtrl.getXhtmlLabel('genLabels', 'tpl.shopListLArticleDelete')}" />
 		</div>
-		<table class="group_table">
-			<tr>
-				<td class="group_table_col_1">
-					<ui:fragment rendered="#{jsfCtrl.isVisible('shopListLArticle.deleteInfos')}">
-						<table class="#{!jsfCtrl.isValid('mainForm:shopListLArticleDelete_shopListLArticle_deleteInfos') ? 'error' : ''}">
-							<tr>
-								<td class="colFieldSetLeft">
-									<h:outputLabel id="i1_shopListLArticleDelete_shopListLArticle_deleteInfos" escape="false" value="#{jsfCtrl.getLabel('shopListLArticle.deleteInfos', 'shopListLArticleDelete.shopListLArticle.deleteInfos')}" title="#{jsfCtrl.getXhtmlLabel('tooltips', 'shopListLArticleDelete.shopListLArticle.deleteInfos')}"/>
-								</td>
-								<td class="colFieldSetMid">
-									<h:outputLabel value=":" />
-								</td>
-								<td class="colFieldSetRight">
-									<h:inputTextarea disabled="true" id="i0_shopListLArticleDelete_shopListLArticle_deleteInfos" value="#{jsfCtrl.entity.deleteInfos}" label="#{jsfCtrl.getLabel('shopListLArticle.deleteInfos', 'shopListLArticle.deleteInfos')}" >
-									</h:inputTextarea>
-									<h:message for="i0_shopListLArticleDelete_shopListLArticle_deleteInfos" styleClass="errorLabel" />
-								</td>
-							</tr>
-						</table>
-					</ui:fragment>
-				</td>
-			</tr>
-		</table>
+		<div class="group">
+			<div class="col col-1">
+				<ui:fragment rendered="#{jsfCtrl.isVisible('shopListLArticle.deleteInfos')}">
+					<div class="col-label">
+						<h:outputLabel id="i1_shopListLArticleDelete_shopListLArticle_deleteInfos" escape="false" value="#{jsfCtrl.getLabel('shopListLArticle.deleteInfos', 'shopListLArticleDelete.shopListLArticle.deleteInfos')}" title="#{jsfCtrl.getXhtmlLabel('tooltips', 'shopListLArticleDelete.shopListLArticle.deleteInfos')}"/>
+					</div>
+					<div class="col-value">
+						<h:inputTextarea disabled="true" id="i0_shopListLArticleDelete_shopListLArticle_deleteInfos" value="#{jsfCtrl.entity.deleteInfos}" label="#{jsfCtrl.getLabel('shopListLArticle.deleteInfos', 'shopListLArticle.deleteInfos')}" >
+						</h:inputTextarea>
+						<h:message for="i0_shopListLArticleDelete_shopListLArticle_deleteInfos" styleClass="errorLabel" />
+					</div>
+				</ui:fragment>
+			</div>
+		</div>
 	</div>
 	</h:panelGroup>
 	<div class="actions bottomActions">

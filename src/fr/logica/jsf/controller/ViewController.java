@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.faces.application.FacesMessage;
+import javax.faces.application.ViewExpiredException;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ComponentSystemEvent;
@@ -27,6 +27,7 @@ import fr.logica.business.Action;
 import fr.logica.business.Constants;
 import fr.logica.business.Entity;
 import fr.logica.business.EntityManager;
+import fr.logica.business.EntityModel;
 import fr.logica.business.FunctionalException;
 import fr.logica.business.Key;
 import fr.logica.business.MessageUtils;
@@ -41,9 +42,11 @@ import fr.logica.jsf.model.DataModel.UiTemplate;
 import fr.logica.jsf.model.group.GroupModel;
 import fr.logica.jsf.model.group.TabPanelModel;
 import fr.logica.jsf.model.group.WizardModel;
+import fr.logica.jsf.model.list.ListModel;
 import fr.logica.jsf.model.var.ClobFileModel;
 import fr.logica.jsf.model.var.FileUploadModel;
 import fr.logica.jsf.model.var.ImageLinkModel;
+import fr.logica.jsf.utils.FacesMessagesUtils;
 import fr.logica.jsf.webflow.View;
 import fr.logica.ui.Message;
 import fr.logica.ui.Message.Severity;
@@ -194,17 +197,29 @@ public class ViewController implements Serializable {
 	public DataModel uiWizardPanel(String entityPath, String entityName, String groupName) {
 		return getGroupModel(UiTemplate.GROUP_WIZARD, entityPath, entityName, groupName);
 	}
-
+	
 	public DataModel uiList(String queryName) {
-		return getDataModel(null, UiTemplate.LIST, null, currentView.getEntityName(), "", queryName, "");
+		return uiList(queryName, false);
+	}
+
+	public DataModel uiList(String queryName, boolean globalSearch) {
+		return getDataModel(null, UiTemplate.LIST, null, currentView.getEntityName(), "", queryName, "", globalSearch);
 	}
 
 	public DataModel uiTabeditList(String queryName) {
-		return getDataModel(null, UiTemplate.LIST_TAB_EDIT, null, currentView.getEntityName(), "", queryName, "");
+		return uiTabeditList(queryName, false);
+	}
+
+	public DataModel uiTabeditList(String queryName, boolean globalSearch) {
+		return getDataModel(null, UiTemplate.LIST_TAB_EDIT, null, currentView.getEntityName(), "", queryName, "", globalSearch);
 	}
 
 	public DataModel uiListCategory(String queryName) {
-		return getDataModel(null, UiTemplate.LIST_CATEGORY, null, currentView.getEntityName(), "", queryName, "");
+		return uiListCategory(queryName, false);
+	}
+
+	public DataModel uiListCategory(String queryName, boolean globalSearch) {
+		return getDataModel(null, UiTemplate.LIST_CATEGORY, null, currentView.getEntityName(), "", queryName, "", globalSearch);
 	}
 
 	public DataModel uiBackRefList(String linkPath, String entityName, String queryName, String filterName) {
@@ -248,6 +263,43 @@ public class ViewController implements Serializable {
 		// Combos don't use QueryName
 		return getDataModel(UiTemplate.LINK_COMBO, linkPath, entityName, "", filterName);
 	}
+	
+	/**
+	 * Loads a link combo inside an editable table or gets it from cache
+	 * 
+	 * @param tabEditPath
+	 *            The tabEdit link path that uniquely identifies it
+	 * @param tabEditEntity
+	 *            The current entity instance modified in editable table
+	 * @param linkName
+	 *            Link between entity instance and combo elements
+	 * @param entityName
+	 *            Entity name of the link
+	 * @param filterName
+	 *            Query to use to filter combobox elements
+	 * @return LinkCombo model loaded
+	 */
+	public DataModel uiTabEditLinkCombo(String tabEditPath, Entity tabEditEntity, String linkName, String entityName, String filterName) {
+		// Combos don't use QueryName
+		String uniqueIdentifier = UiTemplate.LINK_COMBO + "_" + tabEditPath + "_" + entityName + "_" + linkName + "_" + filterName;
+		try {
+			if (viewModels.get(uniqueIdentifier) == null) {
+				Map<String, String> modelStore = (Map<String, String>) currentView.getViewModelsData().get(uniqueIdentifier);
+				if (modelStore == null) {
+					modelStore = new HashMap<String, String>();
+				}
+				modelStore.put(ListModel.GLOBAL_SEARCH, "false");
+				DataModel model = DataModel.build(null, UiTemplate.LINK_COMBO, entityName, linkName, "", filterName, tabEditEntity, modelStore,
+						this);
+				viewModels.put(uniqueIdentifier, model);
+				// Get datamodel initialization messages
+				displayMessages(context);
+			}
+		} catch (Exception e) {
+			handleModelException(uniqueIdentifier, e);
+		}
+		return viewModels.get(uniqueIdentifier);
+	}
 
 	public DataModel uiCustomModel(Class<?> clazz, String linkPath, String entityName, String queryName, String filterName) {
 		return getDataModel(clazz, UiTemplate.CUSTOM, linkPath, entityName, queryName, filterName);
@@ -264,7 +316,7 @@ public class ViewController implements Serializable {
 			linkName = linkPath.substring(linkPath.lastIndexOf(".") + 1);
 			entityPath = linkPath.substring(0, linkPath.lastIndexOf("."));
 		}
-		return getDataModel(clazz, ui, entityPath, entityName, linkName, queryName, filterName);
+		return getDataModel(clazz, ui, entityPath, entityName, linkName, queryName, filterName, false);
 	}
 
 	private DataModel getGroupModel(UiTemplate ui, String entityPath, String entityName, String groupName) {
@@ -304,10 +356,11 @@ public class ViewController implements Serializable {
 	 *        like linkMultiCombo for instance.
 	 * @param queryName Query used by the data model. (in backref list for instance)
 	 * @param filterName Filter used by data model. (In combobox for instance)
+	 * @param globalSearch Is global search activated.
 	 * @return Loaded DataModel.
 	 */
 	private DataModel getDataModel(Class<?> clazz, UiTemplate ui, String entityPath, String entityName, String linkName, String queryName,
-			String filterName) {
+			String filterName, boolean globalSearch) {
 		String uniqueIdentifier = (clazz != null ? clazz.getSimpleName() : ui) + "_" + entityPath + "_" + entityName + "_" + linkName + "_"
 				+ queryName + "_" + filterName;
 		try {
@@ -317,30 +370,42 @@ public class ViewController implements Serializable {
 				if (modelStore == null) {
 					modelStore = new HashMap<String, String>();
 				}
+				modelStore.put(ListModel.GLOBAL_SEARCH, globalSearch ? "true" : "false");
 				DataModel model = DataModel.build(clazz, ui, entityName, linkName, queryName, filterName, e, modelStore, this);
 				viewModels.put(uniqueIdentifier, model);
 				// Get datamodel initialization messages
 				displayMessages(context);
 			}
 		} catch (Exception e) {
-			// Error loading component "uniqueIdentifier"
-			// If this is the first error at component loading, we log and display an error message.
-			// If this is not the first error, we'll log it in debug mode, but we won't display it because it's probable an NPE or something due
-			// to the first error
-			if (errorModels == null) {
-				errorModels = new HashSet<String>();
-			}
-			if (errorModels.contains(uniqueIdentifier)) {
-				LOGGER.debug(e.getMessage(), e);
-			} else {
-				errorModels.add(uniqueIdentifier);
-				context.getMessages().add(new Message(getTechnicalMessage(e), Severity.ERROR));
-				LOGGER.error("Error loading component " + uniqueIdentifier);
-				LOGGER.error(e.getMessage(), e);
-				displayMessages(e); 
-			}
+			handleModelException(uniqueIdentifier, e);
 		}
 		return viewModels.get(uniqueIdentifier);
+	}
+
+	/**
+	 * An error occured on loading component "uniqueIdentifier"<br/>
+	 * - If this is the first error at component loading, we log and display an error message. <br/>
+	 * - If this is not the first error, we'll log it in debug mode, but we won't display it because it's probable an NPE or something due to the
+	 * first error
+	 * 
+	 * @param uniqueIdentifier
+	 *            component identifier loaded when error happened
+	 * @param e
+	 *            Exception that happened
+	 */
+	private void handleModelException(String uniqueIdentifier, Exception e) {
+		if (errorModels == null) {
+			errorModels = new HashSet<String>();
+		}
+		if (errorModels.contains(uniqueIdentifier)) {
+			LOGGER.debug(e.getMessage(), e);
+		} else {
+			errorModels.add(uniqueIdentifier);
+			context.getMessages().add(new Message(FacesMessagesUtils.getTechnicalMessage(e), Severity.ERROR));
+			LOGGER.error("Error loading component " + uniqueIdentifier);
+			LOGGER.error(e.getMessage(), e);
+			displayMessages(e);
+		}
 	}
 
 	/**
@@ -404,48 +469,59 @@ public class ViewController implements Serializable {
 			context = new RequestContext(sessionCtrl.getContext());
 		}
 		try {
-			request.setContext(context);
-			storeViewData(currentView);
-			response = business.process(request);
-		} catch (FunctionalException fEx) {
-			// Business error - reload page and display error message to user
-			context.getMessages().add(new Message(fEx.getMessage(), Severity.ERROR));
-			LOGGER.debug(fEx.getMessage(), fEx);
-		} catch (TechnicalException tEx) {
-			context.getMessages().add(new Message(tEx.getMessage(), Severity.ERROR));
-			LOGGER.error(tEx.getMessage(), tEx);
-		} catch (Exception e) {
-			context.getMessages().add(new Message(getTechnicalMessage(e), Severity.ERROR));
-			LOGGER.error(e.getMessage(), e);
+			try {
+				request.setContext(context);
+				storeViewData(currentView);
+				response = business.process(request);
+			} catch (FunctionalException fEx) {
+				// Business error - reload page and display error message to user
+				context.getMessages().addAll(fEx.getMessages());
+			} catch (TechnicalException tEx) {
+				context.getMessages().add(new Message(tEx.getMessage(), Severity.ERROR));
+				LOGGER.error(tEx.getMessage(), tEx);
+			} catch (Exception e) {
+				context.getMessages().add(new Message(FacesMessagesUtils.getTechnicalMessage(e), Severity.ERROR));
+				LOGGER.error(e.getMessage(), e);
+			} finally {
+				// Display potential messages from context
+				displayMessages(context);
+				customData = context.getCustomData();
+			}
+			if (currentView != null) {
+				currentView.setAttachment(context.getAttachment());
+				currentView.setAttachmentName(context.getAttachmentName());
+			}
+			if (response == null) {
+				// Refresh current view
+				if (currentView == null) {
+					return getDefaultPage();
+				}
+				business.loadUi(currentView, context);
+				currentView.setCustomData(context.getCustomData());
+				return currentView.getURL();
+			} else {
+				response.setCustomData(customData);
+				return goToNextView(response);
+			}
 		} finally {
 			// Close request context potential database connection
 			context.close();
-			// Display potential messages from context
-			displayMessages(context);
-			customData = context.getCustomData();
-		}
-		if (currentView != null) {
-			currentView.setAttachment(context.getAttachment());
-			currentView.setAttachmentName(context.getAttachmentName());
-		}
-		if (response == null) {
-			// Refresh current view
-			if (currentView == null) {
-				return getDefaultPage();
-			}
-			currentView.setCustomData(customData);
-			return currentView.getURL();
-		} else {
-			response.setCustomData(customData);
-			return goToNextView(response);
 		}
 	}
 
+	/**
+	 * Redirects the user to prepared next view
+	 * 
+	 * @param response Fully prepared response to send to the user. We may add attachments to the view if there are any. 
+	 * @return Next view URL
+	 */
 	public String goToNextView(Response response) {
 		// We go to next view following response parameters
 		View v = sessionCtrl.getCurrentView(conversation);
 		View newView = new View(conversation, response);
 		newView.setNextView(v);
+		newView.setAttachment(context.getAttachment());
+		newView.setAttachmentName(context.getAttachmentName());
 		sessionCtrl.setCurrentView(conversation, newView);
 		return newView.getURL();
 	}
@@ -487,7 +563,6 @@ public class ViewController implements Serializable {
 			// View has been validated, we remove it from top of the stack
 			View nextView = currentView.getNextView();
 			sessionCtrl.setCurrentView(conversation, nextView);
-			Map<String, Object> customData = context.getCustomData();
 			if (response == null) {
 				if (currentView.getRemKeys() != null) {
 					// Remaining actions to launch
@@ -495,19 +570,17 @@ public class ViewController implements Serializable {
 							currentView.getRemKeys(),
 							currentView.getQueryName(), currentView.getLinkName(), currentView.getEntity(), currentView.isBackRef());
 				} else if (nextView != null) {
+					business.loadUi(nextView, context);
 					nextView.setAttachment(context.getAttachment());
 					nextView.setAttachmentName(context.getAttachmentName());
-					nextView.setCustomData(customData);
-					business.loadUi(nextView, context);
+					nextView.setCustomData(context.getCustomData());
 					return nextView.getURL();
 				}
 			} else {
-				response.setCustomData(customData);
+				response.setCustomData(context.getCustomData());
 				return goToNextView(response);
 			}
-
-
-			return sessionCtrl.getDefaultPage();
+			return getDefaultPage();
 		} catch (FunctionalException fEx) {
 			// all(?) msg from functional exception already stored in context
 			// will be displayed in finally block
@@ -524,6 +597,18 @@ public class ViewController implements Serializable {
 			}
 			// Display potential messages from context
 			displayMessages(context);
+			// currentView is null if reset has been called into getDefaultPage or somewhere else.
+			if (currentView != null) {
+				// Merge customData map
+				Map<String, Object> mergedCustomData = new HashMap<String, Object>();
+				if (currentView.getCustomData() != null) {
+					// These custom data come from previous currentView, they must be kept in case of exception
+					mergedCustomData.putAll(currentView.getCustomData());
+				}
+				// These custom data come from normal processing, they may override existing custom data
+				mergedCustomData.putAll(context.getCustomData());
+				currentView.setCustomData(mergedCustomData);
+			}
 		}
 		return currentView.getURL();
 	}
@@ -587,6 +672,21 @@ public class ViewController implements Serializable {
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * Gets current label to display for a variable with defined values (in combobox for instance)
+	 * 
+	 * @param e
+	 *            Entity containing the field
+	 * @param fieldName
+	 *            Field name
+	 * @param currentValue
+	 *            Current value
+	 * @return Label associated to current value on entity e for field fieldName
+	 */
+	public String getDefinedLabel(Entity e, String fieldName, Object currentValue) {
+		return e.getModel().getField(fieldName).getDefinedLabel(currentValue, sessionCtrl.getContext().getLocale());
 	}
 
 	public String getLabel(String field, String key) {
@@ -665,29 +765,15 @@ public class ViewController implements Serializable {
 	}
 
 	public void displayMessages(FunctionalException fEx) {
-		for (Message m : fEx.getMessages()) {
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(javax.faces.application.FacesMessage.SEVERITY_ERROR, m.getMessage(), null));
-		}
+		FacesMessagesUtils.displayMessages(fEx);
 	}
 
 	public void displayMessages(Exception e) {
-		String message = getTechnicalMessage(e);
-		FacesContext.getCurrentInstance().addMessage(null,
-				new FacesMessage(javax.faces.application.FacesMessage.SEVERITY_ERROR, message, null));
+		FacesMessagesUtils.displayMessages(e);
 	}
 
 	public void displayMessages(RequestContext context) {
-		if (null != context.getMessages()) {
-			for (Message msg : context.getMessages()) {
-				if (msg.getSeverity() == Severity.INFO) {
-					FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, msg.getMessage(), null));
-				} else if (msg.getSeverity() == Severity.ERROR) {
-					FacesContext.getCurrentInstance().addMessage(null,
-							new FacesMessage(javax.faces.application.FacesMessage.SEVERITY_ERROR, msg.getMessage(), null));
-				}
-			}
-			context.getMessages().clear();
-		}
+		FacesMessagesUtils.displayMessages(context);
 	}
 
 	public void displayMessages() {
@@ -704,7 +790,6 @@ public class ViewController implements Serializable {
 	 * 
 	 * @return HTML string for custom data include
 	 */
-	@SuppressWarnings("unchecked")
 	public String getCustomData() {
 		String cData = "";
 		if (currentView != null && currentView.getCustomData() != null) {
@@ -750,6 +835,7 @@ public class ViewController implements Serializable {
 	}
 
 	public void executeDownload() {
+		FileInputStream stream = null;
 		OutputStream out = null;
 		try {
 			File downloadFile = currentView.getAttachment();
@@ -767,7 +853,7 @@ public class ViewController implements Serializable {
 			response.setHeader("Content-Disposition", "attachment; filename=\"" + filename + "\"");
 			response.setHeader("Cache-Control", "public");
 
-			FileInputStream stream = new FileInputStream(downloadFile);
+			stream = new FileInputStream(downloadFile);
 			out = response.getOutputStream();
 			byte[] buffer = new byte[1024];
 			int length;
@@ -775,9 +861,11 @@ public class ViewController implements Serializable {
 				out.write(buffer, 0, length);
 			}
 			stream.close();
+			out.flush();
+			out.close();
+			stream = null;
+			out = null;
 
-			response.getOutputStream().flush();
-			response.getOutputStream().close();
 			fc.responseComplete();
 			currentView.setAttachment(null);
 			currentView.setAttachmentName(null);
@@ -786,6 +874,13 @@ public class ViewController implements Serializable {
 		} catch (IOException e) {
 			LOGGER.error(e.getMessage(), e);
 		} finally {
+			try {
+				if (stream != null) {
+					stream.close();
+				}
+			} catch (IOException e) {
+				LOGGER.error(e);
+			}
 			try {
 				if (out != null) {
 					out.close();
@@ -812,6 +907,11 @@ public class ViewController implements Serializable {
 	}
 
 	public Entity getEntity() {
+		if (currentView == null) {
+			FacesContext fc = FacesContext.getCurrentInstance();
+			fc.getExternalContext().getSessionMap().put(BrowserNavigationListener.EXPIRED_VIEW_TOKEN, BrowserNavigationListener.EXPIRED_VIEW_TOKEN);
+			throw new ViewExpiredException();
+		}
 		return currentView.getEntity();
 	}
 
@@ -845,7 +945,7 @@ public class ViewController implements Serializable {
 		if (currentView != null) {
 			return currentView.toString();
 		}
-		return "no current view";
+		return MessageUtils.getInstance(context).getMessage("error.noCurrentView", (Object[]) null);
 	}
 
 	public View getCurrentView() {
@@ -879,26 +979,6 @@ public class ViewController implements Serializable {
 			sessionCtrl.setCurrentView(oldConversationId, null);
 			newConversation = true;
 		}
-	}
-
-	/**
-	 * Creates a human readable (at least developper readable) message from a technical exception. We'll extract the first 4 lines of stacktrace
-	 * and exception message. This method is public because it might be used by UI Components (DataModels).
-	 * 
-	 * @param e Catched exception we want to display.
-	 * @return String containing exception message and first 4 lines of exception stacktrace.
-	 */
-	public String getTechnicalMessage(Exception e) {
-		StackTraceElement[] stackTrace = e.getStackTrace();
-		String technicalMessage = "An unexpected error occurred: \n";
-		if (e.getMessage() != null) {
-			technicalMessage += e.getMessage() + "\n\n";
-		}
-		technicalMessage += stackTrace[0].toString() + "\n";
-		technicalMessage += stackTrace[1].toString() + "\n";
-		technicalMessage += stackTrace[2].toString() + "\n";
-		technicalMessage += stackTrace[3].toString() + "\n";
-		return technicalMessage;
 	}
 
 	public String getDefaultPage() {
@@ -973,4 +1053,16 @@ public class ViewController implements Serializable {
 
 		return ApplicationUtils.getApplicationLogic().getPermaLink(baseUrl, urlParams);
 	}
+
+	/**
+	 * Utility method to access an entity model
+	 * 
+	 * @param entityName
+	 *            Entity name
+	 * @return Entity Model of entity entityName
+	 */
+	public EntityModel getEntityModel(String entityName) {
+		return EntityManager.getEntityModel(entityName);
+	}
+
 }

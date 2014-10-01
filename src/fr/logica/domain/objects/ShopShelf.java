@@ -1,40 +1,57 @@
 package fr.logica.domain.objects;
 
 import java.io.Serializable;
-
 import java.util.HashSet;
 import java.util.Set;
 
-
+import fr.logica.business.Action.*;
 import fr.logica.business.Entity;
+import fr.logica.business.EntityField.SqlTypes;
 import fr.logica.business.Key;
+import fr.logica.business.KeyModel;
 import fr.logica.business.context.RequestContext;
 import fr.logica.db.DB;
-import fr.logica.domain.models.ShopShelfModel;
+import fr.logica.domain.annotations.*;
+import fr.logica.domain.constants.ShopShelfConstants;
 
 /**
  * Entity ShopShelf definition
  * 
  * @author CGI
  */
+@EntityDef(dbName = "SHELF", primaryKey = { "code" })
+@Links({
+})
+@Actions({
+	@Action(code = 0, input = Input.NONE, persistence = Persistence.INSERT),
+	@Action(code = 2, persistence = Persistence.UPDATE),
+	@Action(code = 4, persistence = Persistence.DELETE, ui = UserInterface.READONLY),
+	@Action(code = 5, persistence = Persistence.NONE, ui = UserInterface.READONLY)
+})
 public class ShopShelf extends Entity implements Serializable {
 	/** serialVersionUID */
 	public static final long serialVersionUID = 1L;
-	
 
 	/** Code */
-	private String code ;
+	@EntityField(sqlName = "CODE", sqlType = SqlTypes.VARCHAR2, sqlSize = 10, isMandatory = true)
+	private String code;
 
 	/** Nom */
-	private String name ;
+	@EntityField(sqlName = "NAME", sqlType = SqlTypes.VARCHAR2, sqlSize = 100, isMandatory = true)
+	private String name;
 
 	/** Position */
-	private Integer position ;
+	@EntityField(sqlName = "POSITION", sqlType = SqlTypes.INTEGER, sqlSize = 3, isMandatory = true)
+	private Integer position;
 
 	/** Description */
-	private String internalCaption ;
+	@EntityField(sqlName = "W$_DESC", sqlType = SqlTypes.VARCHAR2, sqlSize = 100, memory = fr.logica.business.EntityField.Memory.SQL, sqlExpr = ":tableAlias.NAME")
+	private String internalCaption;
 
-
+	/**
+	 * Initialize a new ShopShelf.<br/>
+	 * <b>The fields with initial value will be populated.</b>
+	 */
 	public ShopShelf() {
 		// Default constructor
 		super();
@@ -50,38 +67,34 @@ public class ShopShelf extends Entity implements Serializable {
 	 */
 	public ShopShelf(String code) {
 		super();
-		Key primaryKey = ShopShelfModel.buildPrimaryKey(code);
+		Key primaryKey = buildPrimaryKey(code);
 		setPrimaryKey(primaryKey);
 	}
 	
 	/**
-	 * Load a bean from database based on its primary key
-	 * <b>This method does not call the logic method dbPostLoad().</b>
-	 * @param code Code
-	 * @param ctx Current context with open database connection.
-	 * @return	<code>true</code> if the bean has been loaded, <code>false</code> if no entity was found.  
+	 * Initialize a new ShopShelf from an existing ShopShelf.<br/>
+	 * <b>All fields value are copied.</b>
 	 */
-	public boolean find(String code, RequestContext ctx) {
-		Key primaryKey = ShopShelfModel.buildPrimaryKey(code);
-		if (!primaryKey.isFull()) {
-			return false;
-		}
-		ShopShelf dbInstance = DB.get(NAME, primaryKey, ctx);
-		if (dbInstance != null) {
-			syncFromBean(dbInstance);
-			return true; 
-		}
-		return false; 
-	}
-	
 	public ShopShelf(ShopShelf pShopShelf) {
 		super(pShopShelf);
+	}
+
+	/**
+	 * Generate a primary key for the entity
+	 */
+	public static synchronized Key buildPrimaryKey(String code) {
+		KeyModel pkModel = new KeyModel(ShopShelfConstants.ENTITY_NAME);
+		// FIXME : Récupérer la PK ...
+		Key key = new Key(pkModel);
+		key.setValue("code", code);
+
+		return key;
 	}
 
 	/** Entity name */
 	@Override
 	public String name() {
-		return "shopShelf";
+		return ShopShelfConstants.ENTITY_NAME;
 	}
 
 	/** Entity description */
@@ -98,7 +111,7 @@ public class ShopShelf extends Entity implements Serializable {
 	public String getCode() {
 		return this.code;
 	}
- 
+
 	/**
 	 * Set the value from field Code.
 	 *
@@ -107,8 +120,6 @@ public class ShopShelf extends Entity implements Serializable {
 	public void setCode(final String code) {
 		this.code = code;
 	}
-	
-
 
 	/**
 	 * Get the value from field Name.
@@ -118,7 +129,7 @@ public class ShopShelf extends Entity implements Serializable {
 	public String getName() {
 		return this.name;
 	}
- 
+
 	/**
 	 * Set the value from field Name.
 	 *
@@ -127,8 +138,6 @@ public class ShopShelf extends Entity implements Serializable {
 	public void setName(final String name) {
 		this.name = name;
 	}
-	
-
 
 	/**
 	 * Get the value from field Position.
@@ -138,7 +147,7 @@ public class ShopShelf extends Entity implements Serializable {
 	public Integer getPosition() {
 		return this.position;
 	}
- 
+
 	/**
 	 * Set the value from field Position.
 	 *
@@ -147,8 +156,6 @@ public class ShopShelf extends Entity implements Serializable {
 	public void setPosition(final Integer position) {
 		this.position = position;
 	}
-	
-
 
 	/**
 	 * Gets the value from field InternalCaption. This getter respects real Java naming convention. 
@@ -176,7 +183,7 @@ public class ShopShelf extends Entity implements Serializable {
 	public String getInternalCaption() {
 		return this.internalCaption;
 	}
- 
+
 	/**
 	 * Set the value from field InternalCaption.
 	 *
@@ -185,19 +192,6 @@ public class ShopShelf extends Entity implements Serializable {
 	public void setInternalCaption(final String internalCaption) {
 		this.internalCaption = internalCaption;
 	}
-	
-
-
-	/** Holder for the var names */
-	public interface Var {
-		/** Var CODE */
-		String CODE = "code";
-		/** Var NAME */
-		String NAME = "name";
-		/** Var POSITION */
-		String POSITION = "position";
-	}
-	
 
 	/**
 	 * This methods gets all instances of ShopArticle back referenced by the current ShopShelf instance via link ShopArticleLShelf. <br/>
@@ -213,27 +207,12 @@ public class ShopShelf extends Entity implements Serializable {
 			// Do not get linked entities if PK is incomplete
 			return s;
 		}
-		for (Entity e : DB.getLinkedEntities(this, ShopShelfModel.LINK_SHOP_ARTICLE_L_SHELF, ctx)) {
+		for (Entity e : DB.getLinkedEntities(this, ShopShelfConstants.Links.LINK_SHOP_ARTICLE_L_SHELF, ctx)) {
 			s.add((ShopArticle) e);
 		}
 		return s;
 	}
 
-
-	/** Holder for the action names */
-	public interface Action {
-		/** Créer. */
-		int ACTION_0 = 0;
-		/** Modifier. */
-		int ACTION_2 = 2;
-		/** Supprimer. */
-		int ACTION_4 = 4;
-		/** Afficher. */
-		int ACTION_5 = 5;
-    }
-
-	/** Nom de l'entité. */
-	public static final String NAME = "shopShelf";
 	
 	/**
 	 * Clones the current bean.

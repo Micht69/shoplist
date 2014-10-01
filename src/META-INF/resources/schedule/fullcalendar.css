@@ -572,3 +572,10 @@ table.fc-border-separate {
 .fc-agenda .ui-resizable-resizing { /* TODO: better selector */
 	_overflow: hidden;
 }
+
+.fc-event-selected .ui-icon-check {
+	position: absolute;
+    top: 0;
+    right: 0;
+}
+

@@ -66,6 +66,7 @@
 		<component>
 			<component-type>cgi.faces.HtmlSchedule</component-type>
 			<renderer-type>cgi.faces.Schedule</renderer-type>
+			<handler-class>fr.logica.jsf.components.schedule.ScheduleHandler</handler-class>
 		</component>
 		<attribute>
 			<description>The value binding expression used to wire up this component to a component property of a JavaBean class.</description>
@@ -83,6 +84,12 @@
 			<name>dayClick</name>
 			<required>false</required>
 			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>A list of ScheduleEvent objects that will be displayed on the schedule.</description>
+			<name>events</name>
+			<required>true</required>
+			<type>java.util.List</type>
 		</attribute>		
 		<attribute>
 			<description>The day that each week begins. The value must be a number that represents the day of the week. Sunday=0, Monday=1, Tuesday=2, etc.</description>
@@ -129,11 +136,6 @@
 			<required>false</required>
 			<type>java.lang.Integer</type>
 		</attribute>
-        <attribute>
-            <description>Javascript code executed when this element loses focus and its value has been modified since gaining focus.</description>
-            <name>onchange</name>
-            <type>java.lang.String</type>
-        </attribute>
 		<attribute>
 			<description>Determines whether or not the events on the schedule can be modified.</description>
 			<name>readonly</name>
@@ -147,28 +149,30 @@
         </attribute>
 		<attribute>
 			<description>Determines whether or not to include Saturday/Sunday columns in any of the schedule views.</description>
-			<display-name>Date</display-name>
 			<name>showWeekends</name>
 			<required>false</required>
 			<type>java.lang.Boolean</type>
 		</attribute>
 		<attribute>
 			<description>The frequency for displaying time slots, in minutes.</description>
-			<display-name>Date</display-name>
 			<name>slotMinutes</name>
 			<required>false</required>
 			<type>java.lang.Integer</type>
 		</attribute>
 		<attribute>
-			<description>A list of ScheduleEvent objects that will be displayed on the schedule.</description>
-			<display-name>Date</display-name>
+            <description>MethodExpression representing the application action to invoke when the user updates (moving or resizing) an event.
+            The expression must evaluate to a public method that takes a parameter of type ScheduleEvent, and returns nothing (void).</description>
+            <name>updateListener</name>
+            <type>javax.el.MethodExpression</type>
+        </attribute>
+		<attribute>
+			<description>Selected ScheduleEvent objects.</description>
 			<name>value</name>
 			<required>true</required>
 			<type>java.util.List</type>
 		</attribute>
 		<attribute>
 			<description>The initial view when the schedule loads.</description>
-			<display-name>Date</display-name>
 			<name>view</name>
 			<required>false</required>
 			<type>fr.logica.jsf.components.schedule.ScheduleView</type>

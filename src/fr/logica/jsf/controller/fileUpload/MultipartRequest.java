@@ -12,7 +12,7 @@ import fr.logica.business.FileContainer;
 
 /**
  * This class represents a multipart request. It not only abstracts the
- * <code>{@link Part}</code> away, but it also provides direct access to the
+ * <code>javax.mail.Part</code> away, but it also provides direct access to the
  * <code>{@link MultipartMap}</code>, so that one can get the uploaded files out
  * of it.
  * 

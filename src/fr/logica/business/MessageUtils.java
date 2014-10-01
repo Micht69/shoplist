@@ -12,6 +12,7 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.Set;
 
+import fr.logica.business.MessageUtils;
 import fr.logica.business.context.RequestContext;
 import fr.logica.reflect.DomainUtils;
 import fr.logica.ui.Message;
@@ -55,12 +56,17 @@ public class MessageUtils {
 	 * Gets an instance of MessageUtils for the current user depending on its current locale. Current locale is determined by ApplicationLogic
 	 * behavior.
 	 * 
-	 * @param l
-	 *            Locale to use. If null, Locale.getDefault() will be used
+	 * @param ctx Current request context
 	 * @return An instance of MessageUtils based on current user locale if any, default JVM locale otherwise.
 	 */
 	public static MessageUtils getInstance(RequestContext ctx) {
-		return getInstance(ctx.getSessionContext().getLocale());
+		Locale l;
+		if (ctx == null || ctx.getSessionContext() == null) {
+			l = Locale.getDefault();
+		} else {
+			l = ctx.getSessionContext().getLocale();
+		}
+		return getInstance(l);
 	}
 
 	/**
@@ -131,7 +137,7 @@ public class MessageUtils {
 	 * 
 	 * @param entityName
 	 *            le nom de la liste
-	 * @param var
+	 * @param varName
 	 *            le nom de la variable
 	 * @return le titre
 	 */
@@ -144,10 +150,9 @@ public class MessageUtils {
 	 * 
 	 * @param queryName
 	 *            le nom de la liste
-	 * 
 	 * @param alias
 	 *            l' alias de la table
-	 * @param var
+	 * @param varName
 	 *            le nom de la variable
 	 * @return le titre
 	 */

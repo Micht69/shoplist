@@ -15,8 +15,10 @@ import fr.logica.business.Action.UserInterface;
 import fr.logica.business.Constants;
 import fr.logica.business.EntityManager;
 import fr.logica.business.EntityModel;
+import fr.logica.business.FunctionalException;
 import fr.logica.business.Key;
 import fr.logica.business.MessageUtils;
+import fr.logica.business.TechnicalException;
 import fr.logica.business.context.RequestContext;
 import fr.logica.business.data.ColumnData;
 import fr.logica.business.data.ListCriteria;
@@ -166,18 +168,33 @@ public abstract class AbstractListModel extends DataModel implements Serializabl
 		store.put(JS_FILTER, jsFilter);
 	}
 
-	public void export(String exportType) {
+	/**
+	 * Exports current list data
+	 * 
+	 * @param exportType Export type to use (CSV, XLS, etc.)
+	 * @return Return value is JSF compliant, null when HTTP response has been sent with data, currentView.getURL() if we need to reload current
+	 *         view with an error message.
+	 */
+	public String export(String exportType) {
 		RequestContext context = null;
 		try {
 			context = new RequestContext(viewCtrl.getSessionCtrl().getContext());
 			export(exportType, context);
+			// Exports ended smoothly, HTTP response contains the data, we won't redirect anywhere.
+			return null;
+		} catch (FunctionalException fEx) {
+			viewCtrl.displayMessages(fEx);
+		} catch (TechnicalException tEx) {
+			viewCtrl.displayMessages(tEx);
 		} finally {
 			if (context != null) {
+				viewCtrl.displayMessages(context);
 				context.close();
 			}
 		}
+		// An exception occurred, we reload current view
+		return viewCtrl.getCurrentView().getURL();
 	}
-
 	public abstract void export(String exportType, RequestContext context);
 
 	public Integer getMaxRow() {

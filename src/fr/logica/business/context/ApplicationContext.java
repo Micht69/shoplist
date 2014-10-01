@@ -23,7 +23,7 @@ public class ApplicationContext implements Serializable {
 		ApplicationUtils.getApplicationLogic().initializeApplication(this);
 	}
 
-	public void finalize() {
+	public void finalizeContext() {
 		ApplicationUtils.getApplicationLogic().finalizeApplication(this);
 	}
 

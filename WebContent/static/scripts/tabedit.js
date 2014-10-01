@@ -395,6 +395,11 @@ tabedit.registerEditableTable = function(myTableId, myFormId) {
 				return;
 			}
 
+			/* Protected datatable - no edition */
+			if ($(toJqId(myTableId + "-protected")).val() == 'true') { 
+				return; 
+			}
+			
 			/* Do not process inputs while we are working */
 			if (tabedit.busy) {
 				cgi.debug(this.tableId + '#onclick : busy, ignoring click');
@@ -402,7 +407,7 @@ tabedit.registerEditableTable = function(myTableId, myFormId) {
 			} else {
 				tabedit.busy = true;
 			}
-
+			
 			var that = this;
 
 			/* prepare the next row, will be launched if the user is OK to abandon its current changes */
@@ -492,16 +497,28 @@ tabedit.registerEditableTable = function(myTableId, myFormId) {
 			var currentCell = $currentCell.get(0);
 			var cells = $currentCell.parent().children().toArray();
 			var currentCellIndex = cells.indexOf(currentCell);
-
-			if (shift && currentCellIndex == 1) {
-				tabedit.focusElement($(cells[cells.length - 1]));
-
-			} else if (!shift && currentCellIndex == cells.length - 1) {
-				tabedit.focusElement($(cells[1]));
-
-			} else {
-				tabedit.focusElement($(cells[currentCellIndex + (shift ? - 1 : 1)]));
+			
+			var $nextCellFocus;
+			var nextCellIndex = -1;
+			while (nextCellIndex == -1) {
+				// Select next cell
+				if (shift && currentCellIndex == 1) {
+					nextCellIndex = cells.length - 1;
+				} else if (!shift && currentCellIndex == cells.length - 1) {
+					nextCellIndex = 1;
+				} else {
+					nextCellIndex = currentCellIndex + (shift ? - 1 : 1);
+				}
+				
+				$nextCellFocus = $(cells[nextCellIndex]);
+				if ($nextCellFocus.find("input, select").length == 0) {
+					// Not an editable cell
+					currentCellIndex = nextCellIndex;
+					nextCellIndex = -1;
+				}
 			}
+			// Go to next editable cell
+			tabedit.focusElement($nextCellFocus);
 			return false;
 		},
 

@@ -69,9 +69,9 @@ public class DatatableRenderer extends TableRenderer {
 		if (isVanilla(component)) {
 			super.encodeBegin(context, component);
 
-		} else if (isTabEditAjaxRequest(context, component)) {
+		} else if (isTableAjaxRequest(context, component)) {
 			/*
-			 * Sole the tbody must be updated while validating a creation into an editable list. To do so, current update tag (for the datatable)
+			 * Sole the tbody must be updated while making an Ajax request. To do so, current update tag (for the datatable)
 			 * is closed and a new update tag is opened for the tbody. The created update tag will be closed by JSF (instead of closing the one
 			 * for the datatable).
 			 */
@@ -153,7 +153,7 @@ public class DatatableRenderer extends TableRenderer {
 		if (isVanilla(component)) {
 			super.encodeEnd(context, component);
 
-		} else if (!isTabEditAjaxRequest(context, component)) {
+		} else if (!isTableAjaxRequest(context, component)) {
 			super.encodeEnd(context, component);
 			ResponseWriter writer = context.getResponseWriter();
 			writer.endElement("div");
@@ -175,7 +175,7 @@ public class DatatableRenderer extends TableRenderer {
 	}
 
 	/**
-	 * Indicates whether the current request concerns an editable list row creation.
+	 * Indicates whether the current request concerns an Ajax request for the rendered component.
 	 * 
 	 * @param context
 	 *            Current context.
@@ -184,10 +184,12 @@ public class DatatableRenderer extends TableRenderer {
 	 * @return {@code true} if the request contains the parameter {@code javax.faces.partial.ajax} and the ({@code javax.faces.source} of the
 	 *         request concerns the component; {@code false} otherwise.
 	 */
-	private boolean isTabEditAjaxRequest(FacesContext context, UIComponent component) {
+	private boolean isTableAjaxRequest(FacesContext context, UIComponent component) {
 		Map<String, String> requestParameters = context.getExternalContext().getRequestParameterMap();
-		return (requestParameters.get("javax.faces.partial.ajax") != null
-		&& requestParameters.get("javax.faces.source").endsWith("tabedit-hidden-ajax-button-" + component.getId()));
+		String ajax = requestParameters.get("javax.faces.partial.ajax");
+		String source = requestParameters.get("javax.faces.source");
+		String tabEditId = "tabedit-hidden-ajax-button-" + component.getId();
+		return (ajax != null && (source.endsWith(tabEditId) || source.startsWith(component.getClientId())));
 	}
 
 }

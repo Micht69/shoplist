@@ -17,12 +17,12 @@
 		<tr>
 			<td width="1%" style="text-align: left; white-space: nowrap;">
 				<div id="advanced-actions">
-	    			<h:panelGroup rendered="#{commentCtrl.commentsEnabled}">
+					<h:panelGroup rendered="#{commentCtrl.commentsEnabled}">
 						<h:commandLink id="commentAction" styleClass="btn_comment" value="#{commentCtrl.commentsCount('shopArticle', jsfCtrl.entity.primaryKey.encodedValue)}" title="#{jsfCtrl.getXhtmlLabel('labels', 'boutons.comment')}" onclick="commentPage();">
 							<f:ajax event="click" execute="@none" render="comment-list" />
 						</h:commandLink>
-	    				<ui:include src="../includes/comment.xhtml" />
-	    			</h:panelGroup>
+						<ui:include src="../includes/comment.xhtml" />
+					</h:panelGroup>
 					<h:outputText value=" "/>
 					<h:commandButton id="printAction" styleClass="btn_print" image="../static/img/buttons/print.png" title="#{jsfCtrl.getXhtmlLabel('labels', 'boutons.print')}" onclick="window.print(); return false;" />
 					<h:outputText value=" "/>
@@ -39,62 +39,42 @@
 	</table>
 	</div>
 	<h:panelGroup id="i0_shopArticleCreate" rendered="#{jsfCtrl.uiGroupPanel('', 'shopArticle', 'shopArticleCreate').visible}" layout="none">
-		<table class="group_table">
-			<tr>
-				<td class="group_table_col_1">
-					<ui:fragment rendered="#{jsfCtrl.isVisible('shopArticleLShelf')}">
-						<table>
-							<tr>
-								<td class="colFieldSetLeft">
-									<h:outputLabel id="i0_shopArticleCreate_0_shopArticleLShelf" escape="false" value="#{jsfCtrl.getLabel('shopArticleLShelf', 'shopArticleCreate.0.shopArticleLShelf')}" title="#{jsfCtrl.getXhtmlLabel('tooltips', 'shopArticleCreate.0.shopArticleLShelf')}"/>
-									
-									<h:outputLabel value="*" styleClass="mandatory_label" rendered="#{jsfCtrl.isMandatory('shopArticleLShelf')}"/>
-								</td>
-								<td class="colFieldSetMid">
-									<h:outputLabel value=":" />
-								</td>
-								<td class="colFieldSetRight">
-									<h:selectOneMenu disabledClass="disabledCombo" disabled="#{jsfCtrl.uiLinkCombo('shopArticleLShelf', 'shopShelf', 'SHOP_SHELF').readonly}" value="#{jsfCtrl.uiLinkCombo('shopArticleLShelf', 'shopShelf', 'SHOP_SHELF').selectedValue}"  label="#{jsfCtrl.getXhtmlLabel('genLabels', 'shopArticleCreate.0.shopArticleLShelf')}" onchange="markAsDirty(this)">
-									
-										<f:selectItem noSelectionOption="true" itemLabel=" "/>
-										<f:selectItems value="#{jsfCtrl.uiLinkCombo('shopArticleLShelf', 'shopShelf', 'SHOP_SHELF').comboValues}" />
-										<f:validateRequired disabled="#{param['skipRequired'] == true}" />
-									</h:selectOneMenu>
-								</td>
-							</tr>
-						</table>
-					</ui:fragment>
-				</td>
-			</tr>
-			<tr>
-				<td class="group_table_col_1">
-					<ui:fragment rendered="#{jsfCtrl.isVisible('shopArticle.ean13')}">
-						<table class="#{!jsfCtrl.isValid('mainForm:shopArticleCreate_shopArticle_ean13') ? 'error' : ''}">
-							<tr>
-								<td class="colFieldSetLeft">
-									<h:outputLabel id="i1_shopArticleCreate_shopArticle_ean13" escape="false" value="#{jsfCtrl.getLabel('shopArticle.ean13', 'shopArticleCreate.shopArticle.ean13')}" title="#{jsfCtrl.getXhtmlLabel('tooltips', 'shopArticleCreate.shopArticle.ean13')}"/>
-									<h:outputLabel value="*" styleClass="mandatory_label" rendered="#{jsfCtrl.isMandatory('shopArticle.ean13')}"/>
-								</td>
-								<td class="colFieldSetMid">
-									<h:outputLabel value=":" />
-								</td>
-								<td class="colFieldSetRight">
-									<h:inputText style=""  disabled="#{jsfCtrl.readonly('','shopArticle','ean13')}" id="i0_shopArticleCreate_shopArticle_ean13" value="#{jsfCtrl.entity.ean13}" label="#{jsfCtrl.getLabel('shopArticle.ean13', 'shopArticle.ean13')}" maxlength="13" onkeypress="markAsDirty(this)">
-										<f:validateLength maximum="13" />
-									</h:inputText>
-									<h:message for="i0_shopArticleCreate_shopArticle_ean13" styleClass="errorLabel" />
-								</td>
-							</tr>
-						</table>
-					</ui:fragment>
-				</td>
-			</tr>
-			<tr>
-				<td class="group_table_col_1">
-					<ui:include src="../includes/ean_scan.xhtml" />
-				</td>
-			</tr>
-		</table>
+		<div class="group">
+			<div class="col col-1">
+				<ui:fragment rendered="#{jsfCtrl.isVisible('shopArticleLShelf')}">
+					<div class="col-label">
+						<h:outputLabel id="i0_shopArticleCreate_0_shopArticleLShelf" escape="false" value="#{jsfCtrl.getLabel('shopArticleLShelf', 'shopArticleCreate.0.shopArticleLShelf')}" title="#{jsfCtrl.getXhtmlLabel('tooltips', 'shopArticleCreate.0.shopArticleLShelf')}"/>
+						
+						<h:outputLabel value="*" styleClass="mandatory_label" rendered="#{jsfCtrl.isMandatory('shopArticleLShelf')}"/>
+					</div>
+					<div class="col-value">
+						<h:selectOneMenu id="i1_shopArticleCreate_0_shopArticleLShelf" disabledClass="disabledCombo" disabled="#{jsfCtrl.uiLinkCombo('shopArticleLShelf', 'shopShelf', 'SHOP_SHELF').readonly}" value="#{jsfCtrl.uiLinkCombo('shopArticleLShelf', 'shopShelf', 'SHOP_SHELF').selectedValue}"  label="#{jsfCtrl.getXhtmlLabel('genLabels', 'shopArticleCreate.0.shopArticleLShelf')}" onchange="markAsDirty()">
+						
+							<f:selectItem noSelectionOption="true" itemLabel=" "/>
+							<f:selectItems value="#{jsfCtrl.uiLinkCombo('shopArticleLShelf', 'shopShelf', 'SHOP_SHELF').comboValues}" />
+							<f:validateRequired disabled="#{param['skipRequired'] == true}" />
+						</h:selectOneMenu>
+					</div>
+				</ui:fragment>
+			</div>
+			<div class="col col-1">
+				<ui:fragment rendered="#{jsfCtrl.isVisible('shopArticle.ean13')}">
+					<div class="col-label">
+						<h:outputLabel id="i1_shopArticleCreate_shopArticle_ean13" escape="false" value="#{jsfCtrl.getLabel('shopArticle.ean13', 'shopArticleCreate.shopArticle.ean13')}" title="#{jsfCtrl.getXhtmlLabel('tooltips', 'shopArticleCreate.shopArticle.ean13')}"/>
+						<h:outputLabel value="*" styleClass="mandatory_label" rendered="#{jsfCtrl.isMandatory('shopArticle.ean13')}"/>
+					</div>
+					<div class="col-value">
+						<h:inputText style=""  disabled="#{jsfCtrl.readonly('','shopArticle','ean13')}" id="i0_shopArticleCreate_shopArticle_ean13" value="#{jsfCtrl.entity.ean13}" label="#{jsfCtrl.getLabel('shopArticle.ean13', 'shopArticle.ean13')}" maxlength="13" onkeypress="markAsDirty(this)">
+							<f:validateLength maximum="13" />
+						</h:inputText>
+						<h:message for="i0_shopArticleCreate_shopArticle_ean13" styleClass="errorLabel" />
+					</div>
+				</ui:fragment>
+			</div>
+			<div class="col col-1">
+				<ui:include src="../includes/ean_scan.xhtml" />
+			</div>
+		</div>
 	</h:panelGroup>
 	<div class="actions bottomActions">
 	<table style="width: 100%">

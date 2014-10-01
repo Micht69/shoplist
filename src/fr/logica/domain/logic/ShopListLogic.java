@@ -7,23 +7,23 @@ import fr.logica.business.DefaultLogic;
 import fr.logica.business.context.RequestContext;
 import fr.logica.db.DbManager;
 import fr.logica.db.DbQuery;
-import fr.logica.domain.models.ShopListLArticleModel;
+import fr.logica.domain.constants.ShopListConstants;
+import fr.logica.domain.constants.ShopListLArticleConstants;
 import fr.logica.domain.objects.ShopList;
-import fr.logica.domain.objects.ShopListLArticle;
 
 /**
  * Logic class for the entity ShopList
  *
  * @author CGI
  */
-public class ShopListLogic extends DefaultLogic<ShopList> {
+public class ShopListLogic extends DefaultLogic<ShopList> implements ShopListConstants {
 	@Override
 	public Object uiListVarValue(Map<String, Object> vars, String queryName, String domainName, String varName, RequestContext ctx) {
-		if (ShopList.Var.ARTICLE_COUNT.equals(varName)) {
+		if (ShopListConstants.Vars.ARTICLE_COUNT.equals(varName)) {
 			// Get article count
-			DbQuery artCount = new DbQuery(ShopListLArticleModel.ENTITY_NAME, "ART");
-			artCount.addCondEq(ShopListLArticle.Var.LIST_ID, "ART", vars.get("T1_id"));
-			artCount.addCount(ShopListLArticle.Var.ARTICLE_ID, "ART", "artCount", false);
+			DbQuery artCount = new DbQuery(ShopListLArticleConstants.ENTITY_NAME, "ART");
+			artCount.addCondEq(ShopListLArticleConstants.Vars.LIST_ID, "ART", vars.get("T1_id"));
+			artCount.addCount(ShopListLArticleConstants.Vars.ARTICLE_ID, "ART", "artCount", false);
 
 			DbManager dbm = null;
 			try {
@@ -43,7 +43,7 @@ public class ShopListLogic extends DefaultLogic<ShopList> {
 	
 	@Override
 	public void dbPostLoad(ShopList bean, Action action, RequestContext ctx) {
-		if (action.is(ShopList.Action.ACTION_0)) {
+		if (action.is(ShopListConstants.Actions.ACTION_0)) {
 			bean.setUser(ctx.getSessionContext().getUser().getLogin());
 		}
 		super.dbPostLoad(bean, action, ctx);

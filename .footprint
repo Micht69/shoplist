@@ -1,22 +1,25 @@
 
 ### Generated with layers
-* jsf2-3.1.0-SNAPSHOT
-* jweb-3.1.0-SNAPSHOT
-* rorschach-3.1.2-SNAPSHOT
-* sql-3.1.0-SNAPSHOT
+* jsf2-3.2.5-SNAPSHOT
+* jweb-3.2.5-SNAPSHOT
+* rorschach-3.2.2-SNAPSHOT
+* sql-3.2.3-SNAPSHOT
 
 ### Generation options
 exportData=true
+outPath=C:/dev/java/workspace/shoplist-gen
 locale=fr
 lock=none
 webServer=tomcat7
 database=MYSQL
 testUnits=false
 dataGenerator=false
+sequence=none
 encoding=windows-1252
+displayEmptyListHeaders=true
 beanValidation=false
-mavenProject=false
 execTimesStack=false
+mavenProject=false
 actionTooltips=false
 multiapp=false
 persistence.schema=none

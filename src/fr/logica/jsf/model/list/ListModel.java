@@ -30,15 +30,21 @@ public class ListModel extends AbstractListModel implements Serializable {
 	protected String queryName;
 
 	protected boolean displayCriterias;
+	protected boolean globalSearch;
 
 	private int currentRowCount;
 
 	private static final String DISPLAY_CRITERIA = "displayCriterias";
+	public static final String GLOBAL_SEARCH = "globalSearch";
 
 	public ListModel(ViewController viewCtrl, Map<String, String> store, Entity entity, String entityName, String queryName) {
 		super(viewCtrl, store, entityName);
 		this.entity = entity;
 		this.queryName = queryName;
+		this.globalSearch = false;
+		if (store.get(GLOBAL_SEARCH) != null) {
+			globalSearch = "true".equals(store.get(GLOBAL_SEARCH));
+		}
 		loadData(viewCtrl.getContext());
 		// Do we have to open criteria at list opening ?
 		if (store.get(DISPLAY_CRITERIA) != null) {
@@ -88,7 +94,7 @@ public class ListModel extends AbstractListModel implements Serializable {
 	@Override
 	public void loadData(RequestContext context) {
 		data = new BusinessController().getListData(entity, entityName, queryName, criteria, viewCtrl.getCurrentView().getAction(), viewCtrl
-				.getCurrentView().getLinkName(), viewCtrl.getCurrentView().getLinkedEntity(), context);
+				.getCurrentView().getLinkName(), viewCtrl.getCurrentView().getLinkedEntity(), globalSearch, context);
 	}
 
 	public void moreLines() {
@@ -107,7 +113,7 @@ public class ListModel extends AbstractListModel implements Serializable {
 			moreCriteria.maxRow = criteria.maxRow; // maxRow is used as the number of row to fetch from DB, not the last row number
 			ListData moreData = new BusinessController().getListData(entity, entityName, queryName, moreCriteria, viewCtrl.getCurrentView()
 					.getAction(), viewCtrl
-					.getCurrentView().getLinkName(), viewCtrl.getCurrentView().getLinkedEntity(), context);
+					.getCurrentView().getLinkName(), viewCtrl.getCurrentView().getLinkedEntity(), globalSearch, context);
 			data.getRows().addAll(moreData.getRows());
 			currentRowCount = currentRowCount + criteria.maxRow;
 		} finally {
@@ -124,6 +130,7 @@ public class ListModel extends AbstractListModel implements Serializable {
 	}
 
 	@Override
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void validateView(View currentView) {
 		if (viewCtrl.isSelect()) {
 			currentView.setKeys(getSelected());

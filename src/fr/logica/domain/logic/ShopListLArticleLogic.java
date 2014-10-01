@@ -12,6 +12,9 @@ import fr.logica.business.Key;
 import fr.logica.business.context.RequestContext;
 import fr.logica.business.controller.Request;
 import fr.logica.business.controller.Response;
+import fr.logica.db.DB;
+import fr.logica.domain.constants.ShopArticleConstants;
+import fr.logica.domain.constants.ShopListLArticleConstants;
 import fr.logica.domain.objects.ShopArticle;
 import fr.logica.domain.objects.ShopListLArticle;
 import fr.logica.queries.ShopArticleQuery;
@@ -21,7 +24,7 @@ import fr.logica.queries.ShopArticleQuery;
  * 
  * @author CGI
  */
-public class ShopListLArticleLogic extends DefaultLogic<ShopListLArticle> {
+public class ShopListLArticleLogic extends DefaultLogic<ShopListLArticle> implements ShopListLArticleConstants {
 
 	@Override
 	public String doDescription(ShopListLArticle bean, RequestContext ctx) {
@@ -40,23 +43,19 @@ public class ShopListLArticleLogic extends DefaultLogic<ShopListLArticle> {
 
 	@Override
 	public List<Key> doCustomAction(Request<ShopListLArticle> request, ShopListLArticle entity, List<Key> keys, RequestContext ctx) {
-		if (request.getAction().getCode() == ShopListLArticle.Action.ACTION_60) {
+		if (request.getAction().getCode() == ShopListLArticleConstants.Actions.ACTION_60) {
 			// Mark as buyed
 			for (Key k : keys) {
-				int listId = Integer.parseInt((String) k.getValue(ShopListLArticle.Var.LIST_ID));
-				int articleId = Integer.parseInt((String) k.getValue(ShopListLArticle.Var.ARTICLE_ID));
-
-				ShopListLArticle e = new ShopListLArticle(listId, articleId);
-				e.setStatus(ShopListLArticle.ValueList.STATUS.DONE);
-				e.persist(ctx);
+				ShopListLArticle e = DB.get(ShopListLArticleConstants.ENTITY_NAME, k, ctx);
+				e.setStatus(ShopListLArticleConstants.ValueList.STATUS.DONE);
+				DB.persist(e, ctx);
 			}
-		} else if (request.getAction().getCode() == ShopListLArticle.Action.ACTION_20) {
+		} else if (request.getAction().getCode() == ShopListLArticleConstants.Actions.ACTION_20) {
 			// Custom delete
 			for (Key k : keys) {
-				ShopListLArticle e = new ShopListLArticle();
-				e.setPrimaryKey(k);
-				if (e.find(ctx)) {
-					e.remove(ctx);
+				ShopListLArticle e = DB.get(ShopListLArticleConstants.ENTITY_NAME, k, ctx);
+				if (e != null) {
+					DB.remove(e, ctx);
 				}
 			}
 		}
@@ -65,14 +64,13 @@ public class ShopListLArticleLogic extends DefaultLogic<ShopListLArticle> {
 
 	@Override
 	public void uiActionOnLoad(Response<ShopListLArticle> response, RequestContext ctx) {
-		if (response.getAction().getCode() == ShopListLArticle.Action.ACTION_20) {
+		if (response.getAction().getCode() == ShopListLArticleConstants.Actions.ACTION_20) {
 			List<Key> keys = response.getKeys();
 			String entityToRemove = "Les lignes d'article suivantes seront supprimées :<br>";
 			entityToRemove += "<ul style=\"list-style: initial; padding-left: 40px;\">";
 			for (Key k : keys) {
-				ShopListLArticle e = new ShopListLArticle();
-				e.setPrimaryKey(k);
-				if (e.find(ctx)) {
+				ShopListLArticle e = DB.get(ShopListLArticleConstants.ENTITY_NAME, k, ctx);
+				if (e != null) {
 					entityToRemove += "<li>";
 					entityToRemove += doDescription(e, ctx);
 					entityToRemove += "</li>";
@@ -87,7 +85,7 @@ public class ShopListLArticleLogic extends DefaultLogic<ShopListLArticle> {
 	@Override
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public Response uiCtrlOverrideAction(Response response, RequestContext ctx) {
-		if (response.getAction().is(ShopListLArticle.Action.ACTION_70)) {
+		if (response.getAction().is(ShopListLArticleConstants.Actions.ACTION_70)) {
 
 			Response r = new Response<ShopArticle>();
 			String queryName = ShopArticleQuery.Query.QUERY_SHOP_ARTICLE;
@@ -97,7 +95,7 @@ public class ShopListLArticleLogic extends DefaultLogic<ShopListLArticle> {
 					fr.logica.business.Action.Process.CUSTOM);
 
 			r.setAction(customAttachmentAction);
-			r.setEntityName(ShopArticle.NAME);
+			r.setEntityName(ShopArticleConstants.ENTITY_NAME);
 			r.setLinkedEntity(response.getLinkedEntity());
 			r.setLinkName(response.getLinkName());
 			r.setQueryName(queryName);

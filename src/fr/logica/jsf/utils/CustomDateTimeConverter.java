@@ -28,8 +28,19 @@ public class CustomDateTimeConverter extends DateTimeConverter {
 				Calendar calendar = (Calendar) component;
 				String pattern = calendar.getPattern().replace('l', 'S');
 				DateFormat format = new SimpleDateFormat(pattern);
+
 				try {
-					return format.parse(value);
+					Date d = format.parse(value);
+					if (value.length() < pattern.length() && d.getTime() < 0) {
+						java.util.Calendar c = java.util.Calendar.getInstance();
+						c.setTime(d);
+						c.add(java.util.Calendar.YEAR, 1900);
+						if (c.getTimeInMillis() < 0) {
+							c.add(java.util.Calendar.YEAR, 100);
+						}
+						return c.getTime();
+					}
+					return d;
 				} catch (ParseException pe) {
 					String precision = calendar.getPrecision();
 					String key;

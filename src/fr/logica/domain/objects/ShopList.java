@@ -1,48 +1,69 @@
 package fr.logica.domain.objects;
 
 import java.io.Serializable;
-
 import java.util.HashSet;
 import java.util.Set;
-
 import fr.logica.business.DateTimeUpgraded;
 import java.util.Date;
 
+import fr.logica.business.Action.*;
 import fr.logica.business.Entity;
+import fr.logica.business.EntityField.SqlTypes;
 import fr.logica.business.Key;
+import fr.logica.business.KeyModel;
 import fr.logica.business.context.RequestContext;
 import fr.logica.db.DB;
-import fr.logica.domain.models.ShopListModel;
+import fr.logica.domain.annotations.*;
+import fr.logica.domain.constants.ShopListConstants;
 
 /**
  * Entity ShopList definition
  * 
  * @author CGI
  */
+@EntityDef(dbName = "LIST", primaryKey = { "id" })
+@Links({
+	@Link(name = "shopArticleLUser", targetEntity = "shopUser", fields = { "user" })
+})
+@Actions({
+	@Action(code = 0, pageName = "SHOP_LIST_CREATE", input = Input.NONE, persistence = Persistence.INSERT),
+	@Action(code = 2, persistence = Persistence.UPDATE),
+	@Action(code = 4, persistence = Persistence.DELETE, ui = UserInterface.READONLY),
+	@Action(code = 5, persistence = Persistence.NONE, ui = UserInterface.READONLY),
+	@Action(code = 50, pageName = "SHOP_LIST_SHOPPING", persistence = Persistence.UPDATE)
+})
 public class ShopList extends Entity implements Serializable {
 	/** serialVersionUID */
 	public static final long serialVersionUID = 1L;
-	
 
 	/** ID */
-	private Integer id ;
+	@EntityField(sqlName = "ID", sqlType = SqlTypes.INTEGER, sqlSize = 10, isMandatory = true, isAutoIncrementField = true)
+	private Integer id;
 
 	/** Titre */
-	private String name ;
+	@EntityField(sqlName = "NAME", sqlType = SqlTypes.VARCHAR2, sqlSize = 100, isMandatory = true)
+	private String name;
 
 	/** Créateur */
-	private String user ;
+	@EntityField(sqlName = "USER", sqlType = SqlTypes.VARCHAR2, sqlSize = 10, isMandatory = true)
+	private String user;
 
 	/** Date de création */
+	@EntityField(sqlName = "CREATE_DATE", sqlType = SqlTypes.DATE, sqlSize = 0)
 	private Date createDate = fr.logica.business.DateUtils.today();
 
 	/** Description */
-	private String internalCaption ;
+	@EntityField(sqlName = "W$_DESC", sqlType = SqlTypes.VARCHAR2, sqlSize = 200, memory = fr.logica.business.EntityField.Memory.SQL, sqlExpr = ":tableAlias.NAME")
+	private String internalCaption;
 
 	/** Nbr d'articles */
-	private Integer articleCount ;
+	@EntityField(sqlName = "ARTICLE_COUNT", sqlType = SqlTypes.INTEGER, sqlSize = 3, memory = fr.logica.business.EntityField.Memory.ALWAYS)
+	private Integer articleCount;
 
-
+	/**
+	 * Initialize a new ShopList.<br/>
+	 * <b>The fields with initial value will be populated.</b>
+	 */
 	public ShopList() {
 		// Default constructor
 		super();
@@ -58,38 +79,34 @@ public class ShopList extends Entity implements Serializable {
 	 */
 	public ShopList(Integer id) {
 		super();
-		Key primaryKey = ShopListModel.buildPrimaryKey(id);
+		Key primaryKey = buildPrimaryKey(id);
 		setPrimaryKey(primaryKey);
 	}
 	
 	/**
-	 * Load a bean from database based on its primary key
-	 * <b>This method does not call the logic method dbPostLoad().</b>
-	 * @param id ID
-	 * @param ctx Current context with open database connection.
-	 * @return	<code>true</code> if the bean has been loaded, <code>false</code> if no entity was found.  
+	 * Initialize a new ShopList from an existing ShopList.<br/>
+	 * <b>All fields value are copied.</b>
 	 */
-	public boolean find(Integer id, RequestContext ctx) {
-		Key primaryKey = ShopListModel.buildPrimaryKey(id);
-		if (!primaryKey.isFull()) {
-			return false;
-		}
-		ShopList dbInstance = DB.get(NAME, primaryKey, ctx);
-		if (dbInstance != null) {
-			syncFromBean(dbInstance);
-			return true; 
-		}
-		return false; 
-	}
-	
 	public ShopList(ShopList pShopList) {
 		super(pShopList);
+	}
+
+	/**
+	 * Generate a primary key for the entity
+	 */
+	public static synchronized Key buildPrimaryKey(Integer id) {
+		KeyModel pkModel = new KeyModel(ShopListConstants.ENTITY_NAME);
+		// FIXME : Récupérer la PK ...
+		Key key = new Key(pkModel);
+		key.setValue("id", id);
+
+		return key;
 	}
 
 	/** Entity name */
 	@Override
 	public String name() {
-		return "shopList";
+		return ShopListConstants.ENTITY_NAME;
 	}
 
 	/** Entity description */
@@ -106,7 +123,7 @@ public class ShopList extends Entity implements Serializable {
 	public Integer getId() {
 		return this.id;
 	}
- 
+
 	/**
 	 * Set the value from field Id.
 	 *
@@ -115,8 +132,6 @@ public class ShopList extends Entity implements Serializable {
 	public void setId(final Integer id) {
 		this.id = id;
 	}
-	
-
 
 	/**
 	 * Get the value from field Name.
@@ -126,7 +141,7 @@ public class ShopList extends Entity implements Serializable {
 	public String getName() {
 		return this.name;
 	}
- 
+
 	/**
 	 * Set the value from field Name.
 	 *
@@ -135,8 +150,6 @@ public class ShopList extends Entity implements Serializable {
 	public void setName(final String name) {
 		this.name = name;
 	}
-	
-
 
 	/**
 	 * Get the value from field User.
@@ -146,7 +159,7 @@ public class ShopList extends Entity implements Serializable {
 	public String getUser() {
 		return this.user;
 	}
- 
+
 	/**
 	 * Set the value from field User.
 	 *
@@ -155,8 +168,6 @@ public class ShopList extends Entity implements Serializable {
 	public void setUser(final String user) {
 		this.user = user;
 	}
-	
-
 
 	/**
 	 * Get the value from field CreateDate.
@@ -166,7 +177,7 @@ public class ShopList extends Entity implements Serializable {
 	public Date getCreateDate() {
 		return this.createDate;
 	}
- 
+
 	/**
 	 * Set the value from field CreateDate.
 	 *
@@ -175,8 +186,6 @@ public class ShopList extends Entity implements Serializable {
 	public void setCreateDate(final Date createDate) {
 		this.createDate = createDate;
 	}
-	
-
 
 	/**
 	 * Gets the value from field InternalCaption. This getter respects real Java naming convention. 
@@ -204,7 +213,7 @@ public class ShopList extends Entity implements Serializable {
 	public String getInternalCaption() {
 		return this.internalCaption;
 	}
- 
+
 	/**
 	 * Set the value from field InternalCaption.
 	 *
@@ -213,8 +222,6 @@ public class ShopList extends Entity implements Serializable {
 	public void setInternalCaption(final String internalCaption) {
 		this.internalCaption = internalCaption;
 	}
-	
-
 
 	/**
 	 * Get the value from field ArticleCount.
@@ -224,7 +231,7 @@ public class ShopList extends Entity implements Serializable {
 	public Integer getArticleCount() {
 		return this.articleCount;
 	}
- 
+
 	/**
 	 * Set the value from field ArticleCount.
 	 *
@@ -233,23 +240,6 @@ public class ShopList extends Entity implements Serializable {
 	public void setArticleCount(final Integer articleCount) {
 		this.articleCount = articleCount;
 	}
-	
-
-
-	/** Holder for the var names */
-	public interface Var {
-		/** Var ID */
-		String ID = "id";
-		/** Var NAME */
-		String NAME = "name";
-		/** Var USER */
-		String USER = "user";
-		/** Var CREATE_DATE */
-		String CREATE_DATE = "createDate";
-		/** Var ARTICLE_COUNT */
-		String ARTICLE_COUNT = "articleCount";
-	}
-	
 
 	/**
 	 * Instance of ShopUser matching the link ShopArticleLUser based on foreign key values. <br/>
@@ -259,7 +249,7 @@ public class ShopList extends Entity implements Serializable {
 	 * @return Instance of ShopUser matching the link pays if any, null otherwise.
 	 */
 	public ShopUser getRef_ShopListUserFk(RequestContext ctx) {
-		return (ShopUser) DB.getRef(this, ShopListModel.LINK_SHOP_ARTICLE_L_USER, ctx);
+		return (ShopUser) DB.getRef(this, ShopListConstants.Links.LINK_SHOP_ARTICLE_L_USER, ctx);
 	}
 	
 	/**
@@ -274,7 +264,7 @@ public class ShopList extends Entity implements Serializable {
 		if (pShopUser != null) {
 			primaryKey = pShopUser.getPrimaryKey();
 		}
-		setForeignKey(getModel().getLinkModel(ShopListModel.LINK_SHOP_ARTICLE_L_USER).getKeyName(), primaryKey);
+		setForeignKey(ShopListConstants.Links.LINK_SHOP_ARTICLE_L_USER, primaryKey);
 	}
 
 	/**
@@ -291,29 +281,12 @@ public class ShopList extends Entity implements Serializable {
 			// Do not get linked entities if PK is incomplete
 			return s;
 		}
-		for (Entity e : DB.getLinkedEntities(this, ShopListModel.LINK_SHOP_LIST_L_ARTICLE_L_LIST, ctx)) {
+		for (Entity e : DB.getLinkedEntities(this, ShopListConstants.Links.LINK_SHOP_LIST_L_ARTICLE_L_LIST, ctx)) {
 			s.add((ShopListLArticle) e);
 		}
 		return s;
 	}
 
-
-	/** Holder for the action names */
-	public interface Action {
-		/** Créer. */
-		int ACTION_0 = 0;
-		/** Modifier. */
-		int ACTION_2 = 2;
-		/** Supprimer. */
-		int ACTION_4 = 4;
-		/** Afficher. */
-		int ACTION_5 = 5;
-		/** Réaliser les course. */
-		int ACTION_50 = 50;
-    }
-
-	/** Nom de l'entité. */
-	public static final String NAME = "shopList";
 	
 	/**
 	 * Clones the current bean.

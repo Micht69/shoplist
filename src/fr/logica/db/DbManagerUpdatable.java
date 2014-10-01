@@ -1,6 +1,7 @@
 package fr.logica.db;
 
 import java.lang.ref.WeakReference;
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -28,27 +29,15 @@ public class DbManagerUpdatable extends DbManager {
 
 	public void insertRow(Entity bean) throws SQLException {
 
-		try {
-			rs.moveToInsertRow();
-		} catch (SQLException e) {
-			throw new RuntimeException("Move to Insert row failed.", e);
-		}
+		rs.moveToInsertRow();
 		putToResultSet(bean, rs, true);
-		try {
-			rs.insertRow();
-		} catch (SQLException e) {
-			throw e;
-		}
+		rs.insertRow();
 	}
 
 	public void updateRow(Entity bean) throws SQLException {
 
 		putToResultSet(bean, rs, true);
-		try {
-			rs.updateRow();
-		} catch (SQLException e) {
-			throw e;
-		}
+		rs.updateRow();
 	}
 
 	/**
@@ -66,22 +55,22 @@ public class DbManagerUpdatable extends DbManager {
 		rs.deleteRow();
 	}
 
+
 	/**
 	 * Gestion des id : si seulement un id est du type Compteur, alors set automatique avec la nextVal
 	 * 
-	 * @param entity
-	 * @param RequestContext
-	 * @return
+	 * @param entity Current entity
+	 * @param ctx Current request context
+	 * @return the given entity with autoincrement fields updated
 	 */
 	public static Entity fillAutoIncrement(Entity entity, RequestContext ctx) {
 		for (String fieldName : entity.getModel().getFields()) {
 			if (entity.getModel().isAutoIncrementField(fieldName) && entity.invokeGetter(fieldName) == null) {
+				// Auto Increment field is not filled
 				// compute delta here to avoid context alive when getting count from db but dead when computing delta
 				int delta = concurrentAccesses(entity.getModel().name(), ctx);
-				// Auto Increment field is not filled
 				String selectNextValSql = "SELECT MAX(" + entity.getModel().getField(fieldName).getSqlName() + ") + 1 FROM "
 						+ entity.getModel().dbName();
-
 				DbManager dbManager = new DbManager(ctx, selectNextValSql);
 				Integer nextVal = 1;
 				if (dbManager.next()) {
@@ -101,7 +90,7 @@ public class DbManagerUpdatable extends DbManager {
 	 * 
 	 * @param entityName
 	 * @param ctx
-	 * @return
+	 * @return count of concurrent access
 	 */
 	private static synchronized int concurrentAccesses(String entityName, RequestContext ctx) {
 		int delta = 0;
@@ -113,14 +102,17 @@ public class DbManagerUpdatable extends DbManager {
 			while (it.hasNext()) {
 				WeakReference<RequestContext> weakRequestContext = it.next();
 				RequestContext rc = weakRequestContext.get();
-				if (rc != null) {
-					DbConnection dbCxn = rc.getDbConnection();
-					if (dbCxn.getCnx() == null) {
-						// connection closed --> remove context
-						weakRequestContext.clear();
-						it.remove();
+				if (rc != null)
+					try {
+						Connection cxn = (rc.hasDbConnection() ? rc.getDbConnection().getCnx() : null);
+						if (cxn == null || cxn.isClosed()) {
+							// connection closed --> remove context
+							weakRequestContext.clear();
+							it.remove();
+						}
+					} catch (SQLException e) {
+						// do nothing, context will be removed when garbaged
 					}
-				}
 			}
 			// get delta from unique contexts
 			if (!contexts.contains(ctx)) {
@@ -134,5 +126,7 @@ public class DbManagerUpdatable extends DbManager {
 		}
 		return delta;
 	}
+
+
 
 }

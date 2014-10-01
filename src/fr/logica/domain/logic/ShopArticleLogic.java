@@ -28,7 +28,10 @@ import fr.logica.business.DefaultLogic;
 import fr.logica.business.Key;
 import fr.logica.business.context.RequestContext;
 import fr.logica.business.controller.Request;
-import fr.logica.domain.models.ShopShelfModel;
+import fr.logica.db.DB;
+import fr.logica.domain.constants.ShopArticleConstants;
+import fr.logica.domain.constants.ShopListLArticleConstants;
+import fr.logica.domain.constants.ShopShelfConstants;
 import fr.logica.domain.objects.ShopArticle;
 import fr.logica.domain.objects.ShopList;
 import fr.logica.domain.objects.ShopListLArticle;
@@ -40,12 +43,12 @@ import fr.logica.ui.Message;
  * 
  * @author CGI
  */
-public class ShopArticleLogic extends DefaultLogic<ShopArticle> {
+public class ShopArticleLogic extends DefaultLogic<ShopArticle> implements ShopArticleConstants {
 	private final Logger logger = Logger.getLogger(this.getClass());
 
 	@Override
 	public void dbOnSave(ShopArticle bean, Action action, RequestContext ctx) {
-		if (action.getCode() == ShopArticle.Action.ACTION_50) {
+		if (action.getCode() == ShopArticleConstants.Actions.ACTION_50) {
 			// Import from EAN database
 			logger.debug("EAN import.");
 			searchUPCdatabase(bean, ctx);
@@ -55,14 +58,14 @@ public class ShopArticleLogic extends DefaultLogic<ShopArticle> {
 
 	@Override
 	public void dbPostLoad(ShopArticle bean, Action action, RequestContext ctx) {
-		if (action.getCode() == ShopArticle.Action.ACTION_50) {
+		if (action.getCode() == ShopArticleConstants.Actions.ACTION_50) {
 			User user = ctx.getSessionContext().getUser();
 			if (user.eanCode != null) {
 				bean.setEan13(user.eanCode);
 				user.eanCode = null;
 			}
 			if (user.eanShelf != null) {
-				bean.setForeignKey("shopArticleRShelf", new Key(ShopShelfModel.ENTITY_NAME, user.eanShelf));
+				bean.setForeignKey("shopArticleRShelf", new Key(ShopShelfConstants.ENTITY_NAME, user.eanShelf));
 				user.eanShelf = null;
 			}
 		}
@@ -76,13 +79,13 @@ public class ShopArticleLogic extends DefaultLogic<ShopArticle> {
 			for (Key articlePk : keys) {
 				ShopListLArticle lienListeArticle = new ShopListLArticle();
 				lienListeArticle.setListId(liste.getId());
-				if (articlePk.getValue(ShopArticle.Var.ID) instanceof String)
-					lienListeArticle.setArticleId(Integer.parseInt((String) articlePk.getValue(ShopArticle.Var.ID)));
+				if (articlePk.getValue(ShopArticleConstants.Vars.ID) instanceof String)
+					lienListeArticle.setArticleId(Integer.parseInt((String) articlePk.getValue(ShopArticleConstants.Vars.ID)));
 				else
-					lienListeArticle.setArticleId((Integer) articlePk.getValue(ShopArticle.Var.ID));
+					lienListeArticle.setArticleId((Integer) articlePk.getValue(ShopArticleConstants.Vars.ID));
 				lienListeArticle.setQuantity(1);
-				lienListeArticle.setStatus(ShopListLArticle.ValueList.STATUS.BUY);
-				lienListeArticle.persist(ctx);
+				lienListeArticle.setStatus(ShopListLArticleConstants.ValueList.STATUS.BUY);
+				DB.persist(lienListeArticle, ctx);
 			}
 		}
 		return super.doCustomAction(request, entity, keys, ctx);

@@ -2,6 +2,7 @@ package fr.logica.application.logic;
 
 import java.io.Serializable;
 
+import fr.logica.domain.constants.ShopUserConstants;
 import fr.logica.domain.objects.ShopUser;
 import fr.logica.security.DefaultUser;
 
@@ -23,12 +24,12 @@ public class User extends DefaultUser implements Serializable {
 
 	public User() {
 		super();
-		this.profile = ShopUser.ValueList.PROFILE.USER;
+		this.profile = ShopUserConstants.ValueList.PROFILE.USER;
 	}
 
 	public User(String login) {
 		super(login);
-		this.profile = ShopUser.ValueList.PROFILE.USER;
+		this.profile = ShopUserConstants.ValueList.PROFILE.USER;
 	}
 	
 	public User(ShopUser dbUser) {
