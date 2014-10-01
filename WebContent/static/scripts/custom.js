@@ -19,17 +19,19 @@ function doPageCustomize(pageName) {
 function doListCustomize(queryName, pageName) {
 	$(".filter").focus();
 	
-	// Handle action fix
-	$(window).scroll(function() {
-		var $actions = $('.actions');
-		if ($(this).scrollTop() > 165) {
-			$actions.addClass('fixed');
-			$actions.parent().css('padding-top', $actions.height());
-		} else {
-			$actions.removeClass('fixed');
-			$actions.parent().css('padding-top', '0px');
-		}
-	});
+	// Handle actions position for small screens
+	if ($(window).width() < 980) {
+		$(window).scroll(function() {
+			var $actions = $('.actions');
+			if ($(this).scrollTop() > 165) {
+				$actions.addClass('fixed');
+				$actions.parent().css('padding-top', $actions.height());
+			} else {
+				$actions.removeClass('fixed');
+				$actions.parent().css('padding-top', '0px');
+			}
+		});
+	}
 }
 
 /**
