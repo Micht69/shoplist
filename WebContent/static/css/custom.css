@@ -13,6 +13,16 @@
 	background-color: white;
 }
 
+.fixed {
+	position: fixed;
+	top: 0;
+	right: 0;
+	z-index: 1000;
+}
+.table_container > .fixed > .actions-col:first-child {
+	display: none;
+}
+
 @media screen and (max-width: 980px) {
 	/**
 	 * Should be applied only on mobile device
@@ -33,6 +43,7 @@
 	}
 	.content {
 		padding: 0px;
+		margin: 0px;
 		width: 100%;
 	}
 	.footer { 
@@ -58,9 +69,6 @@
 	
 	.filter-line {
 		display: inline;
-	}
-	.table_container > .actions > table > tbody > tr > td:first-child > span.filter-line > input.filter {
-		width: auto;
 	}
 	.ariane {
 		display: none;
@@ -132,4 +140,11 @@
 		font-size: 26px !important;
 	}
 	*/
+	
+	#mainForm > .inner-content > .form_container, 
+	.group .form_container, 
+	.mainTable_container,
+	.ui-accordion {
+		width: calc(100% - 2px);
+	}
 }

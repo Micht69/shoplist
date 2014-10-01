@@ -58,32 +58,30 @@
 						<div class="table_title"><h:outputText value="#{jsfCtrl.getLabel('shopListLArticleLList_SHOP_ARTICLES_SHOPPING', 'shopListShopping.0.shopListLArticleLList')}" /></div>
 						<div class="table_container">
 							<div class="actions">
-								<table style="width: 100%">
-									<tr>
-										<td style="text-align: left;" class="filter">
-											<span class="filter-line">
-												<span><h:outputText value="#{jsfCtrl.getXhtmlLabel('labels', 'filtrer')}" /></span>
-												<h:outputText value=" " />
-												
-												<h:inputText id="globalFilter_shopListLArticleLList_shopArticlesShopping" value="#{jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES_SHOPPING', 'SHOP_LIST_L_ARTICLE').jsFilter}" onkeyup="showLines(null, this.value, 'i0_shopListLArticleLList_shopArticlesShopping')" styleClass="filter linklist-filter" />
-												
-												<span id="filterCount_SHOP_ARTICLES_SHOPPING"> </span>
-											</span>
-										</td>
-										<td style="text-align: right;"><span class="allActionButtons">
-											<h:panelGroup rendered="#{!jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES_SHOPPING', 'SHOP_LIST_L_ARTICLE').readonly}">
-												<span class="listButtons" id="buttonshopListLArticleLList_shopArticlesShopping">
-													<h:commandButton id="shopListLArticleLList_shopArticlesShopping_button60" alt='commandButton60' styleClass="btn_icon btn_medium"
+								<div class="actions-col filter">
+									<span class="filter-line">
+										<span><h:outputText value="#{jsfCtrl.getXhtmlLabel('labels', 'filtrer')}" /></span>
+										<h:outputText value=" " />
+										
+										<h:inputText id="globalFilter_shopListLArticleLList_shopArticlesShopping" value="#{jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES_SHOPPING', 'SHOP_LIST_L_ARTICLE').jsFilter}" onkeyup="showLines(null, this.value, 'i0_shopListLArticleLList_shopArticlesShopping')" styleClass="filter linklist-filter" />
+										
+										<span id="filterCount_SHOP_ARTICLES_SHOPPING"> </span>
+									</span>
+								</div>
+								<div class="actions-col">
+									<span class="allActionButtons">
+										<h:panelGroup rendered="#{!jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES_SHOPPING', 'SHOP_LIST_L_ARTICLE').readonly}">
+											<span class="listButtons" id="buttonshopListLArticleLList_shopArticlesShopping">
+												<h:commandButton id="shopListLArticleLList_shopArticlesShopping_button60" alt='commandButton60' styleClass="btn_icon btn_medium"
 													rendered="#{sessionCtrl.isActionRendered('shopListLArticle', 60) and !jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES_SHOPPING', 'SHOP_LIST_L_ARTICLE').protected}"
 													value="#{jsfCtrl.getXhtmlLabel('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_60')}" title="#{jsfCtrl.getXhtmlLabel('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_60')}" action="#{jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES_SHOPPING', 'SHOP_LIST_L_ARTICLE').prepareActionCode(60)}" style="background-image: url('#{application.contextPath}/static/img/icons/mark.png');" />
-													<h:outputText value=" " />
-												</span>
-											</h:panelGroup>
-											<h:commandButton id="shopListLArticleLList_shopArticlesShopping_buttonXls" alt="commandButtonXlsExport" rendered="#{applicationCtrl.displayXlsExport and jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES_SHOPPING', 'SHOP_LIST_L_ARTICLE').rows.size() > 0}" styleClass="btn_medium"
-												value="#{jsfCtrl.getXhtmlLabel('labels', 'boutons.exportExcel')}" action="#{jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES_SHOPPING', 'SHOP_LIST_L_ARTICLE').export('xls')}" />
-										</span></td>
-									</tr>
-								</table>
+												<h:outputText value=" " />
+											</span>
+										</h:panelGroup>
+										<h:commandButton id="shopListLArticleLList_shopArticlesShopping_buttonXls" alt="commandButtonXlsExport" rendered="#{applicationCtrl.displayXlsExport and jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES_SHOPPING', 'SHOP_LIST_L_ARTICLE').rows.size() > 0}" styleClass="btn_medium"
+											value="#{jsfCtrl.getXhtmlLabel('labels', 'boutons.exportExcel')}" action="#{jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES_SHOPPING', 'SHOP_LIST_L_ARTICLE').export('xls')}" />
+									</span>
+								</div>
 								<h:commandButton id="shopListLArticleLList_shopArticlesShopping_launchAction" action="#{jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES_SHOPPING', 'SHOP_LIST_L_ARTICLE').prepareDefaultAction('60')}" disabled="#{not jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES_SHOPPING', 'SHOP_LIST_L_ARTICLE').hasAvailableActionIn('60')}" style="display:none;"/> 
 								<h:inputText id="shopListLArticleLList_shopArticlesShopping_launchActionSelected" value="#{jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES_SHOPPING', 'SHOP_LIST_L_ARTICLE').selectedRowEncodedKey}" style="display:none" />
 							</div>

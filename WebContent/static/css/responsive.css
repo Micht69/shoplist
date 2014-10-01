@@ -28,6 +28,14 @@
 		padding-bottom: 0px;
 		width: 100%;
 	}
+	#mainForm {
+		display: block;
+		width: 100%;
+	}
+	.inner-content {
+		display: block;
+		width: 100%;
+	}
 	.footer { 
 		position: relative; 
 		width: 100%;
@@ -59,6 +67,27 @@
 	}
 	
 	/* Form fields */
+	.mainTable_container > .table_container {
+		padding: 4px 2px 9px 2px;
+	}
+	.table_container > .actions > .actions {
+		display: block;
+		width: 100%;
+	}
+	.table_container > .actions > .actions-col {
+		display: block;
+		width: 100% !important;
+	}
+	.table_container > .actions > .actions-col:first-child {
+		margin-bottom: 2px;
+	}
+	.table_container > .actions > div:first-child > span.filter-line,
+	.table_container > .actions > div:first-child > span.filter-line > input.filter {
+		width: calc(100% - 38px);
+	}
+	#mainForm > .inner-content > .group > .col {
+		padding-top: 5px;
+	}
 	.col-1,
 	.col-2 {
 		display: block;
@@ -95,8 +124,38 @@
 		padding: 3px 7px;
 		font-size: medium;
 	}
+	.ui-accordion > div {
+		padding: 4px 2px 9px 2px;
+	}
 
 	.language_selector input[type=image] {
 		margin-right: 4px;
+	}
+	
+	a.btn_medium ~ .listButtons, 
+	input.btn_medium ~ .listButtons {
+		margin-left: 0px;
+	}
+	.listButtons ~ a.btn_medium, 
+	.listButtons ~ input.btn_medium, 
+	.listButtons ~ .listButtons, 
+	a.btn_medium ~ a.btn_medium {
+		margin-left: 2px;
+	}
+	.actions ~ .list_results_container, .actions ~ .results_container {
+		margin-top: 5px;
+	}
+}
+@media screen and (max-width: 490px) {
+	.col-label,
+	.col-value {
+		display: inline-block;
+		width: auto;
+		text-align: left;
+		padding: 5px 2px 0px 2px
+	}
+	
+	.mainTable_container > .table_container > .actions > div:first-child {
+		display: none;
 	}
 }

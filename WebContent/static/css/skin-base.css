@@ -342,28 +342,41 @@ input.inline {
 * Lists
 ******************************************************************************/
 
-.table_container > .actions > table > tbody > tr {
+.table_container > .actions {
+	display: table;
+	width: 100%;
+}
+.table_container > .actions > .actions-col {
+	display: table-cell;
+	text-align: right;
+}
+.table_container > .actions > .actions-col:first-child {
+	width: 50%;
+	text-align: left;
+}
+
+.table_container > .actions > div {
 	height: 30px;
 }
 
 /* The full filter line */
-.table_container > .actions > table > tbody > tr > td:first-child > span.filter-line {
+.table_container > .actions > div:first-child > span.filter-line {
 	position: relative;
 }
 
 /* The text about filtering */
-.table_container > .actions > table > tbody > tr > td:first-child > span.filter-line > span:first-child {
+.table_container > .actions > div:first-child > span.filter-line > span:first-child {
 	display: none;
 }
 
 /* Filtering field */
-.table_container > .actions > table > tbody > tr > td:first-child > span.filter-line > input.filter {
+.table_container > .actions > div:first-child > span.filter-line > input.filter {
 	width: 250px;
 	padding-left: 30px;
 }
 
 /* Adding an icon */
-.table_container > .actions > table > tbody > tr > td:first-child > span.filter-line > span:last-child:before {
+.table_container > .actions > div:first-child > span.filter-line > span:last-child:before {
 	content: url("../img/form/icon-filter.png");
 	position: absolute;
 	top: -7px;

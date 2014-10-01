@@ -40,6 +40,15 @@ public class ShopListLArticleLogic extends DefaultLogic<ShopListLArticle> implem
 
 		return desc.toString();
 	}
+	
+	@Override
+	public List<Key> doCustomAction(Request<ShopListLArticle> request, ShopListLArticle entity, RequestContext ctx) {
+		if (request.getAction().getCode() == ShopListLArticleConstants.Actions.ACTION_60) {
+			// Mark as buyed
+			markAsBuyed(entity, ctx);
+		}
+		return super.doCustomAction(request, entity, ctx);
+	}
 
 	@Override
 	public List<Key> doCustomAction(Request<ShopListLArticle> request, ShopListLArticle entity, List<Key> keys, RequestContext ctx) {
@@ -47,8 +56,7 @@ public class ShopListLArticleLogic extends DefaultLogic<ShopListLArticle> implem
 			// Mark as buyed
 			for (Key k : keys) {
 				ShopListLArticle e = DB.get(ShopListLArticleConstants.ENTITY_NAME, k, ctx);
-				e.setStatus(ShopListLArticleConstants.ValueList.STATUS.DONE);
-				DB.persist(e, ctx);
+				markAsBuyed(e, ctx);
 			}
 		} else if (request.getAction().getCode() == ShopListLArticleConstants.Actions.ACTION_20) {
 			// Custom delete
@@ -60,6 +68,11 @@ public class ShopListLArticleLogic extends DefaultLogic<ShopListLArticle> implem
 			}
 		}
 		return super.doCustomAction(request, entity, keys, ctx);
+	}
+	
+	private void markAsBuyed(ShopListLArticle e, RequestContext ctx) {
+		e.setStatus(ShopListLArticleConstants.ValueList.STATUS.DONE);
+		DB.persist(e, ctx);
 	}
 
 	@Override

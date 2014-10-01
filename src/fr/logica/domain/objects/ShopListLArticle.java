@@ -28,7 +28,7 @@ import fr.logica.domain.constants.ShopListLArticleConstants;
 	@Action(code = 70, input = Input.NONE, persistence = Persistence.UPDATE, ui = UserInterface.NONE, process = fr.logica.business.Action.Process.CUSTOM),
 	@Action(code = 2, persistence = Persistence.UPDATE),
 	@Action(code = 20, pageName = "SHOP_LIST_L_ARTICLE_DELETE", input = Input.MANY, persistence = Persistence.DELETE, ui = UserInterface.READONLY, process = fr.logica.business.Action.Process.CUSTOM),
-	@Action(code = 60, input = Input.MANY, persistence = Persistence.UPDATE, ui = UserInterface.NONE, process = fr.logica.business.Action.Process.CUSTOM)
+	@Action(code = 60, persistence = Persistence.UPDATE, ui = UserInterface.NONE, process = fr.logica.business.Action.Process.CUSTOM)
 })
 public class ShopListLArticle extends Entity implements Serializable {
 	/** serialVersionUID */
