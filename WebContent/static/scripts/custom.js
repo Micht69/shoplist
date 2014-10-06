@@ -8,13 +8,23 @@ function doPageCustomize(pageName) {
 	try {
 		$("#mainForm .col-value input:visible, #mainForm .col-value select:visible").first().focus();
 	} catch (e) {}
+	// Handle numeric fields for mobile display
+	if ($(window).width() < 980) {
+		if (pageName == 'SHOP_LIST_L_ARTICLE') {
+			$("input[id$='shopListLArticle_quantity']").attr('type', 'number');
+		} else if (pageName == 'SHOP_SHELF') {
+			$("input[id$='shopShelf_position']").attr('type', 'number');
+		}
+	}
 }
 
 /**
  * Method to allow JS list customization.
  * 
- * @param queryName the name of the query
- * @param pageName the name of the page displaying the list
+ * @param queryName
+ *            the name of the query
+ * @param pageName
+ *            the name of the page displaying the list
  */
 function doListCustomize(queryName, pageName) {
 	$(".filter").focus();
