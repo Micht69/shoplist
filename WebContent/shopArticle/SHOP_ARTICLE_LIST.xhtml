@@ -44,7 +44,7 @@
 				<span class="filter-line">
 					<span><h:outputText value="#{jsfCtrl.getXhtmlLabel('labels', 'filtrer')}" /></span>
 					<h:outputText value=" " />
-					<h:inputText id="globalFilter_SHOP_ARTICLE" value="#{jsfCtrl.uiList('SHOP_ARTICLE', false).jsFilter}" onkeyup="showLines(null, this.value, 'SHOP_ARTICLE')" styleClass="filter" />
+					<h:inputText id="globalFilter_SHOP_ARTICLE" value="#{jsfCtrl.uiList('SHOP_ARTICLE', false).jsFilter}" onkeyup="showLines(null, this.value, 'SHOP_ARTICLE')" styleClass="filter" autocomplete="off" />
 					<span id="filterCount_SHOP_ARTICLE"> </span>
 				</span>
 			</div>
