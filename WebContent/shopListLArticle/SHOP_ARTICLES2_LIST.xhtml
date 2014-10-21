@@ -34,73 +34,75 @@
 				</tr>
 			</table>
 		</h3>
-
 		<div id="resultatsBody">
-
 		<div class="table_container">
-		
-		<div class="actions">
-			<div class="actions-col">
-				<span class="filter-line">
-					<span><h:outputText value="#{jsfCtrl.getXhtmlLabel('labels', 'filtrer')}" /></span>
-					<h:outputText value=" " />
-					<h:inputText id="globalFilter_SHOP_ARTICLES2" value="#{jsfCtrl.uiList('SHOP_ARTICLES2', false).jsFilter}" onkeyup="showLines(null, this.value, 'SHOP_ARTICLES2')" styleClass="filter" />
-					<span id="filterCount_SHOP_ARTICLES2"> </span>
-				</span>
+			<div class="actions">
+				<div class="actions-col actions-col1">
+					<span class="filter-line">
+						<span><h:outputText value="#{jsfCtrl.getXhtmlLabel('labels', 'filtrer')}" /></span>
+						<h:outputText value=" " />
+						<h:inputText id="globalFilter_SHOP_ARTICLES2" value="#{jsfCtrl.uiList('SHOP_ARTICLES2', false).jsFilter}" onkeyup="showLines(null, this.value, 'SHOP_ARTICLES2')" styleClass="filter" autocomplete="off" />
+						<span id="filterCount_SHOP_ARTICLES2"> </span>
+					</span>
+				</div>
+				<div class="actions-col actions-col2">
+					<span class="allActionButtons">
+						<h:panelGroup rendered="#{jsfCtrl.select}">
+							<span class="listButtons" id="buttonSHOP_ARTICLES2">
+								<h:commandButton id="SHOP_ARTICLES2_buttonSelect" alt="commandButtonSelect" styleClass="btn_medium" 
+									onclick="if (actionClicked) { alert('Traitement en cours. Veuillez patienter...');return false;} else { actionClicked = true; return true; }"
+									value="#{jsfCtrl.getXhtmlLabel('labels', 'action.selectionner')}" action="#{jsfCtrl.validate}"/>
+							</span>
+							<h:commandButton id="SHOP_ARTICLES2_buttonCancel" alt="cancelButtonSelect" styleClass="btn_medium"
+								onclick="if (actionClicked) { alert('Traitement en cours. Veuillez patienter...');return false;} else { actionClicked = true; return true; }"
+								value="#{jsfCtrl.getXhtmlLabel('labels', 'action.annuler')}" action="#{jsfCtrl.cancel}"/>
+						</h:panelGroup>
+						<h:panelGroup rendered="#{applicationCtrl.displaySelectActions or !jsfCtrl.select}">
+			
+							<h:commandButton id="SHOP_ARTICLES2_button0" alt='commandButton0' styleClass="btn_icon btn_medium"
+								onclick="if (actionClicked) { alert('Traitement en cours. Veuillez patienter...');return false;} else { actionClicked = true; return true; }"
+								rendered="#{sessionCtrl.isActionRendered('shopListLArticle', 0)}"
+								value="#{jsfCtrl.getXhtmlLabel('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_0')}" title="#{jsfCtrl.getXhtmlLabel('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_0')}" action="#{jsfCtrl.uiList('SHOP_ARTICLES2', false).prepareActionCode(0)}" style="background-image: url('#{application.contextPath}/static/img/icons/create.png');" />
+			
+							<h:commandButton id="SHOP_ARTICLES2_button70" alt='commandButton70' styleClass="btn_icon btn_medium"
+								onclick="if (actionClicked) { alert('Traitement en cours. Veuillez patienter...');return false;} else { actionClicked = true; return true; }"
+								rendered="#{sessionCtrl.isActionRendered('shopListLArticle', 70)}"
+								value="#{jsfCtrl.getXhtmlLabel('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_70')}" title="#{jsfCtrl.getXhtmlLabel('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_70')}" action="#{jsfCtrl.uiList('SHOP_ARTICLES2', false).prepareActionCode(70)}" style="background-image: url('#{application.contextPath}/static/img/icons/select.png');" />
+			
+							<h:commandButton id="SHOP_ARTICLES2_button71" alt='commandButton71' styleClass="btn_icon btn_medium"
+								onclick="if (actionClicked) { alert('Traitement en cours. Veuillez patienter...');return false;} else { actionClicked = true; return true; }"
+								rendered="#{sessionCtrl.isActionRendered('shopListLArticle', 71)}"
+								value="#{jsfCtrl.getXhtmlLabel('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_71')}" title="#{jsfCtrl.getXhtmlLabel('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_71')}" action="#{jsfCtrl.uiList('SHOP_ARTICLES2', false).prepareActionCode(71)}" style="background-image: url('#{application.contextPath}/static/img/icons/barcode.png');" />
+			
+							<span class="listButtons" id="buttonSHOP_ARTICLES2">
+			
+								<h:commandButton id="SHOP_ARTICLES2_button2" alt='commandButton2' styleClass="btn_icon btn_medium"
+									onclick="if (actionClicked) { alert('Traitement en cours. Veuillez patienter...');return false;} else { actionClicked = true; return true; }"
+									rendered="#{sessionCtrl.isActionRendered('shopListLArticle', 2)}"
+									value="#{jsfCtrl.getXhtmlLabel('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_2')}" title="#{jsfCtrl.getXhtmlLabel('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_2')}" action="#{jsfCtrl.uiList('SHOP_ARTICLES2', false).prepareActionCode(2)}" style="background-image: url('#{application.contextPath}/static/img/icons/edit.png');" />
+			
+								<h:commandButton id="SHOP_ARTICLES2_button20" alt='commandButton20' styleClass="btn_icon btn_medium"
+									onclick="if (actionClicked) { alert('Traitement en cours. Veuillez patienter...');return false;} else { actionClicked = true; return true; }"
+									rendered="#{sessionCtrl.isActionRendered('shopListLArticle', 20)}"
+									value="#{jsfCtrl.getXhtmlLabel('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_20')}" title="#{jsfCtrl.getXhtmlLabel('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_20')}" action="#{jsfCtrl.uiList('SHOP_ARTICLES2', false).prepareActionCode(20)}" style="background-image: url('#{application.contextPath}/static/img/icons/delete.png');" />
+			
+								<h:commandButton id="SHOP_ARTICLES2_buttonDefaultAction" alt='commandButton05' styleClass="btn_icon btn_medium"
+									onclick="if (actionClicked) { alert('Traitement en cours. Veuillez patienter...');return false;} else { actionClicked = true; return true; }"
+									rendered="#{sessionCtrl.isDisplayActionRendered('shopListLArticle', 2)}"
+									value="Consulter" title="Consulter" action="#{jsfCtrl.prepareMultiAction('shopListLArticle', 5, 5, jsfCtrl.uiList('SHOP_ARTICLES2', false).selectedPk, null)}" style="background-image: url('#{application.contextPath}/static/img/icons/edit.png');" />
+			
+							</span>
+						</h:panelGroup>
+							<h:commandButton id="SHOP_ARTICLES2_buttonXls" alt='commandButtonXlsExport' styleClass="btn_medium"
+								rendered="#{!jsfCtrl.select and applicationCtrl.displayXlsExport}" value="#{jsfCtrl.getXhtmlLabel('labels', 'boutons.exportExcel')}" action="#{jsfCtrl.uiList('SHOP_ARTICLES2', false).export('xls')}" />
+			
+					</span>
+				</div>
+			
+				<h:commandButton id="launchAction" action="#{jsfCtrl.uiList('SHOP_ARTICLES2', false).prepareDefaultAction('2,20')}" 
+					disabled="#{not jsfCtrl.uiList('SHOP_ARTICLES2', false).hasAvailableActionIn('2,20')}" style="display:none;"/> 
+				<h:inputText id="launchActionSelected" value="#{jsfCtrl.uiList('SHOP_ARTICLES2', false).selectedRowEncodedKey}" style="display:none" />
 			</div>
-			<div class="actions-col">
-				<span class="allActionButtons">
-					<h:panelGroup rendered="#{jsfCtrl.select}">
-						<span class="listButtons" id="buttonSHOP_ARTICLES2">
-							<h:commandButton id="SHOP_ARTICLES2_buttonSelect" alt="commandButtonSelect" styleClass="btn_medium" 
-								onclick="if (actionClicked) { alert('Traitement en cours. Veuillez patienter...');return false;} else { actionClicked = true; return true; }"
-								value="#{jsfCtrl.getXhtmlLabel('labels', 'action.selectionner')}" action="#{jsfCtrl.validate}"/>
-						</span>
-						<h:commandButton id="SHOP_ARTICLES2_buttonCancel" alt="cancelButtonSelect" styleClass="btn_medium"
-							onclick="if (actionClicked) { alert('Traitement en cours. Veuillez patienter...');return false;} else { actionClicked = true; return true; }"
-							value="#{jsfCtrl.getXhtmlLabel('labels', 'action.annuler')}" action="#{jsfCtrl.cancel}"/>
-					</h:panelGroup>
-					<h:panelGroup rendered="#{applicationCtrl.displaySelectActions or !jsfCtrl.select}">
-		
-						<h:commandButton id="SHOP_ARTICLES2_button0" alt='commandButton0' styleClass="btn_icon btn_medium"
-							onclick="if (actionClicked) { alert('Traitement en cours. Veuillez patienter...');return false;} else { actionClicked = true; return true; }"
-							rendered="#{sessionCtrl.isActionRendered('shopListLArticle', 0)}"
-							value="#{jsfCtrl.getXhtmlLabel('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_0')}" title="#{jsfCtrl.getXhtmlLabel('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_0')}" action="#{jsfCtrl.uiList('SHOP_ARTICLES2', false).prepareActionCode(0)}" style="background-image: url('#{application.contextPath}/static/img/icons/create.png');" />
-		
-						<h:commandButton id="SHOP_ARTICLES2_button70" alt='commandButton70' styleClass="btn_icon btn_medium"
-							onclick="if (actionClicked) { alert('Traitement en cours. Veuillez patienter...');return false;} else { actionClicked = true; return true; }"
-							rendered="#{sessionCtrl.isActionRendered('shopListLArticle', 70)}"
-							value="#{jsfCtrl.getXhtmlLabel('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_70')}" title="#{jsfCtrl.getXhtmlLabel('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_70')}" action="#{jsfCtrl.uiList('SHOP_ARTICLES2', false).prepareActionCode(70)}" style="background-image: url('#{application.contextPath}/static/img/icons/select.png');" />
-		
-						<span class="listButtons" id="buttonSHOP_ARTICLES2">
-		
-							<h:commandButton id="SHOP_ARTICLES2_button2" alt='commandButton2' styleClass="btn_icon btn_medium"
-								onclick="if (actionClicked) { alert('Traitement en cours. Veuillez patienter...');return false;} else { actionClicked = true; return true; }"
-								rendered="#{sessionCtrl.isActionRendered('shopListLArticle', 2)}"
-								value="#{jsfCtrl.getXhtmlLabel('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_2')}" title="#{jsfCtrl.getXhtmlLabel('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_2')}" action="#{jsfCtrl.uiList('SHOP_ARTICLES2', false).prepareActionCode(2)}" style="background-image: url('#{application.contextPath}/static/img/icons/edit.png');" />
-		
-							<h:commandButton id="SHOP_ARTICLES2_button20" alt='commandButton20' styleClass="btn_icon btn_medium"
-								onclick="if (actionClicked) { alert('Traitement en cours. Veuillez patienter...');return false;} else { actionClicked = true; return true; }"
-								rendered="#{sessionCtrl.isActionRendered('shopListLArticle', 20)}"
-								value="#{jsfCtrl.getXhtmlLabel('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_20')}" title="#{jsfCtrl.getXhtmlLabel('genLabels', 'SHOP_LIST_L_ARTICLE_ACTION_20')}" action="#{jsfCtrl.uiList('SHOP_ARTICLES2', false).prepareActionCode(20)}" style="background-image: url('#{application.contextPath}/static/img/icons/delete.png');" />
-		
-							<h:commandButton id="SHOP_ARTICLES2_buttonDefaultAction" alt='commandButton05' styleClass="btn_icon btn_medium"
-								onclick="if (actionClicked) { alert('Traitement en cours. Veuillez patienter...');return false;} else { actionClicked = true; return true; }"
-								rendered="#{sessionCtrl.isDisplayActionRendered('shopListLArticle', 2)}"
-								value="Consulter" title="Consulter" action="#{jsfCtrl.prepareMultiAction('shopListLArticle', 5, 5, jsfCtrl.uiList('SHOP_ARTICLES2', false).selectedPk, null)}" style="background-image: url('#{application.contextPath}/static/img/icons/edit.png');" />
-		
-						</span>
-					</h:panelGroup>
-						<h:commandButton id="SHOP_ARTICLES2_buttonXls" alt='commandButtonXlsExport' styleClass="btn_medium"
-							rendered="#{!jsfCtrl.select and applicationCtrl.displayXlsExport}" value="#{jsfCtrl.getXhtmlLabel('labels', 'boutons.exportExcel')}" action="#{jsfCtrl.uiList('SHOP_ARTICLES2', false).export('xls')}" />
-		
-				</span>
-			</div>
-		
-			<h:commandButton id="launchAction" action="#{jsfCtrl.uiList('SHOP_ARTICLES2', false).prepareDefaultAction('2,20')}" 
-				disabled="#{not jsfCtrl.uiList('SHOP_ARTICLES2', false).hasAvailableActionIn('2,20')}" style="display:none;"/> 
-			<h:inputText id="launchActionSelected" value="#{jsfCtrl.uiList('SHOP_ARTICLES2', false).selectedRowEncodedKey}" style="display:none" />
-		</div>
 	
 			<div class="list_results_container">
 				<h:panelGroup id="noResult" layout="block" styleClass="no-result">
@@ -120,48 +122,44 @@
 					<h:column rendered="#{jsfCtrl.uiList('SHOP_ARTICLES2', false).columns.T3_name.visible}">
  						<f:facet name="header">
 							<h:commandLink style="#{jsfCtrl.uiList('SHOP_ARTICLES2', false).sortedStyle('T3_name')}">
-								<f:ajax render=":mainForm:messages :mainForm:tableSHOP_ARTICLES2" listener="#{jsfCtrl.uiList('SHOP_ARTICLES2', false).sortBy('T3_name')}"></f:ajax>
+								<f:ajax onevent="disableColClick" render=":mainForm:messages :mainForm:tableSHOP_ARTICLES2" listener="#{jsfCtrl.uiList('SHOP_ARTICLES2', false).sortBy('T3_name')}"></f:ajax>
 								<h:outputText value="#{jsfCtrl.uiList('SHOP_ARTICLES2', false).columns.T3_name.title}" />
 							</h:commandLink>
 							<h:outputText value=" " />
 						</f:facet>
-							 			
 						<h:outputLabel value="#{tempVar.T3_name}" />
 					</h:column>
 
 					<h:column rendered="#{jsfCtrl.uiList('SHOP_ARTICLES2', false).columns.T4_name.visible}">
  						<f:facet name="header">
 							<h:commandLink style="#{jsfCtrl.uiList('SHOP_ARTICLES2', false).sortedStyle('T4_name')}">
-								<f:ajax render=":mainForm:messages :mainForm:tableSHOP_ARTICLES2" listener="#{jsfCtrl.uiList('SHOP_ARTICLES2', false).sortBy('T4_name')}"></f:ajax>
+								<f:ajax onevent="disableColClick" render=":mainForm:messages :mainForm:tableSHOP_ARTICLES2" listener="#{jsfCtrl.uiList('SHOP_ARTICLES2', false).sortBy('T4_name')}"></f:ajax>
 								<h:outputText value="#{jsfCtrl.uiList('SHOP_ARTICLES2', false).columns.T4_name.title}" />
 							</h:commandLink>
 							<h:outputText value=" " />
 						</f:facet>
-							 			
 						<h:outputLabel value="#{tempVar.T4_name}" />
 					</h:column>
 
 					<h:column rendered="#{jsfCtrl.uiList('SHOP_ARTICLES2', false).columns.T1_quantity.visible}">
  						<f:facet name="header">
 							<h:commandLink style="#{jsfCtrl.uiList('SHOP_ARTICLES2', false).sortedStyle('T1_quantity')}">
-								<f:ajax render=":mainForm:messages :mainForm:tableSHOP_ARTICLES2" listener="#{jsfCtrl.uiList('SHOP_ARTICLES2', false).sortBy('T1_quantity')}"></f:ajax>
+								<f:ajax onevent="disableColClick" render=":mainForm:messages :mainForm:tableSHOP_ARTICLES2" listener="#{jsfCtrl.uiList('SHOP_ARTICLES2', false).sortBy('T1_quantity')}"></f:ajax>
 								<h:outputText value="#{jsfCtrl.uiList('SHOP_ARTICLES2', false).columns.T1_quantity.title}" />
 							</h:commandLink>
 							<h:outputText value=" " />
 						</f:facet>
-							 			
 						<h:outputLabel value="#{tempVar.T1_quantity}" />
 					</h:column>
 
 					<h:column rendered="#{jsfCtrl.uiList('SHOP_ARTICLES2', false).columns.T1_status.visible}">
  						<f:facet name="header">
 							<h:commandLink style="#{jsfCtrl.uiList('SHOP_ARTICLES2', false).sortedStyle('T1_status')}">
-								<f:ajax render=":mainForm:messages :mainForm:tableSHOP_ARTICLES2" listener="#{jsfCtrl.uiList('SHOP_ARTICLES2', false).sortBy('T1_status')}"></f:ajax>
+								<f:ajax onevent="disableColClick" render=":mainForm:messages :mainForm:tableSHOP_ARTICLES2" listener="#{jsfCtrl.uiList('SHOP_ARTICLES2', false).sortBy('T1_status')}"></f:ajax>
 								<h:outputText value="#{jsfCtrl.uiList('SHOP_ARTICLES2', false).columns.T1_status.title}" />
 							</h:commandLink>
 							<h:outputText value=" " />
 						</f:facet>
-							 			
 						<h:outputLabel value="#{tempVar.T1_status}" />
 					</h:column>
 					<f:facet name="footer">
@@ -171,9 +169,6 @@
 					</f:facet>
 				</h:dataTable>
 				</h:panelGroup>
-				
-
-
 			</div>
 		</div>
 		</div>
@@ -186,7 +181,6 @@
 				displayResults();
 			}
 			initList('SHOP_ARTICLES2');
-
 		}
 	}
 </script>
@@ -195,7 +189,6 @@ $(document).ready(function() {
 	try {
 		initList('SHOP_ARTICLES2');
 		#{jsfCtrl.uiList('SHOP_ARTICLES2', false).displayCriterias ? 'listInitialized = false;' : ''}
-
 		<h:outputText value="doListCustomize('SHOP_ARTICLES2', 'SHOP_ARTICLES2_LIST');" rendered="#{!sessionCtrl.disableJS}"/>
 		showLines(null, '#{jsfCtrl.uiList('SHOP_ARTICLES2', false).jsFilter}', 'SHOP_ARTICLES2');
 	} catch (e) {}

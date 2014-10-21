@@ -56,7 +56,7 @@ public abstract class SecurityFunctionTree {
 
 		insertNewEntity("shopArticle", 0, 2, 4, 5, 50);
 		insertNewEntity("shopList", 0, 2, 4, 5, 50);
-		insertNewEntity("shopListLArticle", 0, 51, 70, 2, 20, 60);
+		insertNewEntity("shopListLArticle", 0, 51, 70, 71, 2, 20, 60);
 		insertNewEntity("shopShelf", 0, 2, 4, 5);
 		insertNewEntity("shopUser", 0, 2, 4, 5);
 	}

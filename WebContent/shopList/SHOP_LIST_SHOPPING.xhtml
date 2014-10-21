@@ -58,17 +58,17 @@
 						<div class="table_title"><h:outputText value="#{jsfCtrl.getLabel('shopListLArticleLList_SHOP_ARTICLES_SHOPPING', 'shopListShopping.0.shopListLArticleLList')}" /></div>
 						<div class="table_container">
 							<div class="actions">
-								<div class="actions-col filter">
+								<div class="actions-col actions-col1 filter">
 									<span class="filter-line">
 										<span><h:outputText value="#{jsfCtrl.getXhtmlLabel('labels', 'filtrer')}" /></span>
 										<h:outputText value=" " />
 										
-										<h:inputText id="globalFilter_shopListLArticleLList_shopArticlesShopping" value="#{jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES_SHOPPING', 'SHOP_LIST_L_ARTICLE').jsFilter}" onkeyup="showLines(null, this.value, 'i0_shopListLArticleLList_shopArticlesShopping')" styleClass="filter linklist-filter" />
+										<h:inputText id="globalFilter_shopListLArticleLList_shopArticlesShopping" value="#{jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES_SHOPPING', 'SHOP_LIST_L_ARTICLE').jsFilter}" onkeyup="showLines(null, this.value, 'i0_shopListLArticleLList_shopArticlesShopping')" styleClass="filter linklist-filter" autocomplete="off" />
 										
 										<span id="filterCount_SHOP_ARTICLES_SHOPPING"> </span>
 									</span>
 								</div>
-								<div class="actions-col">
+								<div class="actions-col actions-col2">
 									<span class="allActionButtons">
 										<h:panelGroup rendered="#{!jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES_SHOPPING', 'SHOP_LIST_L_ARTICLE').readonly}">
 											<span class="listButtons" id="buttonshopListLArticleLList_shopArticlesShopping">
@@ -103,7 +103,7 @@
 										<h:column rendered="#{jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES_SHOPPING', 'SHOP_LIST_L_ARTICLE').columns.T3_name.visible}">
 											<f:facet name="header">
 												<h:commandLink style="#{jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES_SHOPPING', 'SHOP_LIST_L_ARTICLE').sortedStyle('T3_name')}">
-													<f:ajax render=":mainForm:messages :mainForm:tablei0_shopListLArticleLList_shopArticlesShopping" listener="#{jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES_SHOPPING', 'SHOP_LIST_L_ARTICLE').sortBy('T3_name')}"></f:ajax>
+													<f:ajax onevent="disableColClick" render=":mainForm:messages :mainForm:tablei0_shopListLArticleLList_shopArticlesShopping" listener="#{jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES_SHOPPING', 'SHOP_LIST_L_ARTICLE').sortBy('T3_name')}"></f:ajax>
 													<h:outputText value="#{jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES_SHOPPING', 'SHOP_LIST_L_ARTICLE').columns.T3_name.title}" />
 												</h:commandLink>
 												<h:outputText value=" " />
@@ -113,7 +113,7 @@
 										<h:column rendered="#{jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES_SHOPPING', 'SHOP_LIST_L_ARTICLE').columns.T4_name.visible}">
 											<f:facet name="header">
 												<h:commandLink style="#{jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES_SHOPPING', 'SHOP_LIST_L_ARTICLE').sortedStyle('T4_name')}">
-													<f:ajax render=":mainForm:messages :mainForm:tablei0_shopListLArticleLList_shopArticlesShopping" listener="#{jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES_SHOPPING', 'SHOP_LIST_L_ARTICLE').sortBy('T4_name')}"></f:ajax>
+													<f:ajax onevent="disableColClick" render=":mainForm:messages :mainForm:tablei0_shopListLArticleLList_shopArticlesShopping" listener="#{jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES_SHOPPING', 'SHOP_LIST_L_ARTICLE').sortBy('T4_name')}"></f:ajax>
 													<h:outputText value="#{jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES_SHOPPING', 'SHOP_LIST_L_ARTICLE').columns.T4_name.title}" />
 												</h:commandLink>
 												<h:outputText value=" " />
@@ -123,7 +123,7 @@
 										<h:column rendered="#{jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES_SHOPPING', 'SHOP_LIST_L_ARTICLE').columns.T1_quantity.visible}">
 											<f:facet name="header">
 												<h:commandLink style="#{jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES_SHOPPING', 'SHOP_LIST_L_ARTICLE').sortedStyle('T1_quantity')}">
-													<f:ajax render=":mainForm:messages :mainForm:tablei0_shopListLArticleLList_shopArticlesShopping" listener="#{jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES_SHOPPING', 'SHOP_LIST_L_ARTICLE').sortBy('T1_quantity')}"></f:ajax>
+													<f:ajax onevent="disableColClick" render=":mainForm:messages :mainForm:tablei0_shopListLArticleLList_shopArticlesShopping" listener="#{jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES_SHOPPING', 'SHOP_LIST_L_ARTICLE').sortBy('T1_quantity')}"></f:ajax>
 													<h:outputText value="#{jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES_SHOPPING', 'SHOP_LIST_L_ARTICLE').columns.T1_quantity.title}" />
 												</h:commandLink>
 												<h:outputText value=" " />
@@ -133,7 +133,7 @@
 										<h:column rendered="#{jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES_SHOPPING', 'SHOP_LIST_L_ARTICLE').columns.T1_status.visible}">
 											<f:facet name="header">
 												<h:commandLink style="#{jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES_SHOPPING', 'SHOP_LIST_L_ARTICLE').sortedStyle('T1_status')}">
-													<f:ajax render=":mainForm:messages :mainForm:tablei0_shopListLArticleLList_shopArticlesShopping" listener="#{jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES_SHOPPING', 'SHOP_LIST_L_ARTICLE').sortBy('T1_status')}"></f:ajax>
+													<f:ajax onevent="disableColClick" render=":mainForm:messages :mainForm:tablei0_shopListLArticleLList_shopArticlesShopping" listener="#{jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES_SHOPPING', 'SHOP_LIST_L_ARTICLE').sortBy('T1_status')}"></f:ajax>
 													<h:outputText value="#{jsfCtrl.uiBackRefList('shopListLArticleLList', 'shopListLArticle', 'SHOP_ARTICLES_SHOPPING', 'SHOP_LIST_L_ARTICLE').columns.T1_status.title}" />
 												</h:commandLink>
 												<h:outputText value=" " />

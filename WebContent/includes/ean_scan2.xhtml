@@ -1,0 +1,41 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:ui="http://java.sun.com/jsf/facelets" 
+	xmlns:f="http://java.sun.com/jsf/core" xmlns:hh="http://cgi.com/jsf/html"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+<h:body>
+<ui:composition>
+	<c:set var="scanPage" value="#{request.requestURL.substring(0, request.requestURL.length() - request.requestURI.length())}#{request.contextPath}/" />
+
+	<div style="text-align: center;">
+		<a href="#" onclick="scanBarcode(); return false;"><img src="../static/img/barcode.jpg" title="Scanner un code barre" /></a><br/>
+		<h:outputText value="cliquez pour scanner" style="font-size: smaller;" />
+	</div>
+	<script type="text/javascript">
+		function scanBarcode() {
+			var url = "zxing://scan/?ret=";
+			
+			var retUrl = '#{scanPage}index/viewAccess.jsf?actionCode=71&amp;entityName=shopListLArticle&amp;code={CODE}';
+			url += encodeURIComponent(retUrl);
+			
+			//console.log(url);
+			window.location.href = url;
+		}
+	</script>
+	
+	<h:panelGroup rendered="false">
+	<br/>
+	<a href="#" onclick="scanBarcodeDebug(); return false;">Debug mode</a><br/>
+	<script type="text/javascript">
+		function scanBarcodeDebug() {
+			var retUrl = '#{scanPage}index/viewAccess.jsf?actionCode=71&amp;entityName=shopListLArticle&amp;code=3106980002007';
+			window.location.href = retUrl;
+		}
+	</script>
+	<br/>
+	<br/>
+	<h:outputText value="#{header['user-agent']}" />
+	</h:panelGroup>
+</ui:composition>
+</h:body>
+</html>

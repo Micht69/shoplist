@@ -1,9 +1,9 @@
 
 ### Generated with layers
-* jsf2-3.2.5-SNAPSHOT
-* jweb-3.2.5-SNAPSHOT
-* rorschach-3.2.2-SNAPSHOT
-* sql-3.2.3-SNAPSHOT
+* jsf2-3.2.8-SNAPSHOT
+* jweb-3.2.9-SNAPSHOT
+* rorschach-3.2.4-SNAPSHOT
+* sql-3.2.5-SNAPSHOT
 
 ### Generation options
 exportData=true

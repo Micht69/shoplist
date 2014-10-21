@@ -21,6 +21,7 @@ public class User extends DefaultUser implements Serializable {
 	public String profile;
 	public String eanCode;
 	public String eanShelf;
+	public Integer listId;
 
 	public User() {
 		super();

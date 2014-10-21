@@ -24,6 +24,8 @@ public interface ShopListLArticleConstants {
 		String STATUS = "status";
 		/** Var DELETE_INFOS */
 		String DELETE_INFOS = "deleteInfos";
+		/** Var ITEM_EAN13 */
+		String ITEM_EAN13 = "itemEan13";
 	}
 
 	/** Holder for the defined values */
@@ -44,6 +46,8 @@ public interface ShopListLArticleConstants {
 		int ACTION_51 = 51;
 		/** Sélectionner articles. */
 		int ACTION_70 = 70;
+		/** Scan. */
+		int ACTION_71 = 71;
 		/** Modifier. */
 		int ACTION_2 = 2;
 		/** Supprimer. */
@@ -66,6 +70,8 @@ public interface ShopListLArticleConstants {
 
 	/** Holder for the page names */
 	public interface Pages {
+		/** Page SHOP_LIST_L_ARTICLE_SCAN. */
+		public static final String SHOP_LIST_L_ARTICLE_SCAN = "SHOP_LIST_L_ARTICLE_SCAN";
 		/** Page SHOP_LIST_L_ARTICLE_DELETE. */
 		public static final String SHOP_LIST_L_ARTICLE_DELETE = "SHOP_LIST_L_ARTICLE_DELETE";
 		/** Page SHOP_LIST_L_ARTICLE. */
@@ -74,8 +80,12 @@ public interface ShopListLArticleConstants {
 
 	/** Holder for the templates names */
 	public interface Templates {
+		/** Template SHOP_LIST_L_ARTICLE_SCAN. */
+		public static final String SHOP_LIST_L_ARTICLE_SCAN = "shopListLArticleScan";
 		/** Template SHOP_LIST_L_ARTICLE_DELETE. */
 		public static final String SHOP_LIST_L_ARTICLE_DELETE = "shopListLArticleDelete";
+		/** Template SHOP_LIST_L_ARTICLE_SCAN_5_EAN_SCAN. */
+		public static final String SHOP_LIST_L_ARTICLE_SCAN_5_EAN_SCAN = "shopListLArticleScan5EanScan";
 		/** Template SHOP_LIST_L_ARTICLE. */
 		public static final String SHOP_LIST_L_ARTICLE = "shopListLArticle";
 	}

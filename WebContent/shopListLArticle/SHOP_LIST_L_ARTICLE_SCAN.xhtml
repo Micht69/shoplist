@@ -1,0 +1,87 @@
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets" template="/templates/generic.xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core" xmlns:logica="http://java.sun.com/jsf/composite/logica" xmlns:hh="http://cgi.com/jsf/html" xmlns:p="http://primefaces.org/ui">
+
+<ui:define name="metadata">
+	<f:metadata>
+		<f:attribute name="entityName" value="shopListLArticle" />
+		<f:event type="preRenderView" listener="#{requestCtrl.initializeViewContext(jsfCtrl)}" />
+		<f:event type="preRenderView" listener="#{jsfCtrl.initializeView}" />
+	</f:metadata>
+</ui:define>
+
+<ui:define name="title"><h:outputText value="#{jsfCtrl.title}" /></ui:define>
+
+<ui:define name="body">
+	<div class="actions topActions">
+	<table style="width: 100%">
+		<tr>
+			<td width="1%" style="text-align: left; white-space: nowrap;">
+				<div id="advanced-actions">
+					<h:panelGroup rendered="#{commentCtrl.commentsEnabled}">
+						<h:commandLink id="commentAction" styleClass="btn_comment" value="#{commentCtrl.commentsCount('shopListLArticle', jsfCtrl.entity.primaryKey.encodedValue)}" title="#{jsfCtrl.getXhtmlLabel('labels', 'boutons.comment')}" onclick="commentPage();">
+							<f:ajax event="click" execute="@none" render="comment-list" />
+						</h:commandLink>
+						<ui:include src="../includes/comment.xhtml" />
+					</h:panelGroup>
+					<h:outputText value=" "/>
+					<h:commandButton id="printAction" styleClass="btn_print" image="../static/img/buttons/print.png" title="#{jsfCtrl.getXhtmlLabel('labels', 'boutons.print')}" onclick="window.print(); return false;" />
+					<h:outputText value=" "/>
+				</div>
+			</td>
+			<td width="99%" style="text-align: right; white-space: nowrap;">
+				<h:commandButton id="validateAction" rendered="#{!jsfCtrl.displaySubActions()}" styleClass="btn_medium" value="#{jsfCtrl.getXhtmlLabel('labels', 'boutons.valider')}"
+					action="#{jsfCtrl.validate}" onclick="if (actionClicked) { alert('Traitement en cours. Veuillez patienter...');return false;} else { actionClicked = true; return true; }" />
+				<h:outputText value=" "/>
+				<h:commandButton id="cancelAction" immediate="true" styleClass="btn_medium" value="#{jsfCtrl.getXhtmlLabel('labels', 'boutons.annuler')}"
+					action="#{jsfCtrl.cancel}" onclick="return checkDirtyState(this);" />
+			</td>
+		</tr>
+	</table>
+	</div>
+	<h:panelGroup id="i0_shopListLArticleScan" rendered="#{jsfCtrl.uiGroupPanel('', 'shopListLArticle', 'shopListLArticleScan').visible}" layout="none">
+		<div class="group">
+			<div class="col col-1">
+				<ui:fragment rendered="#{jsfCtrl.isVisible('shopListLArticle.itemEan13')}">
+					<div class="col-label">
+						<h:outputLabel id="i1_shopListLArticleScan_shopListLArticle_itemEan13" escape="false" value="#{jsfCtrl.getLabel('shopListLArticle.itemEan13', 'shopListLArticleScan.shopListLArticle.itemEan13')}" title="#{jsfCtrl.getXhtmlLabel('tooltips', 'shopListLArticleScan.shopListLArticle.itemEan13')}"/>
+						<h:outputLabel value="*" styleClass="mandatory_label" rendered="#{jsfCtrl.isMandatory('shopListLArticle.itemEan13')}"/>
+					</div>
+					<div class="col-value">
+						<h:inputText style=""  disabled="#{jsfCtrl.readonly('','shopListLArticle','itemEan13')}" id="i0_shopListLArticleScan_shopListLArticle_itemEan13" value="#{jsfCtrl.entity.itemEan13}" label="#{jsfCtrl.getLabel('shopListLArticle.itemEan13', 'shopListLArticle.itemEan13')}" maxlength="13" onkeypress="markAsDirty(this)">
+							<f:validateLength maximum="13" />
+						</h:inputText>
+						<h:message for="i0_shopListLArticleScan_shopListLArticle_itemEan13" styleClass="errorLabel" />
+					</div>
+				</ui:fragment>
+			</div>
+			<div class="col col-1">
+				<ui:include src="../includes/ean_scan2.xhtml" />
+			</div>
+		</div>
+	</h:panelGroup>
+	<div class="actions bottomActions">
+	<table style="width: 100%">
+		<tr>
+			<td style="text-align: right;">
+				<h:commandButton id="validateAction2" rendered="#{!jsfCtrl.displaySubActions()}" styleClass="btn_medium" value="#{jsfCtrl.getXhtmlLabel('labels', 'boutons.valider')}"
+					action="#{jsfCtrl.validate}"  onclick="if (actionClicked) { alert('Traitement en cours. Veuillez patienter...');return false;} else { actionClicked = true; return true; }" />
+				<h:outputText value=" "/>
+				<h:commandButton id="cancelAction2" immediate="true" styleClass="btn_medium" value="#{jsfCtrl.getXhtmlLabel('labels', 'boutons.annuler')}"
+					action="#{jsfCtrl.cancel}" onclick="return checkDirtyState(this);" />
+			</td>
+		</tr>
+	</table>
+	</div>
+	<script type="text/javascript">
+	$(document).ready(function() {
+		try { 
+			<h:outputText value="doPageCustomize('SHOP_LIST_L_ARTICLE_SCAN');" rendered="#{!sessionCtrl.disableJS}"/>
+			$('td[class="first"]').click(function(event){
+				event.stopPropagation();
+			});
+		} catch (e) {}
+	});
+</script>
+</ui:define>
+</ui:composition>
+

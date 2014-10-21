@@ -19,7 +19,7 @@
 	right: 0;
 	z-index: 1000;
 }
-.table_container > .fixed > .actions-col:first-child {
+.table_container > .fixed > .actions-col1 {
 	display: none;
 }
 

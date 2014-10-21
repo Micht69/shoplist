@@ -88,6 +88,7 @@ public class SecurityManager extends DefaultSecurityManager {
 		ret.add(getQuerySecurityFunction(ShopListLArticleConstants.ENTITY_NAME, ShopListLArticleQuery.Query.QUERY_SHOP_LIST_L_ARTICLE));
 		ret.add(getActionSecurityFunction(ShopListLArticleConstants.ENTITY_NAME, ShopListLArticleConstants.Actions.ACTION_0));
 		ret.add(getActionSecurityFunction(ShopListLArticleConstants.ENTITY_NAME, ShopListLArticleConstants.Actions.ACTION_70));
+		ret.add(getActionSecurityFunction(ShopListLArticleConstants.ENTITY_NAME, ShopListLArticleConstants.Actions.ACTION_71));
 		ret.add(getActionSecurityFunction(ShopListLArticleConstants.ENTITY_NAME, ShopListLArticleConstants.Actions.ACTION_2));
 		ret.add(getActionSecurityFunction(ShopListLArticleConstants.ENTITY_NAME, ShopListLArticleConstants.Actions.ACTION_51));
 	}

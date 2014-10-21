@@ -44,11 +44,13 @@ public class ApplicationLogic extends DefaultApplicationLogic {
 	@Override
 	public Request<?> getPermalinkRequest(Map<String, String> parameters, RequestContext context) {
 		// Store custom data
+		User user = context.getSessionContext().getUser();
 		String code = parameters.get("code");
-		String shelf = parameters.get("shelf");
 		if (code != null && !"".equals(code)) {
-			User user = context.getSessionContext().getUser();
 			user.eanCode = code;
+		}
+		String shelf = parameters.get("shelf");
+		if (shelf != null && !"".equals(shelf)) {
 			user.eanShelf = shelf;
 		}
 		

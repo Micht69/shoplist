@@ -26,6 +26,7 @@ import fr.logica.domain.constants.ShopListLArticleConstants;
 	@Action(code = 0, nextAction = 51, input = Input.NONE, persistence = Persistence.INSERT),
 	@Action(code = 51, nextAction = 0, input = Input.NONE, persistence = Persistence.INSERT),
 	@Action(code = 70, input = Input.NONE, persistence = Persistence.UPDATE, ui = UserInterface.NONE, process = fr.logica.business.Action.Process.CUSTOM),
+	@Action(code = 71, pageName = "SHOP_LIST_L_ARTICLE_SCAN", input = Input.NONE, persistence = Persistence.INSERT, process = fr.logica.business.Action.Process.CUSTOM),
 	@Action(code = 2, persistence = Persistence.UPDATE),
 	@Action(code = 20, pageName = "SHOP_LIST_L_ARTICLE_DELETE", input = Input.MANY, persistence = Persistence.DELETE, ui = UserInterface.READONLY, process = fr.logica.business.Action.Process.CUSTOM),
 	@Action(code = 60, persistence = Persistence.UPDATE, ui = UserInterface.NONE, process = fr.logica.business.Action.Process.CUSTOM)
@@ -57,6 +58,10 @@ public class ShopListLArticle extends Entity implements Serializable {
 	/** Récapitulatif */
 	@EntityField(sqlName = "DELETE_INFOS", sqlType = SqlTypes.VARCHAR2, sqlSize = 1000, memory = fr.logica.business.EntityField.Memory.ALWAYS)
 	private String deleteInfos;
+
+	/** Ean13 */
+	@EntityField(sqlName = "ITEM_EAN13", sqlType = SqlTypes.VARCHAR2, sqlSize = 13, memory = fr.logica.business.EntityField.Memory.NEVER)
+	private String itemEan13;
 
 	/**
 	 * Initialize a new ShopListLArticle.<br/>
@@ -203,6 +208,24 @@ public class ShopListLArticle extends Entity implements Serializable {
 	 */
 	public void setDeleteInfos(final String deleteInfos) {
 		this.deleteInfos = deleteInfos;
+	}
+
+	/**
+	 * Get the value from field ItemEan13.
+	 *
+	 * @return the value
+	 */
+	public String getItemEan13() {
+		return this.itemEan13;
+	}
+
+	/**
+	 * Set the value from field ItemEan13.
+	 *
+	 * @param itemEan13 : the value to set
+	 */
+	public void setItemEan13(final String itemEan13) {
+		this.itemEan13 = itemEan13;
 	}
 
 	/**
