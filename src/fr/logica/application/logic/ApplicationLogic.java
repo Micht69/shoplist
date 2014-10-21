@@ -1,8 +1,12 @@
 package fr.logica.application.logic;
 
+import java.util.Map;
+
 import javax.faces.context.FacesContext;
 
 import fr.logica.application.DefaultApplicationLogic;
+import fr.logica.business.context.RequestContext;
+import fr.logica.business.controller.Request;
 import fr.logica.domain.constants.ShopListConstants;
 import fr.logica.jsf.controller.ViewController;
 import fr.logica.jsf.utils.JSFBeanUtils;
@@ -30,5 +34,24 @@ public class ApplicationLogic extends DefaultApplicationLogic {
 	@Override
 	public boolean enableXlsExport() {
 		return false;
+	}
+	
+	@Override
+	public boolean enablePermalink() {
+		return true;
+	}
+	
+	@Override
+	public Request<?> getPermalinkRequest(Map<String, String> parameters, RequestContext context) {
+		// Store custom data
+		String code = parameters.get("code");
+		String shelf = parameters.get("shelf");
+		if (code != null && !"".equals(code)) {
+			User user = context.getSessionContext().getUser();
+			user.eanCode = code;
+			user.eanShelf = shelf;
+		}
+		
+		return super.getPermalinkRequest(parameters, context);
 	}
 }

@@ -65,7 +65,8 @@ public class ShopArticleLogic extends DefaultLogic<ShopArticle> implements ShopA
 				user.eanCode = null;
 			}
 			if (user.eanShelf != null) {
-				bean.setForeignKey("shopArticleRShelf", new Key(ShopShelfConstants.ENTITY_NAME, user.eanShelf));
+				bean.setShelf(user.eanShelf);
+				bean.setForeignKey(ShopArticleConstants.Links.LINK_SHOP_ARTICLE_L_SHELF, new Key(ShopShelfConstants.ENTITY_NAME, user.eanShelf));
 				user.eanShelf = null;
 			}
 		}

@@ -23,6 +23,11 @@
 	display: none;
 }
 
+/* Hide permalink */
+label[id$=permalink] {
+	display: none;
+}
+
 @media screen and (max-width: 980px) {
 	/**
 	 * Should be applied only on mobile device

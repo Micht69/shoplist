@@ -11,12 +11,24 @@
 		<a href="#" onclick="scanBarcode(); return false;"><img src="../static/img/barcode.jpg" title="Scanner un code barre" /></a><br/>
 		<h:outputText value="cliquez pour scanner" style="font-size: smaller;" />
 	</div>
+	<script type="text/javascript">
+		function scanBarcode() {
+			var url = "zxing://scan/?ret=";
+			
+			var retUrl = '#{scanPage}index/viewAccess.jsf?actionCode=50&amp;entityName=shopArticle&amp;code={CODE}&amp;shelf='+$("select").val();
+			url += encodeURIComponent(retUrl);
+			
+			//console.log(url);
+			window.location.href = url;
+		}
+	</script>
+	
 	<h:panelGroup rendered="false">
 	<br/>
 	<a href="#" onclick="scanBarcodeDebug(); return false;">Debug mode</a><br/>
 	<script type="text/javascript">
 		function scanBarcodeDebug() {
-			var retUrl = '#{scanPage}scan.jsp?code=3106980002007<h:outputText value="&amp;" escape="false"/>shelf='+$("select").val();
+			var retUrl = '#{scanPage}index/viewAccess.jsf?actionCode=50&amp;entityName=shopArticle&amp;code=3106980002007&amp;shelf='+$("select").val();
 			window.location.href = retUrl;
 		}
 	</script>
@@ -24,17 +36,6 @@
 	<br/>
 	<h:outputText value="#{header['user-agent']}" />
 	</h:panelGroup>
-	<script type="text/javascript">
-		function scanBarcode() {
-			var url = "zxing://scan/?ret=";
-			
-			var retUrl = '#{scanPage}scan.jsp?code={CODE}<h:outputText value="&amp;" escape="false"/>shelf='+$("select").val();
-			url += encodeURIComponent(retUrl);
-			
-			//console.log(url);
-			window.location.href = url;
-		}
-	</script>
 </ui:composition>
 </h:body>
 </html>
