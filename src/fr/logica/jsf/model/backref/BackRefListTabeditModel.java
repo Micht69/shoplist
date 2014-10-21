@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 
@@ -29,6 +30,7 @@ import fr.logica.reflect.DomainUtils;
 import fr.logica.security.SecurityUtils;
 import fr.logica.ui.Message;
 import fr.logica.ui.Message.Severity;
+import fr.logica.ui.UiAccess;
 
 public class BackRefListTabeditModel extends BackRefListModel implements Serializable {
 
@@ -42,6 +44,8 @@ public class BackRefListTabeditModel extends BackRefListModel implements Seriali
 
 	public static final String CREATE_ACTION_NAME = "create";
 	public static final String MODIFY_ACTION_NAME = "modify";
+
+	public static final String LINKED_ENTITY = "linkedEntity";
 
 	private static final int NEW_LINE_ROWNUM = -1;
 
@@ -142,7 +146,21 @@ public class BackRefListTabeditModel extends BackRefListModel implements Seriali
 		if (keyIfNeeded == null) {
 			currentEntity = DomainUtils.newDomain(entityName);
 		} else {
+			// We put linked entity into context, this is currently the only way to pass info to custom method that will load object
+			ctx.putCustomData(LINKED_ENTITY, entity);
 			currentEntity = DB.get(entityName, keyIfNeeded, action, ctx);
+			ctx.removeCustomData(LINKED_ENTITY);
+		}
+		Set<String> protectedVars = new BusinessController().getEditableListVarIsProtected(currentEntity, action, queryName, ctx);
+		for (String varName : currentEntity.getModel().getFields()) {
+			String key = entityName + "." + varName;
+			UiAccess access = (UiAccess) viewCtrl.getCurrentView().getUiAccess().get(key);
+			if (access == null && protectedVars.contains(varName)) {
+				viewCtrl.getCurrentView().getUiAccess().put(key, new UiAccess(key, true, true, "", false));
+			} else if (access != null) {
+				access.readOnly = (protectedVars.contains(varName));
+				viewCtrl.getCurrentView().getUiAccess().put(key, access);
+			}
 		}
 	}
 

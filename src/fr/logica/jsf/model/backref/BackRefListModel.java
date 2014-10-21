@@ -73,6 +73,13 @@ public class BackRefListModel extends AbstractListModel implements Serializable 
 			readonly = data.isReadOnly();
 		}
 		isProtected = data.isProtected();
+		if (viewCtrl.getCurrentView().getAction().getPersistence() == Persistence.INSERT) {
+			// Current entity is not persisted yet, it can't be linked to anything
+			readonly = true;
+		} else {
+			readonly = data.isReadOnly();
+		}
+		isProtected = data.isProtected();
 	}
 
 	/**

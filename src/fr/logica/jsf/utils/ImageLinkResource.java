@@ -57,7 +57,6 @@ public class ImageLinkResource extends Resource {
 		return id;
 	}
 
-
 	private final String mediaId;
 
 	public ImageLinkResource(final String mediaId) {
@@ -96,7 +95,13 @@ public class ImageLinkResource extends Resource {
 			RequestContext ctx = null;
 			try {
 				ctx = new RequestContext(sessionCtrl.getContext());
-				content = DB.createDbEntity().getLobContent(ctx, e, varName);
+				if (e.getModel().getField(varName).isFromDatabase()) {
+					content = DB.createDbEntity().getLobContent(ctx, e, varName);
+				} else {
+					// We load full entity to go through doVarValue.
+					e = DB.get(entityName, pk, ctx);
+					content = (byte[]) e.invokeGetter(varName);
+				}
 			} finally {
 				if (ctx != null) {
 					ctx.close();

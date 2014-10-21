@@ -12,7 +12,6 @@ public class UiAccess implements Serializable {
 	public boolean readOnly;
 	public String label;
 	public boolean mandatory;
-	public boolean isProtected;
 
 	public UiAccess(String name, boolean isVisible, boolean isReadOnly, String label, boolean mandatory) {
 		this.name = name;

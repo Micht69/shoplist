@@ -74,7 +74,6 @@ public class TreeTableRenderer extends org.primefaces.component.treetable.TreeTa
 
 						writer.startElement("td", null);
 						if (treeNode.getChildCount() != 0) {
-							writer.writeAttribute("colspan", tt.getColumnsCount(), null);
 							if (columnStyleClass == null) {
 								columnStyleClass = "treetable-break-line-col";
 							} else {
@@ -109,10 +108,6 @@ public class TreeTableRenderer extends org.primefaces.component.treetable.TreeTa
 						column.encodeAll(context);
 
 						writer.endElement("td");
-						if (treeNode.getChildCount() != 0) {
-							// When we build a breaking column, we display only one cell with colspan.
-							break;
-						}
 					}
 				}
 

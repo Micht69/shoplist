@@ -5,6 +5,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -550,6 +551,16 @@ public class BusinessController implements Serializable {
 			UiAccess access = new UiAccess(linkName, visible, readOnly, label, mandatory);
 			uiAccess.put(linkName, access);
 		}
+		
+		for (String backRefName : entity.getModel().getBackRefNames()) {
+			// We won't check for back ref protection here cause it's done later, when ui model is loaded
+			boolean readOnly = action.getUi() == UserInterface.READONLY;
+			boolean mandatory = false;
+			boolean visible = isLinkVisible(entity, backRefName, action, context);
+			String label = getLinkLabel(entity, backRefName, action, context);
+			UiAccess access = new UiAccess(backRefName, visible, readOnly, label, mandatory);
+			uiAccess.put(backRefName, access);
+		}
 
 		return uiAccess;
 	}
@@ -1023,6 +1034,19 @@ public class BusinessController implements Serializable {
 			LOGGER.error(e.getMessage(), e);
 		}
 		return allowed;
+	}
+
+	public Set<String> getEditableListVarIsProtected(Entity entity, Action action, String queryName, RequestContext context) {
+		Set<String> protectedVars = new HashSet<String>();
+		DomainLogic domainLogic = DomainUtils.getLogic(entity.name());
+		context.putCustomData("editableList", queryName);
+		for (String varName : entity.getModel().getFields()) {
+			if (domainLogic.uiVarIsProtected(entity, varName, action, context)) {
+				protectedVars.add(varName);
+			}
+		}
+		context.removeCustomData("editableList");
+		return protectedVars;
 	}
 
 }

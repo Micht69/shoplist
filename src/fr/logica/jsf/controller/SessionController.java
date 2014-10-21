@@ -112,6 +112,10 @@ public class SessionController implements Serializable {
 						"Utilisateur / Mot de passe incorrect",
 						null));
 			}
+		} catch (FunctionalException fe) {
+			// Display user messages
+			FacesMessagesUtils.displayMessages(ctx, requestContext);
+			FacesMessagesUtils.displayMessages(fe);
 		} finally {
 			requestContext.close();
 		}

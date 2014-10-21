@@ -1015,3 +1015,8 @@ ul.ui-autocomplete .ui-menu-item > a.ui-state-focus {
 
 	background-repeat: repeat-x;
 }
+
+.ui-treetable-footer,
+.ui-treetable-scrollable-footer {
+	background: white;
+}

@@ -523,19 +523,10 @@ public class DbManager {
 					if (rs.wasNull()) {
 						rsResult = null;
 					}
-					if (var.model.hasDefinedValues()) {
-						rsResultDisplay = var.model.getDefinedLabel(rsResult, ctx.getSessionContext().getLocale());
-					}
 				} else if (var.model.getSqlType() == SqlTypes.BOOLEAN) {
 					rsResult = rs.getBoolean(index);
-					if (var.model.hasDefinedValues()) {
-						rsResultDisplay = var.model.getDefinedLabel(rsResult, ctx.getSessionContext().getLocale());
-					}
 				} else if (var.model.getSqlType() == SqlTypes.VARCHAR2 || var.model.getSqlType() == SqlTypes.CHAR) {
 					rsResult = rs.getString(index);
-					if (var.model.hasDefinedValues()) {
-						rsResultDisplay = var.model.getDefinedLabel(rsResult, ctx.getSessionContext().getLocale());
-					}
 				} else if (var.model.getSqlType() == SqlTypes.DATE) {
 					rsResult = rs.getDate(index);
 					if (rsResult != null) {
@@ -567,7 +558,12 @@ public class DbManager {
 				} else {
 					LOGGER.warn("Type non géré !!! : " + var.model.getSqlType());
 				}
-
+				
+				// Check for defined values field
+				if (var.model.hasDefinedValues()) {
+					// For dates, this will override formated value
+					rsResultDisplay = var.model.getDefinedLabel(rsResult, ctx.getSessionContext().getLocale());
+				}
 			} catch (SQLException ex) {
 				throw new TechnicalException("Erreur à la récupération du champ " + sqlName, ex);
 			}

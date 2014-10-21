@@ -451,6 +451,10 @@ public class ViewController implements Serializable {
 	 */
 	public String prepareView(String entityName, Action action, List<Key> keyList, String queryName, String linkName, Entity linkedEntity,
 			boolean backRef) {
+		// Update linked entities
+		for (DataModel dataModel : viewModels.values()) {
+			dataModel.validateView(currentView);
+		}
 		Request request = new Request(entityName, action, keyList, queryName, linkName, backRef);
 		request.setLinkedEntity(linkedEntity);
 		return prepareView(request);

@@ -3,8 +3,10 @@ package fr.logica.jsf.model.backref;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
@@ -215,6 +217,17 @@ public class BackRefListCategoryModel extends BackRefListModel {
 		for (TreeNode n : root.getChildren()) {
 			if (n instanceof BreakNode) {
 				((BreakNode) n).unselectAll();
+			}
+			n.setSelected(false);
+		}
+	}
+	
+	/** Sum cumulative columns in rows */
+	public void setCumulative(String summableCols) {
+		Set<String> sumColumns = new HashSet<String>(Arrays.asList(summableCols.split(",")));
+		for (TreeNode n : root.getChildren()) {
+			if (n instanceof BreakNode) {
+				((BreakNode) n).sum(sumColumns);
 			}
 			n.setSelected(false);
 		}

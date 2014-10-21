@@ -20,9 +20,9 @@ public class SessionContext implements Serializable {
 	private User user;
 
 	private Locale locale;
-
 	private Map<String, Object> attributes = new HashMap<String, Object>();
-		
+
+
 	public SessionContext(ApplicationContext appContext) {
 		this.appContext = appContext;
 	}

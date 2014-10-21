@@ -2,6 +2,7 @@ package fr.logica.jsf.model.list;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -120,14 +121,15 @@ public abstract class AbstractListModel extends DataModel implements Serializabl
 	}
 
 	protected Action getDefaultAction(String actionsString) {
-		return getDefaultAction(actionsString, Input.ONE);
+		return getDefaultAction(actionsString, Input.ONE, Input.MANY);
 	}
 
-	protected Action getDefaultAction(String actionsString, Input inputType) {
+	protected Action getDefaultAction(String actionsString, Input... inputType) {
 		if (actionsString == null || actionsString.trim().length() == 0) {
 			return null;
 		}
 		String[] actions = actionsString.split(",");
+		List<Input> inputTypes = Arrays.asList(inputType);
 		RequestContext context = new RequestContext(viewCtrl.getSessionCtrl().getContext());
 		try {
 			for (String actionCodeString : actions) {
@@ -148,7 +150,7 @@ public abstract class AbstractListModel extends DataModel implements Serializabl
 				if (isProtected && (action.getUi() != UserInterface.READONLY || action.getPersistence() != Persistence.NONE)) {
 					continue;
 				}
-				if (action.getInput() != inputType) {
+				if (!inputTypes.contains(action.getInput())) {
 					continue;
 				}
 				if (!SecurityUtils.getSecurityManager().isActionRendered(model.name(), action.getCode(),

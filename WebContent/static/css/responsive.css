@@ -78,7 +78,7 @@
 		display: block;
 		width: 100% !important;
 	}
-	.table_container > .actions > .actions-col:first-child {
+	.table_container > .actions > .actions-col1 {
 		margin-bottom: 2px;
 	}
 	.table_container > .actions > div:first-child > span.filter-line,

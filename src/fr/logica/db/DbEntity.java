@@ -366,11 +366,12 @@ public class DbEntity {
 	/**
 	 * Get the DbQuery for a given link.
 	 * 
-	 * @param e
-	 * @param linkName
-	 * @param queryName
-	 * @param selectAll
-	 * @param ctx
+	 * @param e The Entity.
+	 * @param linkName The link name.
+	 * @param queryName The query name.
+	 * @param selectAll if true, <code>queryName</code> is ignored and all variables are selected
+	 * @param ctx Request Context.
+	 *
 	 * @return the query matching the given link
 	 */
 	public DbQuery getLinkQuery(Entity e, String linkName, String queryName, boolean selectAll, RequestContext ctx) {
@@ -402,7 +403,7 @@ public class DbEntity {
 		if (foreignKey != null && !foreignKey.isNull()) {
 			if (isAssociative) {
 				String associatedLinkName = EntityManager.getEntityModel(backRefModel.getEntityName()).getAssociatedLink(linkName);
-				dbQuery.addEntity(backRefModel.getEntityName(), "ASSO_NN", associatedLinkName, null, Join.STRICT);
+				dbQuery.addEntity(backRefModel.getEntityName(), "ASSO_NN", associatedLinkName, null, Join.STRICT, false);
 				dbQuery.addCondKey(foreignKey, "ASSO_NN");
 			} else {
 				dbQuery.addCondKey(foreignKey, dbQuery.getAlias(backRefModel.getEntityName()));

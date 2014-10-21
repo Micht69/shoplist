@@ -343,16 +343,25 @@ input.inline {
 ******************************************************************************/
 
 .table_container > .actions {
-	display: table;
+	display: block;
+	background-color: white;
 	width: 100%;
 }
 .table_container > .actions > .actions-col {
-	display: table-cell;
+	display: inline-block;
 	text-align: right;
+	width: 100%;
 }
-.table_container > .actions > .actions-col:first-child {
+.table_container > .actions > .actions-col1 {
 	width: 50%;
 	text-align: left;
+}
+.table_container > .actions > .actions-col2 {
+	text-align: right;
+	float: right;
+}
+.table_container > .actions > .actions-col1 ~ .actions-col2 {
+	width: 50%;
 }
 
 .table_container > .actions > div {

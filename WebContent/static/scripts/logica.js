@@ -46,7 +46,8 @@ var invalidChars = [ '\u20ac' ];
 // Caractère d'autosplit
 var autosplit = '||';
 
-var listInitialized = true; 
+var listInitialized = true;
+var treeInitialized = true;
 
 function displayCriteres() {
 	var $criteresBody = $('#criteresBody');
@@ -80,6 +81,12 @@ function displayCriteres() {
 		$('.list_results_container').css('height', '');
 		initList(listName);
 		listInitialized = true;
+	}
+	if (!treeInitialized) {
+		var listName = $('#tableIdList').val();
+		$('.ui-treetable-scrollable-body').css('height', '');
+		initTreeTable(listName);
+		treeInitialized = true;
 	}
 }
 
@@ -148,6 +155,8 @@ $(document).ready(function() {
 	$("textarea:disabled").each(function(idx) {
 		$(this).hide();
 		$(this).before($(this).val().replace(/\n/g, '<br/>\n'));
+		//$(this).before($(this).val().replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br/>\n'));
+		//$(this).parent().css('white-space', 'normal');
 	});
 
 	var selectedTabs = new Array();
@@ -586,6 +595,10 @@ function initList(listName) {
 		$data.height(newListHeight - newListHeaderHeight);
 	}
 
+	disableColClick();
+}
+
+function disableColClick() {
 	$('td[class="first"]').click(function(event) {
 		event.stopPropagation();
 	});

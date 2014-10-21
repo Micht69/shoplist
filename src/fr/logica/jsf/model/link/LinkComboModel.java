@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringEscapeUtils;
+
 import fr.logica.business.Action.Input;
 import fr.logica.business.Action.UserInterface;
 import fr.logica.business.Entity;
@@ -100,6 +102,7 @@ public class LinkComboModel extends DataModel {
 		// Handle labels that appear more than once
 		Set<String> existingLabels = new HashSet<String>();
 		if (data != null) {
+			String mapKey;
 			for (Entry<Key, String> e : data.getComboValues().entrySet()) {
 				if (map.containsKey(e.getValue())) {
 					// This label already exists in map, flag it as a
@@ -113,15 +116,17 @@ public class LinkComboModel extends DataModel {
 					map.put(replacementLabel, existingKey);
 					// Add the new label
 					String uniqueLabel = e.getValue() + " (" + e.getKey().getEncodedValue() + ")";
-					map.put(uniqueLabel, e.getKey().getEncodedValue());
+					mapKey = uniqueLabel;
 				} else if (existingLabels.contains(e.getValue())) {
 					// Label already used, make it unique !
 					String uniqueLabel = e.getValue() + " (" + e.getKey().getEncodedValue() + ")";
-					map.put(uniqueLabel, e.getKey().getEncodedValue());
+					mapKey = uniqueLabel;
 				} else {
 					// Already unique label, just put it into the map
-					map.put(e.getValue(), e.getKey().getEncodedValue());
+					mapKey = e.getValue();
 				}
+				
+				map.put(StringEscapeUtils.escapeHtml4(mapKey), e.getKey().getEncodedValue());
 			}
 		}
 		return map;

@@ -237,20 +237,14 @@ public class DB {
 	 * @return Number of rows returned when executing query
 	 */
 	public static int count(DbQuery query, RequestContext ctx) {
-		DbQuery countQuery = query.clone();
-		countQuery.setCount(true);
-		int count = 0;
-		DbManager mgr = createDbManager(ctx, countQuery);
+		DbManager manager = null;
 		try {
-			if (mgr.next()) {
-				// La requête est en mode "comptage", il n'y a qu'une colonne qui
-				// contient 1 seul entier, le nombre de résultats.
-				count = mgr.getInt(1);
-			}
+			manager = dbFactory.createDbManager(ctx, query.clone());
+			return manager.count();
 		} finally {
-			mgr.close();
+			if (manager != null)
+				manager.close();
 		}
-		return count;
 	}
 
 	/** Gets a LOB content from database */
