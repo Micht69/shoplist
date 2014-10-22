@@ -17,6 +17,7 @@ import fr.logica.business.context.RequestContext;
 import fr.logica.business.controller.Request;
 import fr.logica.business.controller.Response;
 import fr.logica.db.DB;
+import fr.logica.db.DbException;
 import fr.logica.db.DbManager;
 import fr.logica.db.DbQuery;
 import fr.logica.domain.constants.ShopArticleConstants;
@@ -80,8 +81,12 @@ public class ShopListLArticleLogic extends DefaultLogic<ShopListLArticle> implem
 				lienListeArticle.setArticleId(article.getId());
 				lienListeArticle.setQuantity(1);
 				lienListeArticle.setStatus(ShopListLArticleConstants.ValueList.STATUS.BUY);
-				// TODO : Check if line exists ...
-				DB.persist(lienListeArticle, ctx);
+				try {
+					DB.insert(lienListeArticle, ctx);
+				} catch (DbException de)
+				{
+					ctx.getMessages().add(MessageUtils.addStringErrorMessage("L'article est déjà dans la liste."));
+				}
 			}
 		}
 		return super.doCustomAction(request, entity, ctx);

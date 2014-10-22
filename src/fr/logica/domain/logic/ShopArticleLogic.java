@@ -25,6 +25,7 @@ import fr.logica.application.logic.User;
 import fr.logica.business.Action;
 import fr.logica.business.Constants;
 import fr.logica.business.DefaultLogic;
+import fr.logica.business.FunctionalException;
 import fr.logica.business.Key;
 import fr.logica.business.context.RequestContext;
 import fr.logica.business.controller.Request;
@@ -91,12 +92,11 @@ public class ShopArticleLogic extends DefaultLogic<ShopArticle> implements ShopA
 		}
 		return super.doCustomAction(request, entity, keys, ctx);
 	}
-
-	private void searchUPCdatabase(ShopArticle bean, RequestContext ctx) {
+	
+	void searchUPCdatabase(ShopArticle bean, RequestContext ctx) {
 		String ean = bean.getEan13();
 		if (ean == null) {
-			ctx.getMessages().add(new Message("Veuillez entrer un code EAN.", Message.Severity.ERROR));
-			return;
+			throw new FunctionalException(new Message("Veuillez entrer un code EAN.", Message.Severity.ERROR));
 		}
 
 		String key = "";
@@ -111,8 +111,7 @@ public class ShopArticleLogic extends DefaultLogic<ShopArticle> implements ShopA
 			key = "ean";
 			// Valid length
 			if (!ean.matches("^[0-9]*$")) {
-				ctx.getMessages().add(new Message("Le code ne doit contenir que des chiffres.", Message.Severity.ERROR));
-				return;
+				throw new FunctionalException(new Message("Le code ne doit contenir que des chiffres.", Message.Severity.ERROR));
 			}
 
 			int total = 0;
@@ -124,13 +123,11 @@ public class ShopArticleLogic extends DefaultLogic<ShopArticle> implements ShopA
 
 			int c = Integer.parseInt(ean.substring(ean.length() - 1));
 			if (total != c) {
-				ctx.getMessages().add(new Message("Le code est invalide.", Message.Severity.ERROR));
-				return;
+				throw new FunctionalException(new Message("Le code est invalide.", Message.Severity.ERROR));
 			}
 			break;
 		default:
-			ctx.getMessages().add(new Message("Longueur invalide.", Message.Severity.ERROR));
-			return;
+			throw new FunctionalException(new Message("Longueur invalide.", Message.Severity.ERROR));
 		}
 
 		try {
@@ -161,15 +158,13 @@ public class ShopArticleLogic extends DefaultLogic<ShopArticle> implements ShopA
 				bean.setName((String) result.get("description"));
 				bean.setDescr((String) result.get("size"));
 			} else {
-				ctx.getMessages().add(new Message("Le code est introuvable.", Message.Severity.ERROR));
+				throw new FunctionalException(new Message("Le code est introuvable.", Message.Severity.ERROR));
 			}
-
-			return;
 		} catch (Exception e) {
-			ctx.getMessages().add(new Message(e.getMessage(), Message.Severity.ERROR));
 			logger.error(e);
+			throw new FunctionalException(new Message(e.getMessage(), Message.Severity.ERROR));
+			//ctx.getMessages().add(new Message(e.getMessage(), Message.Severity.ERROR));
 		}
-		return;
 	}
 
 	class MyTypeFactory extends TypeFactoryImpl {
