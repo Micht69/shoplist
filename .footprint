@@ -1,14 +1,15 @@
 
 ### Generated with layers
-* jsf2-3.2.8-SNAPSHOT
-* jweb-3.2.9-SNAPSHOT
-* rorschach-3.2.4-SNAPSHOT
-* sql-3.2.5-SNAPSHOT
+* jsf2-3.2.9-SNAPSHOT
+* jweb-3.2.10-SNAPSHOT
+* rorschach-3.2.5-SNAPSHOT
+* sql-3.2.6-SNAPSHOT
 
 ### Generation options
 exportData=true
 outPath=C:/dev/java/workspace/shoplist-gen
 locale=fr
+unicode=false
 lock=none
 webServer=tomcat7
 database=MYSQL

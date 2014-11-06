@@ -645,6 +645,13 @@ function initTreeTable(listName) {
 		$treeTable.css('height', $treeTable.height() - 4);
 	}
 	$treeTable.css('height', $treeTable.height() - 20);
+	
+	widthDiff = $(".ui-treetable-scrollable-header-box").width() - $(".ui-treetable-scrollable-body table").width(); 
+	if (widthDiff > 0) { 
+		headers = $(".ui-treetable-scrollable-header-box th"); 
+		lastHeader = headers.last(); 
+		lastHeader.width(lastHeader.width() + widthDiff - (widthDiff / headers.size())); 
+	}
 }
 
 var actionClicked = false;

@@ -2,7 +2,7 @@ package fr.logica.jsf.model.treetable;
 
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
-
+import fr.logica.business.Key;
 import fr.logica.business.data.Row;
 
 public class RowNode extends DefaultTreeNode {
@@ -26,5 +26,9 @@ public class RowNode extends DefaultTreeNode {
 	@Override
 	public Object getData() {
 		return data;
+	}
+
+	public Key getPrimaryKey() {
+		return data.getPk();
 	}
 }

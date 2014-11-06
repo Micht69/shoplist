@@ -346,6 +346,7 @@ input.inline {
 	display: block;
 	background-color: white;
 	width: 100%;
+	min-height: 30px;
 }
 .table_container > .actions > .actions-col {
 	display: inline-block;
@@ -365,7 +366,6 @@ input.inline {
 }
 
 .table_container > .actions > div {
-	height: 30px;
 }
 
 /* The full filter line */

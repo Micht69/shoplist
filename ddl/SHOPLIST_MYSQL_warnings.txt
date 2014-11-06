@@ -1,0 +1,23 @@
+-- Target Database : MYSQL
+
+-- Names translations
+-- Toy name --> Toy external name --> Table/column/index name
+
+------------------------
+-- Tables & variables --
+------------------------
+
+SHOP_LIST
+	USER	-->	USER	-->	`USER`
+
+SHOP_SHELF
+	POSITION	-->	POSITION	-->	`POSITION`
+
+SHOP_USER
+	PASSWORD	-->	PASSWORD	-->	`PASSWORD`
+
+
+-------------
+-- Indexes --
+-------------
+

@@ -84,7 +84,14 @@ public class LinkComboModel extends DataModel {
 	@Override
 	public void validateView(View currentView) {
 		if (!readonly) {
-			sourceEntity.setForeignKey(linkName, new Key(entityName, selectedValue));
+			Key oldForeignKey = sourceEntity.getForeignKey(linkName);
+			Key newForeignKey = new Key(entityName, selectedValue);
+			if (!newForeignKey.isNull() || oldForeignKey.isFull()) {
+				// We override when newForeignKey is not null OR when old foreign key was full. 
+				// We won't override if combo selects nothing and old foreign key was not full 
+				// so we won't remove partial key info
+				sourceEntity.setForeignKey(linkName, newForeignKey);
+			}
 		}
 	}
 

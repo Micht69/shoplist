@@ -13,6 +13,9 @@ import org.primefaces.component.treetable.TreeTable;
 import org.primefaces.model.TreeNode;
 import org.primefaces.renderkit.RendererUtils;
 
+/**
+ * Tree Table Renderer.
+ */
 public class TreeTableRenderer extends org.primefaces.component.treetable.TreeTableRenderer {
 
 	@Override
@@ -49,7 +52,19 @@ public class TreeTableRenderer extends org.primefaces.component.treetable.TreeTa
 					tt.getSelectedRowKeys().add(rowKey);
 				}
 
+				if (treeNode.getChildCount() != 0) {
+					// add a line with break label, the "normal" line will contain potential sums
+					addBreakCaptionLine(context, tt, treeNode, rowKey, parentRowKey, writer);
+				}
+
 				writer.startElement("tr", null);
+				if (treeNode.getChildCount() == 0) {
+					Boolean readOnly = (Boolean) tt.getAttributes().get("readOnly");
+					Object onRowClick = tt.getAttributes().get("onRowClick");
+					if (onRowClick != null && (null == readOnly || !readOnly)) {
+						writer.writeAttribute("onclick", onRowClick, null);
+					}
+				}
 				writer.writeAttribute("id", tt.getClientId(context) + "_node_" + rowKey, null);
 				writer.writeAttribute("class", rowStyleClass, null);
 				writer.writeAttribute("role", "row", null);
@@ -79,6 +94,17 @@ public class TreeTableRenderer extends org.primefaces.component.treetable.TreeTa
 							} else {
 								columnStyleClass += " treetable-break-line-col";
 							}
+							if (i < tt.getChildren().size() - 1) {
+								if (columnStyle == null) {
+									columnStyle = "";
+								}
+							}
+						} else if (i == 0) {
+							if (columnStyleClass == null) {
+								columnStyleClass = "first-gridcell";
+							} else {
+								columnStyleClass += " first-gridcell";
+							}
 						}
 						writer.writeAttribute("role", "gridcell", null);
 						if (columnStyle != null)
@@ -105,13 +131,17 @@ public class TreeTableRenderer extends org.primefaces.component.treetable.TreeTa
 							}
 						}
 
-						column.encodeAll(context);
+						if (treeNode.getChildCount() == 0 || i > 0) {
+							// we do not encode break label of first column here
+							column.encodeAll(context);
+						}
 
 						writer.endElement("td");
 					}
 				}
 
 				writer.endElement("tr");
+
 			}
 
 			// render child nodes if node is expanded or node itself is the root
@@ -127,4 +157,49 @@ public class TreeTableRenderer extends org.primefaces.component.treetable.TreeTa
 			}
 		}
 	}
+
+	private void addBreakCaptionLine(FacesContext context, TreeTable tt, TreeNode treeNode, String rowKey, String parentRowKey,
+			ResponseWriter writer) throws IOException {
+		String rowStyleClass = TreeTable.ROW_CLASS + " " + treeNode.getType();
+
+		String userRowStyleClass = tt.getRowStyleClass();
+		if (userRowStyleClass != null) {
+			rowStyleClass = rowStyleClass + " " + userRowStyleClass;
+		}
+		rowStyleClass += " treetable-break-line-header";
+
+		writer.startElement("tr", null);
+		writer.writeAttribute("class", rowStyleClass, null);
+		writer.writeAttribute("role", "row", null);
+		writer.writeAttribute("aria-expanded", String.valueOf(treeNode.isExpanded()), null);
+		writer.writeAttribute("data-rk", rowKey + "-header", null);
+
+		if (parentRowKey != null) {
+			writer.writeAttribute("data-prk", parentRowKey, null);
+		}
+
+		writer.startElement("td", null);
+		writer.writeAttribute("colspan", tt.getColumnsCount(), null);
+		Column column = (Column) tt.getChildren().get(0);
+		String columnStyleClass = column.getStyleClass();
+		String columnStyle = column.getStyle();
+		if (columnStyleClass == null) {
+			columnStyleClass = "";
+		}
+		columnStyleClass += " treetable-break-line-col";
+		if (columnStyle == null) {
+			columnStyle = "";
+		}
+		if (columnStyle != null)
+			writer.writeAttribute("style", columnStyle, null);
+
+		if (columnStyleClass != null)
+			writer.writeAttribute("class", columnStyleClass, null);
+
+		writer.writeAttribute("role", "gridcell", null);
+		column.encodeAll(context);
+		writer.endElement("td");
+		writer.endElement("tr");
+	}
+
 }

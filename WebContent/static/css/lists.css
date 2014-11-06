@@ -176,17 +176,32 @@ table tr td a.btn_tablerow input {
 .results_container > font {
 	position: absolute;
 	bottom: 0;
-    padding: 10px 0 0 5px;
+	padding: 10px 0 0 5px;
 }
 
 .treetable-break-line-col {
 	background-color: rgba(224, 232, 248, 0.4);
 }
+tr.treetable-break-line-header td {
+	border-bottom-width: 0px !important;
+}
+tr.treetable-break-line-header:hover td {
+	background-color: #eeeeee !important;
+	color: #222222 !important;
+}
 
-.list_results_container table tbody > tr:first-child > td.treetable-break-line-col:only-child {
-	border-width: 0 1px 1px 1px;
+.list_results_container table > tbody > tr > td.treetable-break-line-col {
+	border-width: 0px;
+	border-bottom-width: 1px;
 	border-style: solid;
-	border-color: #DDDDDD;
+	border-color: #b3b3b3;
+}
+.list_results_container table > tbody > tr > td.treetable-break-line-col:only-child,
+.list_results_container table > tbody > tr > td.treetable-break-line-col:last-child {
+	border-right-width: 1px;
+}
+.list_results_container table > tbody > tr > td.treetable-break-line-col:first-child {
+	border-left-width: 1px;
 }
 
 .ui-treetable .ui-treetable-header {
@@ -227,6 +242,13 @@ table tr td a.btn_tablerow input {
 	-webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
 	-moz-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
 	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.ui-treetable .ui-chkbox { 
+	border-radius: 2px; 
+	-webkit-border-radius: 2px;
+	-moz-border-radius: 2px;
+	border: 1px solid; 
 }
 
 .list_results_container table > tbody > tr.ui-state-highlight > td,
