@@ -133,6 +133,9 @@ label[id$=permalink] {
 	.list_results_container table tr, .results_container table tr {
 		height: 40px;
 	}
+	.datatable-div-data {
+		overflow-y: inherit;
+	}
 	/*
 	.content,
 	.content input,
